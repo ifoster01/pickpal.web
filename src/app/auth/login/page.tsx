@@ -90,7 +90,7 @@ export default function () {
                     })}>
                         Log In
                     </Button>
-                    <Text textAlign='center'>Don't have an account? <Button variant='link' onClick={() => router.push("/auth/signup")}>Sign Up</Button></Text>
+                    <Text textAlign='center'>Don&apos;t have an account? <Button variant='link' onClick={() => router.push("/auth/signup")}>Sign Up</Button></Text>
                 </Card.Body>
             </Card.Root>
         </VStack>
