@@ -8,7 +8,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: 'Pickpal',
+  title: 'Pickpockt',
   description: 'Sports betting made simple.',
 }
 

@@ -1,7 +1,7 @@
 "use client";
 import { VStack } from "@/styled-system/jsx";
 import Image from "next/image";
-import Logo from "public/pickpal long.svg";
+import Logo from "public/logos/pickpockt long.svg";
 import Google from "public/google.colored.svg";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
