@@ -16,33 +16,10 @@ export async function GET(request: Request) {
   }
 
   // If the user is signing up, create a new user in the database
-  const { data: user, error: error2 } = await supabase.auth.getUser();
+  const { data: user, error: error } = await supabase.auth.getUser();
 
-  if (error2) {
+  if (error) {
     return NextResponse.redirect(`${origin}/login`);
-  }
-
-  const { data: newUser, error: error1 } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", user?.user?.id);
-
-  if (error1) {
-    return NextResponse.redirect(`${origin}/login`);
-  }
-
-  if (newUser?.length === 0) {
-    const { error: error3 } = await supabase
-      .from("users")
-      .insert([{
-        id: user?.user?.id,
-        first_name: user?.user?.user_metadata?.full_name?.split(" ")[0],
-        last_name: user?.user?.user_metadata?.full_name?.split(" ")[1]
-    }]);
-
-    if (error3) {
-      return NextResponse.redirect(`${origin}/login`);
-    }
   }
 
   return NextResponse.redirect(`${origin}/authed`);
