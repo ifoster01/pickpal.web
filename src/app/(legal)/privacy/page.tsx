@@ -64,7 +64,7 @@ export default function () {
                 6. User Choices
             </Text>
             <Text>
-                You may update or delete your account information at any time by accessing the settings within the app. If you wish to delete your account or request that we delete your personal data, please contact us at [email address].
+                You may update or delete your account information at any time by accessing the settings within the app. If you wish to delete your account or request that we delete your personal data, please contact us at ifoster41901@gmail.com.
             </Text>
             <Text fontWeight='semibold'>
                 7. Updates to this Privacy Policy
