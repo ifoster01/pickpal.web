@@ -10,6 +10,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Text } from "~/components/ui/text";
+import { LabeledInput } from "~/components/general/LabaledInput";
 
 
 export default function () {
@@ -29,70 +30,48 @@ export default function () {
     });
 
     return (
-        <VStack h='screen' w='screen' justify='center'>
-            <Image src={Logo} alt='Pickpal' width={200} height={200} />
-            <Card.Root>
-                <Card.Header textAlign='center' fontWeight='semibold' fontSize='2xl'>Log In</Card.Header>
-                <Card.Body gap={2}>
-                    <Button variant='outline' onClick={async () => {
-                        const supabase = createClient();
-                        const origin = window.location.origin;
+        <VStack justify='center'>
+            <LabeledInput
+                label="Email"
+                type="email"
+                {...register("email", { required: true })}
+                placeholder="test@example.com"
+            />
+            {errors.email && <Text color='red'>{errors.email.message}</Text>}
+            <LabeledInput
+                label="Password"
+                type="password"
+                {...register("password", { required: true })}
+                placeholder="123456789"
+            />
+            {errors.password && <Text color='red'>{errors.password.message}</Text>}
+            <Button w='full' mt={4} onClick={handleSubmit(async (data) => {
+                const { email, password, confirmPassword } = data;
 
-                        const { data, error } = await supabase.auth.signInWithOAuth({
-                            provider: "google",
-                            options: {
-                                redirectTo: `${origin}/auth/callback`,
-                            },
-                        });
+                if (password !== confirmPassword) {
+                    // set error message
+                    setError("confirmPassword", {
+                        type: "manual",
+                        message: "Passwords do not match!",
+                    });
+                }
+                
+                const supabase = createClient();
 
-                        if (error) {
-                            return router.push("/login?message=An error occurred! Please try again");
-                        }
+                const { error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                });
 
-                        return router.push(data.url);
-                    }}>
-                        <Image src={Google} alt='Google' width={20} height={20} />
-                        Continue with Google
-                    </Button>
-                    <Input
-                        {...register("email", { required: true })}
-                        placeholder="Email..."
-                    />
-                    {errors.email && <Text color='red'>{errors.email.message}</Text>}
-                    <Input
-                        {...register("password", { required: true })}
-                        placeholder="Password..."
-                    />
-                    {errors.password && <Text color='red'>{errors.password.message}</Text>}
-                    <Button onClick={handleSubmit(async (data) => {
-                        const { email, password, confirmPassword } = data;
+                if (error) {
+                    return router.push("/login?message=Invalid username and/or password! Please try again");
+                }
 
-                        if (password !== confirmPassword) {
-                            // set error message
-                            setError("confirmPassword", {
-                                type: "manual",
-                                message: "Passwords do not match!",
-                            });
-                        }
-                        
-                        const supabase = createClient();
-
-                        const { error } = await supabase.auth.signInWithPassword({
-                            email,
-                            password,
-                        });
-
-                        if (error) {
-                            return router.push("/login?message=Invalid username and/or password! Please try again");
-                        }
-
-                        return router.push("/authed");
-                    })}>
-                        Log In
-                    </Button>
-                    <Text textAlign='center'>Don&apos;t have an account? <Button variant='link' onClick={() => router.push("/auth/signup")}>Sign Up</Button></Text>
-                </Card.Body>
-            </Card.Root>
+                return router.push("/authed");
+            })}>
+                Log In
+            </Button>
+            <Text textAlign='center'>Don&apos;t have an account? <Button variant='link' onClick={() => router.push("/auth/signup")}>Sign Up</Button></Text>
         </VStack>
     )
 }

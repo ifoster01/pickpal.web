@@ -1,20 +1,28 @@
+"use client";
 import Image from "next/image"
-import { VStack } from "styled-system/jsx"
-import Logo from "public/pickpal outline.svg"
-import { createClient } from "@/utils/supabase/server"
-import { redirect } from "next/navigation"
+import { HStack, VStack } from "styled-system/jsx"
+import Logo from "public/logos/pickpockt long.svg"
+import { Button } from "~/components/ui/button"
+import { useRouter } from "next/navigation";
 
-export default async function Home() {
-  const supabase = createClient()
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect('/auth/login')
-  }
-
+export default function Home() {
+  const router = useRouter();
   return (
-    <VStack h='screen' w='screen'>
-      <Image src={Logo} alt='Pickpal' width={200} height={200} />
+    <VStack h='screen' w='screen' justify='space-between'>
+      {/* Header/Nav */}
+      <VStack>
+        <Image src={Logo} alt='Pickpal' width={400} height={200} />
+        <HStack w='full' justify='center'>
+          <Button onClick={() => router.push('/auth/login')}>Login</Button>
+          <Button variant='outline' onClick={() => router.push('/auth/signup')}>Sign up</Button>
+        </HStack>
+      </VStack>
+
+      {/* Footer */}
+      <HStack w='full' justify='center'>
+        <Button variant='link' onClick={() => router.push('/privacy')}>Privacy Policy</Button>
+        <Button variant='link' onClick={() => router.push('/tos')}>Terms of Service</Button>
+      </HStack>
     </VStack>
   )
 }
