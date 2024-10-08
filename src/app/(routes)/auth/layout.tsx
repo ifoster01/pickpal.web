@@ -22,6 +22,18 @@ export default function ({children}:{children: ReactNode}) {
         }
     }, [user])
 
+    const getURL = () => {
+        let url =
+          process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
+          process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
+          'http://localhost:3000/'
+        // Make sure to include `https://` when not localhost.
+        url = url.startsWith('http') ? url : `https://${url}`
+        // Make sure to include a trailing `/`.
+        url = url.endsWith('/') ? url : `${url}/`
+        return url
+    }
+
     return (
         <VStack minH='screen' maxW='screen' overflow='auto' pt={8}>
             <Image src='/logos/pickpockt long.svg' alt='Pickpockt' width={200} height={100} onClick={() => router.push('/')} className={css({ cursor: 'pointer' })} />
@@ -37,7 +49,7 @@ export default function ({children}:{children: ReactNode}) {
                         const { data, error } = await supabase.auth.signInWithOAuth({
                             provider: "google",
                             options: {
-                                redirectTo: `${origin}/auth/callback`,
+                                redirectTo: `${getURL()}/auth/callback`,
                             },
                         });
 
