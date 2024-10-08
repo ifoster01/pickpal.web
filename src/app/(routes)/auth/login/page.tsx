@@ -1,17 +1,12 @@
 "use client";
 import { VStack } from "@/styled-system/jsx";
-import Image from "next/image";
-import Logo from "public/logos/pickpockt long.svg";
-import Google from "public/google.colored.svg";
 import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Text } from "~/components/ui/text";
 import { LabeledInput } from "~/components/general/LabaledInput";
-
 
 export default function () {
     const router = useRouter();

@@ -1,4 +1,3 @@
-"use client";
 import { VStack } from "@/styled-system/jsx";
 import { Text } from "~/components/ui/text";
 

@@ -1,10 +1,6 @@
 "use client";
-import { Box, HStack, VStack } from "@/styled-system/jsx";
-import Image from "next/image";
-import Logo from "public/pickpal long.svg";
-import Google from "public/google.colored.svg";
+import { HStack, VStack } from "@/styled-system/jsx";
 import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";

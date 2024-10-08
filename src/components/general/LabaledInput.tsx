@@ -1,5 +1,4 @@
 import { VStack } from "@/styled-system/jsx";
-import { Input } from "../ui/input";
 import { ComponentProps, ReactNode } from "react";
 import { Text } from "../ui/text";
 
