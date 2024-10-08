@@ -19,13 +19,11 @@ export default function () {
     const {
         register,
         handleSubmit,
-        setError,
         formState: { errors },
     } = useForm({
         defaultValues: {
             email: "",
             password: "",
-            confirmPassword: "",
         }
     });
 
@@ -33,28 +31,29 @@ export default function () {
         <VStack justify='center'>
             <LabeledInput
                 label="Email"
-                type="email"
-                {...register("email", { required: true })}
-                placeholder="test@example.com"
+                input={
+                    <Input
+                        type="email"
+                        {...register("email", { required: true })}
+                        placeholder="test@example.com"
+                    />
+                }
             />
             {errors.email && <Text color='red'>{errors.email.message}</Text>}
             <LabeledInput
                 label="Password"
-                type="password"
-                {...register("password", { required: true })}
-                placeholder="123456789"
+                input={
+                    <Input
+                        type="password"
+                        {...register("password", { required: true })}
+                        placeholder="123456789"
+                    />
+                }
             />
             {errors.password && <Text color='red'>{errors.password.message}</Text>}
             <Button w='full' mt={4} onClick={handleSubmit(async (data) => {
-                const { email, password, confirmPassword } = data;
-
-                if (password !== confirmPassword) {
-                    // set error message
-                    setError("confirmPassword", {
-                        type: "manual",
-                        message: "Passwords do not match!",
-                    });
-                }
+                const { email, password } = data;
+                console.log('here')
                 
                 const supabase = createClient();
 

@@ -33,23 +33,35 @@ export default function () {
         <VStack justify='center'>
             <LabeledInput
                 label="Email"
-                type="email"
-                {...register("email", { required: true })}
-                placeholder="test@example.com"
+                input={
+                    <Input
+                        type="email"
+                        {...register("email", { required: true })}
+                        placeholder="test@example.com"
+                    />
+                }
             />
             {errors.email && <Text color='red'>{errors.email.message}</Text>}
             <LabeledInput
                 label="Password"
-                type="password"
-                {...register("password", { required: true })}
-                placeholder="123456789"
+                input={
+                    <Input
+                        type="password"
+                        {...register("password", { required: true })}
+                        placeholder="123456789"
+                    />
+                }
             />
             {errors.password && <Text color='red'>{errors.password.message}</Text>}
             <LabeledInput
                 label="Confirm Password"
-                type="password"
-                {...register("confirmPassword", { required: true })}
-                placeholder="123456789"
+                input={
+                    <Input
+                        type="password"
+                        {...register("confirmPassword", { required: true })}
+                        placeholder="123456789"
+                    />
+                }
             />
             {errors.confirmPassword && <Text color='red'>{errors.confirmPassword.message}</Text>}
             <HStack gap={1} flexWrap='wrap' justify='center'>

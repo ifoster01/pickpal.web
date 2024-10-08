@@ -1,23 +1,20 @@
 import { VStack } from "@/styled-system/jsx";
 import { Input } from "../ui/input";
-import { ComponentProps } from "react";
+import { ComponentProps, ReactNode } from "react";
 import { Text } from "../ui/text";
 
 export function LabeledInput({
     label,
-    containerProps,
+    input,
     ...props
 }:{
     label: string
-    containerProps?: ComponentProps<typeof VStack>
-} & ComponentProps<typeof Input>) {
+    input: ReactNode
+} & ComponentProps<typeof VStack>) {
     return (
-        <VStack alignItems='start' gap={0} w='full' {...containerProps}>
+        <VStack alignItems='start' gap={0} w='full' {...props}>
             <Text fontSize='sm'>{label}</Text>
-            <Input
-                w='full'
-                {...props}
-            />
+            {input}
         </VStack>
     )
 }
