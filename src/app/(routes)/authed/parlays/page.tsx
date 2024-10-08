@@ -5,10 +5,10 @@ export default function () {
     return (
         <VStack h='full' w='full'>
             <Text fontWeight='bold' fontSize='2xl'>
-                Page Title
+                Parlay Center
             </Text>
             <Text>
-                Page content goes here
+                Coming soon...
             </Text>
         </VStack>
     )

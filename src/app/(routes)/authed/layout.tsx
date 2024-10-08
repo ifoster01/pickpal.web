@@ -26,20 +26,22 @@ export default function ({children}:{children: ReactNode}) {
         <VStack minH='screen' maxW='screen' overflow='auto' pt={8}>
             {/* Navbar */}
             <Grid
-                gridTemplateColumns={['100px minmax(0, 1fr) 100px']}
+                gridTemplateColumns={['175px minmax(0, 1fr) 175px']}
                 w='full'
                 py={4}
                 px={['15%']}
                 gap={4}
             >
-                <Image src='/logos/pickpockt long.svg' alt='Pickpockt' width={200} height={100} onClick={() => router.push('/authed')} />
+                <Image src='/logos/pickpockt long.svg' alt='Pickpockt' width={400} height={200} onClick={() => router.push('/authed')} />
                 <HStack w='full' justify='center' gap={8}>
                     <Button variant='link' cursor='pointer' onClick={() => router.push('/authed/parlays')}>Parlay Center</Button>
                     <Button variant='link' cursor='pointer' onClick={() => router.push('/authed/bets')}>Bet Calculator</Button>
                 </HStack>
-                <Button onClick={handleSignOut}>
-                    Sign Out
-                </Button>
+                <HStack w='full' justify='flex-end'>
+                    <Button w='fit-content' alignSelf='flex-end' onClick={handleSignOut}>
+                        Sign Out
+                    </Button>
+                </HStack>
             </Grid>
             {children}
         </VStack>
