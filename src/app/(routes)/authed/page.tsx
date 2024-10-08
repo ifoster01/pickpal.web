@@ -2,13 +2,12 @@
 import { VStack } from "@/styled-system/jsx";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 
 export default function () {
     const handleSignOut = async () => {
         const supabase = createClient();
-        console.log('here');
-
         await supabase.auth.signOut();
     }
 

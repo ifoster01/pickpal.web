@@ -1,6 +1,6 @@
 "use client";
 import { Box, HStack, VStack } from "@/styled-system/jsx";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "~/providers/AuthProvider";
 import { Card } from "~/components/ui/card";
@@ -16,9 +16,11 @@ export default function ({children}:{children: ReactNode}) {
     const router = useRouter();
     const pathname = usePathname();
 
-    if (user) {
-        router.push('/authed');
-    }
+    useEffect(() => {
+        if (user) {
+            router.push('/authed');
+        }
+    }, [user])
 
     return (
         <VStack minH='screen' maxW='screen' overflow='auto' pt={8}>
