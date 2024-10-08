@@ -63,7 +63,7 @@ export default function () {
                 });
 
                 if (error) {
-                    return router.push("/login?message=Invalid username and/or password! Please try again");
+                    return router.push("/auth/login?message=Invalid username and/or password! Please try again");
                 }
 
                 return router.push("/authed");
