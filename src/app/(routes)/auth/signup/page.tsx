@@ -54,7 +54,10 @@ export default function () {
             {errors.confirmPassword && <Text color='red'>{errors.confirmPassword.message}</Text>}
             <HStack gap={1} flexWrap='wrap' justify='center'>
                 <Text textWrap='nowrap'>
-                    By clicking &quot;Sign Up&quot;, you are agreeing to our
+                    By clicking &quot;Sign Up&quot; (or sign in with Google),
+                </Text>
+                <Text>
+                    you are agreeing to our
                 </Text>
                 <Button variant='link' fontWeight='bold' onClick={() => router.push("/privacy")}>
                     Privacy Policy
