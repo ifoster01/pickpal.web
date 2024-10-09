@@ -6,6 +6,7 @@ import { useAuth } from "~/providers/AuthProvider";
 import Image from "next/image";
 import { Button } from "~/components/ui/button";
 import { createClient } from "@/utils/supabase/client";
+import { Navbar } from "./(components)/Navigation/Navbar";
 
 export default function ({children}:{children: ReactNode}) {
     const { user } = useAuth();
@@ -23,9 +24,10 @@ export default function ({children}:{children: ReactNode}) {
     }
 
     return (
-        <VStack minH='screen' maxW='screen' overflow='auto' pt={8}>
+        <VStack minH='screen' maxW='screen' overflow='auto'>
             {/* Navbar */}
-            <Grid
+            <Navbar />
+            {/* <Grid
                 gridTemplateColumns={['175px minmax(0, 1fr) 175px']}
                 w='full'
                 py={4}
@@ -42,7 +44,7 @@ export default function ({children}:{children: ReactNode}) {
                         Sign Out
                     </Button>
                 </HStack>
-            </Grid>
+            </Grid> */}
             {children}
         </VStack>
     )

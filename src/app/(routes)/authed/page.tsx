@@ -1,11 +1,14 @@
 "use client";
-import { HStack, VStack } from "@/styled-system/jsx";
+import { Box, HStack, VStack } from "@/styled-system/jsx";
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import { Accordion } from "~/components/ui/accordion";
 import { Text } from "~/components/ui/text";
 import { ChevronDownIcon } from "lucide-react";
 import { Database } from "~/types/supabase";
+import { Avatar } from "~/components/ui/avatar";
+import Image from "next/image";
+import { css } from "@/styled-system/css";
 
 export default function () {
     const [ufcData, setUfcData] = useState<Database['public']['Tables']['upcoming_fight_odds']['Row'][] | null>(null);
@@ -46,15 +49,30 @@ export default function () {
                         <Accordion.Item key={fight.fight_id} value={fight.fight_id}>
                             <Accordion.ItemTrigger>
                                 <HStack w='full' justify='space-around'>
-                                    <VStack w='full' gap={0}>
+                                    {/* <Avatar src={fight.f1_pic_url ?? ''} name={fight.fighter1 ?? ''} objectFit={'scale-down'} objectPosition={'top'} /> */}
+                                    {fight.f1_pic_url ? <Image src={fight.f1_pic_url ?? ''} alt={fight.fighter1 ?? ''} width={100} height={100} className={css({
+                                        borderRadius: 'full',
+                                        objectFit: 'cover',
+                                        objectPosition: 'top',
+                                        height: '100px',
+                                        width: '100px',
+                                    })} /> : <Avatar name={fight.fighter1 ?? ''} />}
+                                    <VStack w='full' gap={0} textAlign='center'>
                                         <Text>{fight.fighter1}</Text>
                                         <Text>{fight.odds1 > 0 ? '+' : ''}{fight.odds1}</Text>
                                     </VStack>
                                     <Text>vs</Text>
-                                    <VStack w='full' gap={0}>
+                                    <VStack w='full' gap={0} textAlign='center'>
                                         <Text>{fight.fighter2}</Text>
                                         <Text>{fight.odds2 > 0 ? '+' : ''}{fight.odds2}</Text>
                                     </VStack>
+                                    {fight.f2_pic_url ? <Image src={fight.f2_pic_url ?? ''} alt={fight.fighter2 ?? ''} width={100} height={100} className={css({
+                                        borderRadius: 'full',
+                                        objectFit: 'cover',
+                                        objectPosition: 'top',
+                                        height: '100px',
+                                        width: '100px',
+                                    })} /> : <Avatar name={fight.fighter2 ?? ''} />}
                                 </HStack>
                                 <Accordion.ItemIndicator>
                                     <ChevronDownIcon />
@@ -64,24 +82,24 @@ export default function () {
                                 <VStack w='full' px='10%'>
                                     <Text fontWeight={700}>Model Predictions</Text>
                                     <HStack w='full' justify='space-around'>
-                                        <VStack w='full' gap={0}>
+                                        <VStack w='full' gap={0} textAlign='center'>
                                             <Text>{fight.fighter1}</Text>
                                             <Text>{fight.odds1 > 0 ? '+' : ''}{fight.odds1}</Text>
                                         </VStack>
                                         <Text>vs</Text>
-                                        <VStack w='full' gap={0}>
+                                        <VStack w='full' gap={0} textAlign='center'>
                                             <Text>{fight.fighter2}</Text>
                                             <Text>{fight.odds2 > 0 ? '+' : ''}{fight.odds2}</Text>
                                         </VStack>
                                     </HStack>
                                     <Text fontWeight={700}>Sports Book</Text>
                                     <HStack w='full' justify='space-around'>
-                                        <VStack w='full' gap={0}>
+                                        <VStack w='full' gap={0} textAlign='center'>
                                             <Text>{fight.fighter1}</Text>
                                             <Text>{fight.f1_book_odds && fight.f1_book_odds > 0 ? '+' : ''}{fight.f1_book_odds ? fight.f1_book_odds : 'N/A'}</Text>
                                         </VStack>
                                         <Text>vs</Text>
-                                        <VStack w='full' gap={0}>
+                                        <VStack w='full' gap={0} textAlign='center'>
                                             <Text>{fight.fighter2}</Text>
                                             <Text>{fight.f2_book_odds && fight.f2_book_odds > 0 ? '+' : ''}{fight.f2_book_odds ? fight.f2_book_odds : 'N/A'}</Text>
                                         </VStack>
