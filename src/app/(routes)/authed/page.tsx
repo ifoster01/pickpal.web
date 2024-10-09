@@ -1,5 +1,5 @@
 "use client";
-import { VStack } from "@/styled-system/jsx";
+import { HStack, VStack } from "@/styled-system/jsx";
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import { Accordion } from "~/components/ui/accordion";
@@ -37,23 +37,60 @@ export default function () {
     }, [])
 
     return (
-        <VStack h='full' w='full' maxW='screen'>
-            <Accordion.Root
-                multiple
-            >
-                { ufcData ? ufcData.map((fight) => (
-                    <Accordion.Item key={fight.fight_id} value={fight.fight_id}>
-                        <Accordion.ItemTrigger>
-                            {fight.fighter1} vs {fight.fighter2}
-                            <Accordion.ItemIndicator>
-                                <ChevronDownIcon />
-                            </Accordion.ItemIndicator>
-                        </Accordion.ItemTrigger>
-                        <Accordion.ItemContent>
-                            {fight.odds1} vs {fight.odds2}
-                        </Accordion.ItemContent>
-                    </Accordion.Item>
-                ))
+        <VStack h='full' w='full' maxW='screen' px={['10%', '15%', '15%', '20%', '25%', '30%']}>
+            <Accordion.Root multiple>
+                { ufcData ? ufcData.map((fight) => {
+                    if (!fight.odds1 || !fight.odds2) return null
+
+                    return (
+                        <Accordion.Item key={fight.fight_id} value={fight.fight_id}>
+                            <Accordion.ItemTrigger>
+                                <HStack w='full' justify='space-around'>
+                                    <VStack w='full' gap={0}>
+                                        <Text>{fight.fighter1}</Text>
+                                        <Text>{fight.odds1 > 0 ? '+' : ''}{fight.odds1}</Text>
+                                    </VStack>
+                                    <Text>vs</Text>
+                                    <VStack w='full' gap={0}>
+                                        <Text>{fight.fighter2}</Text>
+                                        <Text>{fight.odds2 > 0 ? '+' : ''}{fight.odds2}</Text>
+                                    </VStack>
+                                </HStack>
+                                <Accordion.ItemIndicator>
+                                    <ChevronDownIcon />
+                                </Accordion.ItemIndicator>
+                            </Accordion.ItemTrigger>
+                            <Accordion.ItemContent>
+                                <VStack w='full' px='10%'>
+                                    <Text fontWeight={700}>Model Predictions</Text>
+                                    <HStack w='full' justify='space-around'>
+                                        <VStack w='full' gap={0}>
+                                            <Text>{fight.fighter1}</Text>
+                                            <Text>{fight.odds1 > 0 ? '+' : ''}{fight.odds1}</Text>
+                                        </VStack>
+                                        <Text>vs</Text>
+                                        <VStack w='full' gap={0}>
+                                            <Text>{fight.fighter2}</Text>
+                                            <Text>{fight.odds2 > 0 ? '+' : ''}{fight.odds2}</Text>
+                                        </VStack>
+                                    </HStack>
+                                    <Text fontWeight={700}>Sports Book</Text>
+                                    <HStack w='full' justify='space-around'>
+                                        <VStack w='full' gap={0}>
+                                            <Text>{fight.fighter1}</Text>
+                                            <Text>{fight.f1_book_odds && fight.f1_book_odds > 0 ? '+' : ''}{fight.f1_book_odds ? fight.f1_book_odds : 'N/A'}</Text>
+                                        </VStack>
+                                        <Text>vs</Text>
+                                        <VStack w='full' gap={0}>
+                                            <Text>{fight.fighter2}</Text>
+                                            <Text>{fight.f2_book_odds && fight.f2_book_odds > 0 ? '+' : ''}{fight.f2_book_odds ? fight.f2_book_odds : 'N/A'}</Text>
+                                        </VStack>
+                                    </HStack>
+                                </VStack>
+                            </Accordion.ItemContent>
+                        </Accordion.Item>
+                    )
+                })
                     :
                     <Text>Loading...</Text>
                 }
