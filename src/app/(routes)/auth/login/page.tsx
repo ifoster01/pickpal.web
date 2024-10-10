@@ -11,7 +11,6 @@ import { Suspense } from "react";
 
 export default function () {
     const router = useRouter();
-    const params = useSearchParams();
 
     const {
         register,
