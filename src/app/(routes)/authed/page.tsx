@@ -10,6 +10,8 @@ import { Avatar } from "~/components/ui/avatar";
 import Image from "next/image";
 import { css } from "@/styled-system/css";
 import { convertToProbability } from "@/utils/functions";
+import { Progress } from "~/components/ui/progress";
+import { Scale } from "~/components/general/Scale";
 
 export default function () {
     const [ufcData, setUfcData] = useState<Database['public']['Tables']['upcoming_fight_odds']['Row'][] | null>(null);
@@ -65,9 +67,35 @@ export default function () {
                 { ufcData ? ufcData.map((fight) => {
                     if (!fight.odds1 || !fight.odds2) return null
 
+                    const convertToProbability = (odds: number) => {
+                        if (odds < 0) {
+                          return Math.abs(odds) / ((Math.abs(odds) + 100))
+                        } else {
+                          return 100 / ((Math.abs(odds) + 100))
+                        }
+                      }
+                    
+                      let odds1_diff = convertToProbability(fight.odds1) - convertToProbability(fight.f1_book_odds ?? 0)
+                      let odds2_diff = convertToProbability(fight.odds2) - convertToProbability(fight.f2_book_odds ?? 0)
+                      if (fight.f1_book_odds === 0 || fight.f2_book_odds === 0) {
+                        odds1_diff = 0
+                        odds2_diff = 0
+                      }
+                    
+                      let value = odds1_diff > 0 ? -1*odds1_diff : odds2_diff
+                      if (odds1_diff === 0 && odds2_diff < 0 || odds1_diff < 0 && odds2_diff === 0) {
+                        value = 0
+                      }
+
+                      const betText = Math.abs(value) > 0.4 ? 'huge' :
+                                      Math.abs(value) > 0.3 ? 'large' :
+                                      Math.abs(value) > 0.1 ? 'medium' :
+                                      Math.abs(value) > 0.05 ? 'small' :
+                                      'almost no'
+
                     return (
                         <Accordion.Item key={fight.fight_id} value={fight.fight_id}>
-                            <Accordion.ItemTrigger>
+                            <Accordion.ItemTrigger _focus={{ outline: 'none', boxShadow: 'outline' }}>
                                 <HStack w='full' justify='space-around'>
                                     {/* <Avatar src={fight.f1_pic_url ?? ''} name={fight.fighter1 ?? ''} objectFit={'scale-down'} objectPosition={'top'} /> */}
                                     {fight.f1_pic_url ? <Image src={fight.f1_pic_url ?? ''} alt={fight.fighter1 ?? ''} width={100} height={100} className={css({
@@ -124,6 +152,13 @@ export default function () {
                                             <Text>{fight.f2_book_odds && fight.f2_book_odds > 0 ? '+' : ''}{fight.f2_book_odds ? `${fight.f2_book_odds} (${(convertToProbability(fight.f2_book_odds) * 100).toFixed()}%)` : 'N/A'}</Text>
                                         </VStack>
                                     </HStack>
+                                    { value !== 0 && <Text
+                                        textAlign='center'
+                                        marginTop={4}
+                                    >
+                                        { odds1_diff > 0 ? fight.fighter1 + "'s" : fight.fighter2 + "'s" } odds have a {betText} discrepancy from the book
+                                    </Text> }
+                                    <Scale value={value} />
                                 </VStack>
                             </Accordion.ItemContent>
                         </Accordion.Item>
