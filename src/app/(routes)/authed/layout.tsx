@@ -84,6 +84,7 @@ export default function ({children}:{children: ReactNode}) {
                 >
                     <Image src='/logos/pickpockt long.svg' alt='Pickpockt' width={400} height={200} onClick={() => router.push('/authed')} />
                     <HStack w='full' justify='center' gap={8}>
+                        <Button variant='link' cursor='pointer' onClick={() => router.push('/authed')}>Model&apos;s Picks</Button>
                         <Button variant='link' cursor='pointer' onClick={() => router.push('/authed/parlays')}>Parlay Center</Button>
                         <Button variant='link' cursor='pointer' onClick={() => router.push('/authed/bets')}>Bet Calculator</Button>
                     </HStack>

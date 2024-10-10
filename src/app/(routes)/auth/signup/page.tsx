@@ -7,11 +7,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Text } from "~/components/ui/text";
 import { LabeledInput } from "~/components/general/LabaledInput";
-
+import { Suspense } from "react";
 
 export default function () {
     const router = useRouter();
-    const params = useSearchParams();
 
     const {
         register,
@@ -78,7 +77,9 @@ export default function () {
                     Terms of Service
                 </Button>
             </HStack>
-            {params.get('message') && <Text color='red'>{params.get('message')}</Text>}
+            <Suspense fallback={<Text>Loading...</Text>}>
+                <ParamsMessage />
+            </Suspense>
             <Button w='full' mt={4} onClick={handleSubmit(async (data) => {
                 const { email, password, confirmPassword } = data;
 
@@ -108,4 +109,9 @@ export default function () {
             <Text textAlign='center'>Already have an account? <Button variant='link' onClick={() => router.push("/auth/login")}>Log In</Button></Text>
         </VStack>
     )
+}
+
+function ParamsMessage() {
+    const params = useSearchParams();
+    return params.get('message') ? <Text color='red'>{params.get('message')}</Text> : null;
 }

@@ -9,6 +9,7 @@ import { Database } from "~/types/supabase";
 import { Avatar } from "~/components/ui/avatar";
 import Image from "next/image";
 import { css } from "@/styled-system/css";
+import { convertToProbability } from "@/utils/functions";
 
 export default function () {
     const [ufcData, setUfcData] = useState<Database['public']['Tables']['upcoming_fight_odds']['Row'][] | null>(null);
@@ -38,6 +39,25 @@ export default function () {
 
         fetchData()
     }, [])
+
+    // useEffect(() => {
+    //     const fetchAPI = async () => {
+    //         try {
+    //             const res = await fetch('http://localhost:5000/api/draftkings');
+              
+    //             if (!res.ok) {
+    //                 throw new Error(`HTTP error! status: ${res.status}`);
+    //             }
+              
+    //             const result = await res.json();
+    //             console.log(result);
+    //         } catch (e) {
+    //             console.error(e);
+    //         }
+    //     };
+
+    //     fetchAPI()
+    // }, [])
 
     return (
         <VStack h='full' w='full' maxW='screen' px={['10%', '15%', '15%', '20%', '25%', '30%']}>
@@ -84,24 +104,24 @@ export default function () {
                                     <HStack w='full' justify='space-around'>
                                         <VStack w='full' gap={0} textAlign='center'>
                                             <Text>{fight.fighter1}</Text>
-                                            <Text>{fight.odds1 > 0 ? '+' : ''}{fight.odds1}</Text>
+                                            <Text>{fight.odds1 > 0 ? '+' : ''}{fight.odds1} ({(convertToProbability(fight.odds1) * 100).toFixed()}%)</Text>
                                         </VStack>
                                         <Text>vs</Text>
                                         <VStack w='full' gap={0} textAlign='center'>
                                             <Text>{fight.fighter2}</Text>
-                                            <Text>{fight.odds2 > 0 ? '+' : ''}{fight.odds2}</Text>
+                                            <Text>{fight.odds2 > 0 ? '+' : ''}{fight.odds2} ({(convertToProbability(fight.odds2) * 100).toFixed()}%)</Text>
                                         </VStack>
                                     </HStack>
                                     <Text fontWeight={700}>Sports Book</Text>
                                     <HStack w='full' justify='space-around'>
                                         <VStack w='full' gap={0} textAlign='center'>
                                             <Text>{fight.fighter1}</Text>
-                                            <Text>{fight.f1_book_odds && fight.f1_book_odds > 0 ? '+' : ''}{fight.f1_book_odds ? fight.f1_book_odds : 'N/A'}</Text>
+                                            <Text>{fight.f1_book_odds && fight.f1_book_odds > 0 ? '+' : ''}{fight.f1_book_odds ? `${fight.f1_book_odds} (${(convertToProbability(fight.f1_book_odds) * 100).toFixed()}%)` : 'N/A'}</Text>
                                         </VStack>
                                         <Text>vs</Text>
                                         <VStack w='full' gap={0} textAlign='center'>
                                             <Text>{fight.fighter2}</Text>
-                                            <Text>{fight.f2_book_odds && fight.f2_book_odds > 0 ? '+' : ''}{fight.f2_book_odds ? fight.f2_book_odds : 'N/A'}</Text>
+                                            <Text>{fight.f2_book_odds && fight.f2_book_odds > 0 ? '+' : ''}{fight.f2_book_odds ? `${fight.f2_book_odds} (${(convertToProbability(fight.f2_book_odds) * 100).toFixed()}%)` : 'N/A'}</Text>
                                         </VStack>
                                     </HStack>
                                 </VStack>
