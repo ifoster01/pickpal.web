@@ -90,13 +90,13 @@ export default function () {
                 
                 const supabase = createClient();
 
-                const { error } = await supabase.auth.signInWithPassword({
+                const { error } = await supabase.auth.signUp({
                     email,
                     password,
                 });
 
                 if (error) {
-                    return router.push("/auth/login?message=Invalid username and/or password! Please try again");
+                    return router.push("/auth/signup?message=A user with that email already exists! Please try again with a different email.");
                 }
 
                 return router.push("/authed");
