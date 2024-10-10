@@ -10,6 +10,8 @@ import Google from "public/google.colored.svg";
 import Image from "next/image";
 import { Text } from "~/components/ui/text";
 import { css } from "@/styled-system/css";
+import { IconButton } from "~/components/ui/icon-button";
+import { ArrowLeftIcon } from "lucide-react";
 
 export default function ({children}:{children: ReactNode}) {
     const { user } = useAuth();
@@ -24,6 +26,9 @@ export default function ({children}:{children: ReactNode}) {
 
     return (
         <VStack minH='screen' maxW='screen' overflow='auto' pt={8}>
+            <IconButton position='absolute' top={4} left={4} variant='ghost' onClick={() => router.push('/')}>
+                <ArrowLeftIcon size={24} />
+            </IconButton>
             <Image src='/logos/pickpockt long.svg' alt='Pickpockt' width={200} height={100} onClick={() => router.push('/')} className={css({ cursor: 'pointer' })} />
             <VStack px='10%' w={['auto', '40%', '35%', '30%', '25%', '25%']} display={['flex', 'flex', 'flex', 'none', 'none', 'none']}>
                 <Text fontSize='xl' fontWeight='semibold' textAlign='center' mb={4}>

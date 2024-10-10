@@ -3,7 +3,7 @@ import { Text } from "~/components/ui/text";
 
 export default function () {
     return (
-        <VStack minH='screen' maxW='screen' p={24} pt={8} alignItems='start' overflow='auto'>
+        <VStack minH='screen' maxW='screen' p={[8, 8, 8, 24, 24, 24]} pt={8} alignItems='start' overflow='auto'>
             <Text fontWeight='bold' fontSize='2xl'>
                 Privacy Policy
             </Text>
