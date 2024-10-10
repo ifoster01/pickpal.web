@@ -17,8 +17,6 @@ export function Scale({
         return `rgb(${r},${g},${b})`;
     };
 
-    console.log(-1 * value * 100 * 1.75)
-
     return (
         <HStack w='full' gap={0}>
             <VStack
