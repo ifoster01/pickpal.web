@@ -32,7 +32,7 @@ export function ParlayLegCard({
             <VStack w='full'>
                 { fighterPick === fight.fighter1 ?
                     <HStack gap={1} w='full' justify='space-around'>
-                        <HStack gap={8}>
+                        <HStack gap={[2, 2, 2, 8, 8, 8]}>
                             {fight.f1_pic_url ? <Image src={fight.f1_pic_url ?? ''} alt={fight.fighter1 ?? ''} width={100} height={100} className={css({
                                 borderRadius: 'full',
                                 objectFit: 'cover',
@@ -45,7 +45,7 @@ export function ParlayLegCard({
                                 <Text fontSize='sm'>vs {opponentPick}</Text>
                             </VStack>
                         </HStack>
-                        <HStack gap={8}>
+                        <HStack gap={[2, 2, 2, 8, 8, 8]}>
                             <VStack gap={0}>
                                 <Text>predicted:</Text>
                                 <Text>{predictedPayout}</Text>
@@ -58,7 +58,7 @@ export function ParlayLegCard({
                     </HStack>
                     :
                     <HStack gap={1} w='full' justify='space-around'>
-                        <HStack gap={8}>
+                        <HStack gap={[2, 2, 2, 8, 8, 8]}>
                             {fight.f2_pic_url ? <Image src={fight.f2_pic_url ?? ''} alt={fight.fighter2 ?? ''} width={100} height={100} className={css({
                                 borderRadius: 'full',
                                 objectFit: 'cover',
@@ -71,7 +71,7 @@ export function ParlayLegCard({
                                 <Text fontSize='sm'>vs {opponentPick}</Text>
                             </VStack>
                         </HStack>
-                        <HStack gap={8}>
+                        <HStack gap={[2, 2, 2, 8, 8, 8]}>
                             <VStack gap={0}>
                                 <Text>predicted:</Text>
                                 <Text>{predictedPayout}</Text>
