@@ -38,7 +38,8 @@ export const MenuItem = ({ label, link }: { label: string; link: string }) => {
             <VStack
                 w="screen"
                 pr={["80vw", "50vw"]}
-                py="1vh">
+                py="1vh"
+            >
                 {label === "Log Out" && (
                     <Button
                         size="xl"
