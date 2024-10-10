@@ -3,13 +3,14 @@ import { VStack } from "@/styled-system/jsx";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { createClient } from "@/utils/supabase/client";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Text } from "~/components/ui/text";
 import { LabeledInput } from "~/components/general/LabaledInput";
 
 export default function () {
     const router = useRouter();
+    const params = useSearchParams();
 
     const {
         register,
@@ -46,6 +47,7 @@ export default function () {
                 }
             />
             {errors.password && <Text color='red'>{errors.password.message}</Text>}
+            {params.get('message') && <Text color='red'>{params.get('message')}</Text>}
             <Button w='full' mt={4} onClick={handleSubmit(async (data) => {
                 const { email, password } = data;
                 console.log('here')

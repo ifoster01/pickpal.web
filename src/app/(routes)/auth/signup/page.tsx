@@ -3,7 +3,7 @@ import { HStack, VStack } from "@/styled-system/jsx";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { createClient } from "@/utils/supabase/client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Text } from "~/components/ui/text";
 import { LabeledInput } from "~/components/general/LabaledInput";
@@ -11,6 +11,7 @@ import { LabeledInput } from "~/components/general/LabaledInput";
 
 export default function () {
     const router = useRouter();
+    const params = useSearchParams();
 
     const {
         register,
@@ -77,6 +78,7 @@ export default function () {
                     Terms of Service
                 </Button>
             </HStack>
+            {params.get('message') && <Text color='red'>{params.get('message')}</Text>}
             <Button w='full' mt={4} onClick={handleSubmit(async (data) => {
                 const { email, password, confirmPassword } = data;
 
