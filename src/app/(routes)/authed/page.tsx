@@ -45,7 +45,7 @@ export default function () {
     // useEffect(() => {
     //     const fetchAPI = async () => {
     //         try {
-    //             const res = await fetch('http://localhost:5000/api/draftkings');
+    //             const res = await fetch('http://localhost:5000/api/draftkings?leagueId=88808');
               
     //             if (!res.ok) {
     //                 throw new Error(`HTTP error! status: ${res.status}`);

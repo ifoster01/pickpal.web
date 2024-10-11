@@ -14,12 +14,14 @@
     "@supabase/ssr": "^0.5.1",
     "@supabase/supabase-js": "^2.45.4",
     "framer-motion": "^11.11.4",
+    "immer": "^10.1.1",
     "lucide-react": "0.419.0",
     "next": "14.1.4",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-hook-form": "^7.53.0",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "zustand": "5.0.0-rc.2"
   },
   "devDependencies": {
     "@pandacss/dev": "0.44.0",
