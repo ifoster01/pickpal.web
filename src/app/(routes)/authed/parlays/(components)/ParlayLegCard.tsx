@@ -41,8 +41,8 @@ export function ParlayLegCard({
                                 width: '50px',
                             })} /> : <Avatar name={fight.fighter1 ?? ''} />}
                             <VStack gap={0}>
-                                <Text fontWeight='semibold' fontSize='xl'>{fight.fighter1}</Text>
-                                <Text fontSize='sm'>vs {opponentPick}</Text>
+                                <Text textAlign='center' fontWeight='semibold' fontSize='xl'>{fight.fighter1}</Text>
+                                <Text textAlign='center' fontSize='sm'>vs {opponentPick}</Text>
                             </VStack>
                         </HStack>
                         <HStack gap={[2, 2, 2, 8, 8, 8]}>
@@ -67,8 +67,8 @@ export function ParlayLegCard({
                                 width: '50px',
                             })} /> : <Avatar name={fight.fighter2 ?? ''} />}
                             <VStack gap={0}>
-                                <Text fontWeight='semibold' fontSize='xl'>{fight.fighter2}</Text>
-                                <Text fontSize='sm'>vs {opponentPick}</Text>
+                                <Text textAlign='center' fontWeight='semibold' fontSize='xl'>{fight.fighter2}</Text>
+                                <Text textAlign='center' fontSize='sm'>vs {opponentPick}</Text>
                             </VStack>
                         </HStack>
                         <HStack gap={[2, 2, 2, 8, 8, 8]}>
