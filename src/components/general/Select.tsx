@@ -4,10 +4,12 @@ import { CheckIcon, ChevronsUpDownIcon } from "lucide-react"
 
 export function Select({
     items,
+    groupLabels,
     _placeholder,
     ...props
 }:{
     items: { label: string, value: string }[]
+    groupLabels?: string[]
     _placeholder?: string
 } & ComponentProps<typeof PSelect.Root>) {
     return (
@@ -24,7 +26,7 @@ export function Select({
             <PSelect.Positioner>
                 <PSelect.Content>
                     <PSelect.ItemGroup>
-                        <PSelect.ItemGroupLabel>Framework</PSelect.ItemGroupLabel>
+                        <PSelect.ItemGroupLabel>{groupLabels ? groupLabels[0] : 'Select'}</PSelect.ItemGroupLabel>
                         {items.map((item) => (
                             <PSelect.Item key={item.value} item={item}>
                                 <PSelect.ItemText>{item.label}</PSelect.ItemText>
