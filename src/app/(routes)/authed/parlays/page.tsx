@@ -218,6 +218,7 @@ export default function () {
                         <Select
                             w='100%'
                             value={[parlayLegs.toString()]}
+                            onValueChange={(value) => setParlayLegs(parseInt(value.value[0]))}
                             items={[
                                 { label: '2', value: '2' },
                                 { label: '3', value: '3' },
