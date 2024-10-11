@@ -24,7 +24,7 @@ export function ParlayCard({
     return (
         <Fragment>
             {idx !== 0 && <VStack h='1px' w='full' bg='gray' />}
-            <VStack mb={4} p={4} w='full'>
+            <VStack mb={4} p={[0, 0, 0, 4, 4, 4]} w='full'>
                 <Text fontWeight={700}>Parlay {idx + 1}</Text>
                 <VStack w='full'>
                     { parlay.fights.map((fight, j) => {

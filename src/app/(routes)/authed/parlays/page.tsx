@@ -207,7 +207,7 @@ export default function () {
     }, [sortByProbability, sortByPayout])
 
     return (
-        <VStack h='full' w='full' p={10}>
+        <VStack h='full' w='full' p={[5, 5, 5, 10, 10, 10]}>
             <Text fontWeight='bold' fontSize='2xl'>
                 Parlay Center
             </Text>
