@@ -39,17 +39,14 @@ export const updateSession = async (request: NextRequest) => {
   // DONT MODIFY ANYTHING ABOVE THIS LINE
 
   if (!user && request.nextUrl.pathname.startsWith("/authed")) {
-    console.log("Redirecting to login");
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     return NextResponse.redirect(url);
   }
 
   if (user && (request.nextUrl.pathname === "/" || request.nextUrl.pathname === "/auth/signup" || request.nextUrl.pathname === "/auth/login")) {
-    console.log("Redirecting to home page");
     const url = request.nextUrl.clone();
     url.pathname = "/authed";
-    console.log(url);
     return NextResponse.redirect(url);
   }
 
