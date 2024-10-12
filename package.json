@@ -13,6 +13,8 @@
     "@icons-pack/react-simple-icons": "9.6.0",
     "@supabase/ssr": "^0.5.1",
     "@supabase/supabase-js": "^2.45.4",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "framer-motion": "^11.11.4",
     "immer": "^10.1.1",
     "lucide-react": "0.419.0",

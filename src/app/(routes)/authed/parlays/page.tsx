@@ -29,6 +29,7 @@ export default function () {
     const [sortByProbability, setSortByProbability] = useState<boolean>(false);
     const [sortByPayout, setSortByPayout] = useState<boolean>(false);
     const [sortByAgreement, setSortByAgreement] = useState<boolean>(false);
+    const [selectedLeague, setSelectedLeague] = useState<string>('ufc');
 
     useEffect(() => {
         const getPicks = async () => {
@@ -207,10 +208,45 @@ export default function () {
     }, [sortByProbability, sortByPayout])
 
     return (
-        <VStack h='full' w='full' p={[5, 5, 5, 10, 10, 10]}>
+        <VStack h='full' w='full' p={[5, 5, 5, 10, 10, 10]} position='relative'>
+            <LabeledInput
+                display={['none', 'none', 'none', 'block', 'block', 'block']}
+                label="League"
+                position='absolute'
+                top={0}
+                right={8}
+                w='fit-content'
+                input={
+                    <Select
+                        w='fit-content'
+                        groupLabels={['Select League']}
+                        value={[selectedLeague]}
+                        onValueChange={(value) => setSelectedLeague(value.value[0])}
+                        items={[
+                            { label: 'UFC', value: 'ufc' },
+                            { label: 'NFL', value: 'nfl' },
+                        ]}
+                    />
+                }
+            />
             <Text fontWeight='bold' fontSize='2xl'>
                 Parlay Center
             </Text>
+            <LabeledInput
+                display={['block', 'block', 'block', 'none', 'none', 'none']}
+                label="League"
+                input={
+                    <Select
+                        groupLabels={['Select League']}
+                        value={[selectedLeague]}
+                        onValueChange={(value) => setSelectedLeague(value.value[0])}
+                        items={[
+                            { label: 'UFC', value: 'ufc' },
+                            { label: 'NFL', value: 'nfl' },
+                        ]}
+                    />
+                }
+            />
             <HStack w={['100%', '100%', '70%', '50%', '50%', '40%']}>
                 <LabeledInput
                     label="Parlay Legs"
