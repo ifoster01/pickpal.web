@@ -8,6 +8,8 @@ import { Prop } from "~/types/clientTypes";
 import { Spinner } from "~/components/ui/spinner";
 import { PropCard } from "./(components)/PropCard";
 import { Pagination } from "~/components/ui/pagination";
+import { FilterIcon } from "lucide-react";
+import { css } from "@/styled-system/css";
 
 export default function () {
     const [propsList, setPropsList] = useState<Prop[]>([]);
@@ -43,10 +45,16 @@ export default function () {
     }
 
     return (
-        <VStack h='full' w='full'>
+        <VStack h='full' w='full' position='relative'>
             <Text fontWeight='bold' fontSize='2xl'>
                 Select Props
             </Text>
+            <FilterIcon className={css({
+                position: 'absolute',
+                top: ['4', '4', '4', '12', '12', '12'],
+                right: ['4', '4', '4', '12', '12', '12'],
+                cursor: 'pointer',
+            })} />
             { propsList.length ? (
                 <VStack w='full' p={12}>
                     <Grid
