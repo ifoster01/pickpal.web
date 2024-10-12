@@ -42,25 +42,6 @@ export default function () {
         fetchData()
     }, [])
 
-    // useEffect(() => {
-    //     const fetchAPI = async () => {
-    //         try {
-    //             const res = await fetch('http://localhost:5000/api/draftkings?leagueId=88808');
-              
-    //             if (!res.ok) {
-    //                 throw new Error(`HTTP error! status: ${res.status}`);
-    //             }
-              
-    //             const result = await res.json();
-    //             console.log(result);
-    //         } catch (e) {
-    //             console.error(e);
-    //         }
-    //     };
-
-    //     fetchAPI()
-    // }, [])
-
     return (
         <VStack h='full' w='full' maxW='screen' px={['10%', '15%', '15%', '20%', '25%', '30%']}>
             <Accordion.Root multiple>
