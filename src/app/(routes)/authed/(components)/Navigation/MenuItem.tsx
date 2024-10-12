@@ -5,7 +5,7 @@ import { Text } from "~/components/ui/text";
 import { VStack } from "@/styled-system/jsx";
 import { Button } from "~/components/ui/button";
 import { WandSparklesIcon } from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "~/utils/supabase/client";
 
 const variants = {
     open: {

@@ -6,21 +6,14 @@ import { useAuth } from "~/providers/AuthProvider";
 // import { Navbar } from "./(components)/Navigation/Navbar";
 import Image from "next/image";
 import { Button } from "~/components/ui/button";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "~/utils/supabase/client";
 import { IconButton } from "~/components/ui/icon-button";
 import { LogOutIcon, MenuIcon, XIcon } from "lucide-react";
 import { Drawer } from "~/components/ui/drawer";
 import { Text } from "~/components/ui/text";
 
 export default function ({children}:{children: ReactNode}) {
-    const { user } = useAuth();
     const router = useRouter();
-
-    useEffect(() => {
-        if (!user) {
-            router.push('/auth/login');
-        }
-    }, [user]);
 
     const handleSignOut = async () => {
         const supabase = createClient();

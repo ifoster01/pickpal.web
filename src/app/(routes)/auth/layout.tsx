@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "~/providers/AuthProvider";
 import { Card } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "~/utils/supabase/client";
 import Google from "public/google.colored.svg";
 import Image from "next/image";
 import { Text } from "~/components/ui/text";
@@ -14,15 +14,8 @@ import { IconButton } from "~/components/ui/icon-button";
 import { ArrowLeftIcon } from "lucide-react";
 
 export default function ({children}:{children: ReactNode}) {
-    const { user } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
-
-    useEffect(() => {
-        if (user) {
-            router.push('/authed');
-        }
-    }, [user]);
 
     return (
         <VStack minH='screen' maxW='screen' overflow='auto' pt={8}>

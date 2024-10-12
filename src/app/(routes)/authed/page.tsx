@@ -1,6 +1,6 @@
 "use client";
 import { Box, HStack, VStack } from "@/styled-system/jsx";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "~/utils/supabase/client";
 import { useEffect, useState } from "react";
 import { Accordion } from "~/components/ui/accordion";
 import { Text } from "~/components/ui/text";
@@ -9,7 +9,7 @@ import { Database } from "~/types/supabase";
 import { Avatar } from "~/components/ui/avatar";
 import Image from "next/image";
 import { css } from "@/styled-system/css";
-import { convertToProbability } from "@/utils/functions";
+import { convertToProbability } from "~/utils/functions";
 import { Progress } from "~/components/ui/progress";
 import { Scale } from "~/components/general/Scale";
 

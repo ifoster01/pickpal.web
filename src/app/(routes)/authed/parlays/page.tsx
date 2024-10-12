@@ -1,7 +1,7 @@
 "use client";
 import { HStack, VStack } from "@/styled-system/jsx";
-import { convertToAmerican, convertToProbability } from "@/utils/functions";
-import { createClient } from "@/utils/supabase/client";
+import { convertToAmerican, convertToProbability } from "~/utils/functions";
+import { createClient } from "~/utils/supabase/client";
 import { useEffect, useState } from "react";
 import { Text } from "~/components/ui/text";
 import { Database } from "~/types/supabase";

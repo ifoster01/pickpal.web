@@ -10,7 +10,7 @@ import { MenuToggle } from "./NavToggle";
 import { useDimensions } from "./use-dimension";
 import { css } from "@/styled-system/css";
 import { Navigation } from "./Navigation";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "~/utils/supabase/client";
 
 export function Navbar() {
     const router = useRouter();

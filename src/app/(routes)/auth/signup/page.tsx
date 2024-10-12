@@ -2,7 +2,7 @@
 import { HStack, VStack } from "@/styled-system/jsx";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "~/utils/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Text } from "~/components/ui/text";

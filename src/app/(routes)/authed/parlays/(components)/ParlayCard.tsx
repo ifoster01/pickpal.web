@@ -3,7 +3,7 @@ import { Parlay } from "../page"
 import { HStack, VStack } from "@/styled-system/jsx"
 import { Text } from "~/components/ui/text"
 import { Input } from "~/components/ui/input"
-import { convertToProbability } from "@/utils/functions"
+import { convertToProbability } from "~/utils/functions"
 import { ParlayLegCard } from "./ParlayLegCard"
 
 export function ParlayCard({

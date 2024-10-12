@@ -1,6 +1,6 @@
 "use client";
 import { VStack } from "@/styled-system/jsx";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "~/utils/supabase/client";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
 
