@@ -1,5 +1,5 @@
 import { css } from "@/styled-system/css";
-import { HStack, VStack } from "@/styled-system/jsx";
+import { Grid, HStack, VStack } from "@/styled-system/jsx";
 import { HeartIcon } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
@@ -29,16 +29,29 @@ export function PropCard({
                     fill: Math.random() > 0.5 ? '' : 'black',
                 }}
             />
-            <HStack>
-                <Text>{prop.eventName}</Text>
-                <Text>{format(prop.eventDate, 'PP')}</Text>
-            </HStack>
+            <Text fontWeight='semibold' fontSize='xl'>{prop.eventName}</Text>
             <HStack>
                 <Text>{prop.label}</Text>
                 <Text>{prop.propLabel}</Text>
-                <Text>{prop.line}</Text>
-                <Text>{prop.americanOdds}</Text>
             </HStack>
+            { prop.label === 'Moneyline' ?
+            <VStack w='25%' p={2} borderRadius='8px' border='1px solid gray'>
+                <Text>{prop.americanOdds}</Text>
+            </VStack>
+            :
+            <Grid
+                w='50%'
+                gridTemplateColumns='minmax(0, 1fr) minmax(0, 1fr)'
+                gap={0}
+            >
+                <VStack w='full' p={2} borderRadius='8px 0px 0px 8px' border='1px solid gray'>
+                    <Text>{prop.line}</Text>
+                </VStack>
+                <VStack w='full' p={2} borderRadius='0px 8px 8px 0px' border='1px solid gray' borderLeft='none'>
+                    <Text>{prop.americanOdds}</Text>
+                </VStack>
+            </Grid> }
+            <Text>{format(prop.eventDate, 'PP')}</Text>
         </VStack>
     )
 }
