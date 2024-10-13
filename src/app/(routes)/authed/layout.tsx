@@ -55,7 +55,7 @@ export default function ({children}:{children: ReactNode}) {
                                         <Button w='full' variant='outline' cursor='pointer' onClick={() => router.push('/authed/parlays')}>Parlay Center</Button>
                                     </Drawer.CloseTrigger>
                                     <Drawer.CloseTrigger asChild>
-                                        <Button w='full' variant='outline' cursor='pointer' onClick={() => router.push('/authed/bets')}>Bet Calculator</Button>
+                                        <Button w='full' variant='outline' cursor='pointer' onClick={() => router.push('/authed/props')}>Select Props</Button>
                                     </Drawer.CloseTrigger>
                                     <Button w='full' onClick={handleSignOut}>
                                         <LogOutIcon size={24} />
@@ -79,7 +79,7 @@ export default function ({children}:{children: ReactNode}) {
                     <HStack w='full' justify='center' gap={8}>
                         <Button variant='link' cursor='pointer' onClick={() => router.push('/authed')}>Model&apos;s Picks</Button>
                         <Button variant='link' cursor='pointer' onClick={() => router.push('/authed/parlays')}>Parlay Center</Button>
-                        <Button variant='link' cursor='pointer' onClick={() => router.push('/authed/bets')}>Bet Calculator</Button>
+                        <Button variant='link' cursor='pointer' onClick={() => router.push('/authed/props')}>Select Props</Button>
                     </HStack>
                     <HStack w='full' justify='flex-end'>
                         <Button w='fit-content' alignSelf='flex-end' onClick={handleSignOut}>

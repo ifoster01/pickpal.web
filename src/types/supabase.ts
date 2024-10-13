@@ -34,6 +34,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      liked_props: {
+        Row: {
+          americanOdds: number | null
+          category: string | null
+          created_at: string
+          eventDate: string | null
+          eventId: number | null
+          eventName: string | null
+          id: string
+          label: string | null
+          leagueId: number | null
+          leagueName: string | null
+          line: string | null
+          propLabel: string | null
+          userId: string | null
+        }
+        Insert: {
+          americanOdds?: number | null
+          category?: string | null
+          created_at?: string
+          eventDate?: string | null
+          eventId?: number | null
+          eventName?: string | null
+          id?: string
+          label?: string | null
+          leagueId?: number | null
+          leagueName?: string | null
+          line?: string | null
+          propLabel?: string | null
+          userId?: string | null
+        }
+        Update: {
+          americanOdds?: number | null
+          category?: string | null
+          created_at?: string
+          eventDate?: string | null
+          eventId?: number | null
+          eventName?: string | null
+          id?: string
+          label?: string | null
+          leagueId?: number | null
+          leagueName?: string | null
+          line?: string | null
+          propLabel?: string | null
+          userId?: string | null
+        }
+        Relationships: []
+      }
       upcoming_fight_odds: {
         Row: {
           created_at: string

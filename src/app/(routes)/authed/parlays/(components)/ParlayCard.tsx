@@ -4,14 +4,18 @@ import { HStack, VStack } from "@/styled-system/jsx"
 import { Text } from "~/components/ui/text"
 import { Input } from "~/components/ui/input"
 import { convertToProbability } from "~/utils/functions"
-import { ParlayLegCard } from "./ParlayLegCard"
+import { UFCParlayLegCard } from "./UFCParlayLegCard"
+import { Database } from "~/types/supabase"
+import { NFLParlayLegCard } from "./NFLParlayLegCard"
 
 export function ParlayCard({
     parlay,
     idx,
+    league,
 }: {
     parlay: Parlay,
     idx: number,
+    league: string,
 }) {
     const [betPool, setBetPool] = useState<number | null>(10)
     const payout = Math.round(parlay.payout)
@@ -27,9 +31,14 @@ export function ParlayCard({
             <VStack mb={4} p={[0, 0, 0, 4, 4, 4]} w='full'>
                 <Text fontWeight={700}>Parlay {idx + 1}</Text>
                 <VStack w='full'>
-                    { parlay.fights.map((fight, j) => {
+                    { parlay.picks.map((pick, j) => {
+                        if (league === 'nfl') {
+                            return (
+                                <NFLParlayLegCard key={`${j}-${parlay.id}-${j * (new Date().getUTCMilliseconds())}`} pick={pick as Database['public']['Tables']['liked_props']['Row']} idx={j} />
+                            )
+                        }
                         return (
-                            <ParlayLegCard key={`${j}-${parlay.id}-${j * (new Date().getUTCMilliseconds())}`} fight={fight} idx={j} />
+                            <UFCParlayLegCard key={`${j}-${parlay.id}-${j * (new Date().getUTCMilliseconds())}`} fight={pick as Database['public']['Tables']['upcoming_fight_odds']['Row']} idx={j} />
                         )
                     })}
                 </VStack>
@@ -37,10 +46,10 @@ export function ParlayCard({
                     <Text>Book Payout:</Text>
                     <Text fontWeight={700}>{payoutString} ({payoutProbability}%)</Text>
                 </HStack>
-                <HStack justify='space-between' w='full'>
+                { league === 'ufc' && <HStack justify='space-between' w='full'>
                     <Text>Predicted Probability:</Text>
                     <Text fontWeight={700}>{probabilityString} ({predictedProbability}%)</Text>
-                </HStack>
+                </HStack> }
                 <HStack justify='space-between' w='full'>
                     <HStack gap={1}>
                         <Text>$</Text>
@@ -62,7 +71,7 @@ export function ParlayCard({
                         <Text>Bet Payout:</Text>
                     </HStack>
                     { betPool !== null ?
-                    <Text fontWeight={700}>${((payout / 100) * betPool).toFixed(2)}</Text>
+                    <Text fontWeight={700}>${(betPool + (payout / 100) * betPool).toFixed(2)}</Text>
                     :
                     <Text fontWeight={700}>N/A</Text>
                     }
