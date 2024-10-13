@@ -12,10 +12,21 @@ import { FilterIcon } from "lucide-react";
 import { css } from "@/styled-system/css";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "~/providers/AuthProvider";
+import { Drawer } from "~/components/general/Drawer";
+import { LabeledInput } from "~/components/general/LabaledInput";
+import { Select } from "~/components/general/Select";
+import { categories, NFLTeams } from "~/constants/props";
+import { Combobox } from "~/components/general/Combobox";
+import { Drawer as PDrawer } from "~/components/ui/drawer";
 
 export default function () {
     const [propsList, setPropsList] = useState<Prop[]>([]);
     const [currentProps, setCurrentProps] = useState<Prop[]>([]);
+    const [filteredProps, setFilteredProps] = useState<Prop[]>([]);
+    const [teamFilter, setTeamFilter] = useState<string[] | null>(null);
+    const [teamFilterString, setTeamFilterString] = useState<string | null>(null);
+    const [categoryFilter, setCategoryFilter] = useState<string[] | null>(null);
+    const [categoryFilterString, setCategoryFilterString] = useState<string | null>(null);
     const user = useAuth();
 
     useEffect(() => {
@@ -34,6 +45,7 @@ export default function () {
             const data = await res.json();
             const props = JSON.parse(data.body);
             setPropsList(props);
+            setFilteredProps(props);
             setCurrentProps(props.slice(0, 20));
         }
 
@@ -62,18 +74,133 @@ export default function () {
         setCurrentProps(propsList.slice(start, end));
     }
 
+    // applying filters
+    const handleApplyFilters = () => {
+        let filteredProps = propsList;
+
+        console.log(teamFilter, categoryFilter);
+
+        if (teamFilter) {
+            filteredProps = filteredProps.filter((prop) => {
+                for (const team of teamFilter) {
+                    if (prop.eventName.includes(team))
+                        return true;
+                }
+            });
+        }
+
+        if (categoryFilter) {
+            filteredProps = filteredProps.filter((prop) => {
+                for (const category of categoryFilter) {
+                    if (prop.category === category)
+                        return true;
+                }
+            });
+        }
+        
+        setFilteredProps(filteredProps);
+        setCurrentProps(filteredProps.slice(0, 20));
+    }
+
     return (
         <VStack h='full' w='full' position='relative'>
             <Text fontWeight='bold' fontSize='2xl'>
                 Select Props
             </Text>
-            <FilterIcon className={css({
-                position: 'absolute',
-                top: ['4', '4', '4', '12', '12', '12'],
-                right: ['4', '4', '4', '12', '12', '12'],
-                cursor: 'pointer',
-            })} />
-            { propsList.length && user.user ? (
+            <Drawer
+                headerTitle='Filter Props'
+                trigger={
+                    <HStack
+                        w='fit-content'
+                        position='absolute'
+                        top={['4', '4', '4', '12', '12', '12']}
+                        right={['4', '4', '4', '12', '12', '12']}
+                        cursor='pointer'
+                    >
+                        <Text>Filter</Text>
+                        <FilterIcon />
+                    </HStack>
+                }
+                footer={
+                    <HStack w='full'>
+                        <PDrawer.CloseTrigger asChild>
+                            <Button
+                                w='full'
+                                variant='outline'
+                                onClick={() => {
+                                    setTeamFilter(null);
+                                    setCategoryFilter(null);
+                                    setFilteredProps(propsList);
+                                    setCurrentProps(propsList.slice(0, 20));
+                                }}
+                            >
+                                Clear Filters
+                            </Button>
+                        </PDrawer.CloseTrigger>
+                        <PDrawer.CloseTrigger asChild>
+                            <Button onClick={handleApplyFilters} w='full'>Apply Filters</Button>
+                        </PDrawer.CloseTrigger>
+                    </HStack>
+                }
+            >
+                <VStack p={4} w='full'>
+                    <LabeledInput
+                        label='Filter by team'
+                        input={
+                            <Combobox
+                                multiple
+                                items={NFLTeams}
+                                label='Team'
+                                placeholder={teamFilter?.length && teamFilterString ? teamFilterString : 'Select a team'}
+                                value={teamFilter ?? []}
+                                onValueChange={(e) => {
+                                    // creating the string to display in the placeholder
+                                    let string = '';
+                                    let i = 0;
+                                    for (const team of e.value) {
+                                        if (i === e.value.length - 1) {
+                                            string += `${team}`;
+                                        } else {
+                                            string += `${team}, `;
+                                        }
+                                        i++;
+                                    }
+                                    setTeamFilterString(string);
+                                    setTeamFilter(e.value)
+                                }}
+                            />
+                        }
+                    />
+                    <LabeledInput
+                        label='Filter by category'
+                        input={
+                            <Combobox
+                                multiple
+                                items={categories}
+                                label='Category'
+                                placeholder={categoryFilter?.length && categoryFilterString ? categoryFilterString : 'Select a category'}
+                                value={categoryFilter ?? []}
+                                onValueChange={(e) => {
+                                    // creating the string to display in the placeholder
+                                    let string = '';
+                                    let i = 0;
+                                    for (const category of e.value) {
+                                        if (i === e.value.length - 1) {
+                                            string += `${category}`;
+                                        } else {
+                                            string += `${category}, `;
+                                        }
+                                        i++;
+                                    }
+                                    setCategoryFilterString(string);
+                                    setCategoryFilter(e.value)
+                                }}
+                            />
+                        }
+                    />
+                </VStack>
+            </Drawer>
+            { filteredProps.length && user.user ? (
                 <VStack w='full' p={12}>
                     <Grid
                         w='full'
@@ -84,7 +211,7 @@ export default function () {
                         ))}
                     </Grid>
                     <Pagination
-                        count={propsList.length}
+                        count={filteredProps.length}
                         pageSize={20}
                         siblingCount={1}
                         onPageChange={(e) => {
