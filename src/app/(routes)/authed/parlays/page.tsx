@@ -47,15 +47,16 @@ export default function () {
                 .select('*')
                 .eq('userId', user.id);
             
-            console.log('got:', data)
-
+                
             // filtering the data so only dates that are in the future are shown
             const filteredData = data?.filter((prop) => {
                 const propDate = new Date(prop.eventDate ?? '')
                 // adding a day to the fight date to account for time zone differences
-                const currentDate = new Date(new Date().getTime() - 2 * 24 * 60 * 60 * 1000)
+                const currentDate = new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000)
+
                 return propDate >= currentDate
             })
+            console.log('got:', filteredData)
             
             return filteredData ?? null;
         },

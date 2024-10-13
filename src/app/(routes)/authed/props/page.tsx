@@ -16,6 +16,7 @@ import { LabeledInput } from "~/components/general/LabaledInput";
 import { categories, NFLTeams } from "~/constants/props";
 import { Combobox } from "~/components/general/Combobox";
 import { Drawer as PDrawer } from "~/components/ui/drawer";
+import { Switch } from "~/components/ui/switch";
 
 export default function () {
     const [loading, setLoading] = useState<boolean>(true);
@@ -27,6 +28,7 @@ export default function () {
     const [teamFilterString, setTeamFilterString] = useState<string | null>(null);
     const [categoryFilter, setCategoryFilter] = useState<string[] | null>(null);
     const [categoryFilterString, setCategoryFilterString] = useState<string | null>(null);
+    const [filterSaved, setFilterSaved] = useState<boolean>(false);
     const user = useAuth();
 
     useEffect(() => {
@@ -98,17 +100,52 @@ export default function () {
                 }
             });
         }
+
+        if (filterSaved) {
+            filteredProps = filteredProps.filter((prop) => {
+                if (!savedProps) return false;
+                return savedProps.find((savedProp) => {
+                    return (
+                        savedProp.americanOdds === prop.americanOdds &&
+                        savedProp.eventName === prop.eventName &&
+                        savedProp.leagueId === prop.leagueId &&
+                        savedProp.eventId === prop.eventId &&
+                        savedProp.category === prop.category &&
+                        new Date(savedProp.eventDate ?? '').getTime() === new Date(prop.eventDate).getTime() &&
+                        savedProp.label === prop.label &&
+                        savedProp.propLabel === prop.propLabel
+                    )
+                });
+            });
+        }
         
         setCurrentPage(1);
         setFilteredProps(filteredProps);
         setCurrentProps(filteredProps.slice(0, 20));
     }
 
+    useEffect(() => {
+        handleApplyFilters();
+    }, [filterSaved]);
+
     return (
         <VStack h='full' w='full' position='relative'>
             <Text fontWeight='bold' fontSize='2xl'>
                 Select Props
             </Text>
+            <HStack
+                w='fit-content'
+                position='absolute'
+                top={['4', '4', '4', '12', '12', '12']}
+                left={['4', '4', '4', '12', '12', '12']}
+                cursor='pointer'
+            >
+                <Text>Saved</Text>
+                <Switch
+                    checked={filterSaved}
+                    onCheckedChange={(e) => setFilterSaved(e.checked)}
+                />
+            </HStack>
             <Drawer
                 headerTitle='Filter Props'
                 trigger={
