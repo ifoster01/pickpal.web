@@ -37,6 +37,7 @@ export type Database = {
       liked_props: {
         Row: {
           americanOdds: number | null
+          category: string | null
           created_at: string
           eventDate: string | null
           eventId: number | null
@@ -51,6 +52,7 @@ export type Database = {
         }
         Insert: {
           americanOdds?: number | null
+          category?: string | null
           created_at?: string
           eventDate?: string | null
           eventId?: number | null
@@ -65,6 +67,7 @@ export type Database = {
         }
         Update: {
           americanOdds?: number | null
+          category?: string | null
           created_at?: string
           eventDate?: string | null
           eventId?: number | null

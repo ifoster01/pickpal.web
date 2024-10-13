@@ -10,10 +10,13 @@ import { PropCard } from "./(components)/PropCard";
 import { Pagination } from "~/components/ui/pagination";
 import { FilterIcon } from "lucide-react";
 import { css } from "@/styled-system/css";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "~/providers/AuthProvider";
 
 export default function () {
     const [propsList, setPropsList] = useState<Prop[]>([]);
     const [currentProps, setCurrentProps] = useState<Prop[]>([]);
+    const user = useAuth();
 
     useEffect(() => {
         const fetchProps = async () => {
@@ -37,6 +40,21 @@ export default function () {
         fetchProps();
     }, []);
 
+    const { data: savedProps, isLoading, error } = useQuery({
+        queryFn: async () => {
+            const supabase = createClient();
+            if (!user.user) return null;
+
+            const { data } = await supabase
+                .from('liked_props')
+                .select('*')
+                .eq('userId', user.user?.id);
+            
+            return data ?? null;
+        },
+        queryKey: ['savedProps'],
+    })
+
     // getting the previous or next 20 picks based on the current page
     const handlePageChange = async (page: number) => {
         const start = (page - 1) * 20;
@@ -55,14 +73,14 @@ export default function () {
                 right: ['4', '4', '4', '12', '12', '12'],
                 cursor: 'pointer',
             })} />
-            { propsList.length ? (
+            { propsList.length && user.user ? (
                 <VStack w='full' p={12}>
                     <Grid
                         w='full'
                         gridTemplateColumns={['minmax(0, 1fr)', 'minmax(0, 1fr)', 'minmax(0, 1fr) minmax(0, 1fr)', 'minmax(0, 1fr) minmax(0, 1fr)', 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)', 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)']}
                     >
                         { currentProps.slice(0, 25).map((prop, idx) => (
-                            <PropCard key={`${idx}-${prop.leagueId}-${prop.eventID}-${prop.propLabel}`} prop={prop}/>
+                            <PropCard key={`${idx}-${prop.leagueId}-${prop.eventId}-${prop.propLabel}`} prop={prop} savedProps={savedProps ?? null} userId={user.user!.id} />
                         ))}
                     </Grid>
                     <Pagination
