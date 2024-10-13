@@ -21,6 +21,7 @@ import { Drawer as PDrawer } from "~/components/ui/drawer";
 
 export default function () {
     const [propsList, setPropsList] = useState<Prop[]>([]);
+    const [currentPage, setCurrentPage] = useState<number>(1);
     const [currentProps, setCurrentProps] = useState<Prop[]>([]);
     const [filteredProps, setFilteredProps] = useState<Prop[]>([]);
     const [teamFilter, setTeamFilter] = useState<string[] | null>(null);
@@ -71,7 +72,8 @@ export default function () {
     const handlePageChange = async (page: number) => {
         const start = (page - 1) * 20;
         const end = page * 20;
-        setCurrentProps(propsList.slice(start, end));
+        setCurrentPage(page);
+        setCurrentProps(filteredProps.slice(start, end));
     }
 
     // applying filters
@@ -98,6 +100,7 @@ export default function () {
             });
         }
         
+        setCurrentPage(1);
         setFilteredProps(filteredProps);
         setCurrentProps(filteredProps.slice(0, 20));
     }
@@ -214,6 +217,7 @@ export default function () {
                         count={filteredProps.length}
                         pageSize={20}
                         siblingCount={1}
+                        page={currentPage}
                         onPageChange={(e) => {
                             handlePageChange(e.page);
                         }}
