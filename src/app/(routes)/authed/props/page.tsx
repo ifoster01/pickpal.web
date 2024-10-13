@@ -20,6 +20,7 @@ import { Combobox } from "~/components/general/Combobox";
 import { Drawer as PDrawer } from "~/components/ui/drawer";
 
 export default function () {
+    const [loading, setLoading] = useState<boolean>(true);
     const [propsList, setPropsList] = useState<Prop[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [currentProps, setCurrentProps] = useState<Prop[]>([]);
@@ -32,6 +33,7 @@ export default function () {
 
     useEffect(() => {
         const fetchProps = async () => {
+            setLoading(true);
             const supabase = createClient();
             const { data: jwtTokenData } = await supabase.auth.getSession();
             if (!jwtTokenData?.session?.access_token) return;
@@ -48,6 +50,7 @@ export default function () {
             setPropsList(props);
             setFilteredProps(props);
             setCurrentProps(props.slice(0, 20));
+            setLoading(false);
         }
 
         fetchProps();
@@ -79,8 +82,6 @@ export default function () {
     // applying filters
     const handleApplyFilters = () => {
         let filteredProps = propsList;
-
-        console.log(teamFilter, categoryFilter);
 
         if (teamFilter) {
             filteredProps = filteredProps.filter((prop) => {
@@ -203,7 +204,7 @@ export default function () {
                     />
                 </VStack>
             </Drawer>
-            { filteredProps.length && user.user ? (
+            { filteredProps.length && user.user && !loading ? (
                 <VStack w='full' p={12}>
                     <Grid
                         w='full'
@@ -224,13 +225,19 @@ export default function () {
                     />
                 </VStack>
             )
-            :
+            : loading ?
             (
                 <HStack mt={['20%', '20%', '20%', '20%', '20%', '20%']}>
                     <Spinner />
                     <Text>Loading props...</Text>
                 </HStack>
-            )}
+            )
+            : (
+                <HStack mt={['20%', '20%', '20%', '20%', '20%', '20%']}>
+                    <Text>No props available for the selected filters</Text>
+                </HStack>
+            )
+            }
         </VStack>
     )
 }
