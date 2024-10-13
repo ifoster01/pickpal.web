@@ -12,15 +12,19 @@ import { Button } from "~/components/ui/button";
 import { Switch } from "~/components/ui/switch";
 import { ParlayCard } from "./(components)/ParlayCard";
 import { LabeledInput } from "~/components/general/LabaledInput";
+import { useAuth } from "~/providers/AuthProvider";
+import { useQuery } from "@tanstack/react-query";
+import { Spinner } from "~/components/ui/spinner";
 
 export type Parlay = {
-    fights: Database['public']['Tables']['upcoming_fight_odds']['Row'][];
+    picks: Database['public']['Tables']['upcoming_fight_odds']['Row'][] | Database['public']['Tables']['liked_props']['Row'][];
     payout: number;
     probability: number;
     id: string;
 }
 
 export default function () {
+    const { user } = useAuth();
     const [ufcData, setUfcData] = useState<Database['public']['Tables']['upcoming_fight_odds']['Row'][]>([]);
     const [parlayLegs, setParlayLegs] = useState<number>(3);
     const [minPayout, setMinPayout] = useState<number | null>(400);
@@ -30,6 +34,33 @@ export default function () {
     const [sortByPayout, setSortByPayout] = useState<boolean>(false);
     const [sortByAgreement, setSortByAgreement] = useState<boolean>(false);
     const [selectedLeague, setSelectedLeague] = useState<string>('ufc');
+
+    const { data: nflProps, isLoading, error } = useQuery({
+        queryFn: async () => {
+            const supabase = createClient();
+            if (!user) return null;
+
+            console.log('getting props from supabase')
+
+            const { data } = await supabase
+                .from('liked_props')
+                .select('*')
+                .eq('userId', user.id);
+            
+            console.log('got:', data)
+
+            // filtering the data so only dates that are in the future are shown
+            const filteredData = data?.filter((prop) => {
+                const propDate = new Date(prop.eventDate ?? '')
+                // adding a day to the fight date to account for time zone differences
+                const currentDate = new Date(new Date().getTime() - 2 * 24 * 60 * 60 * 1000)
+                return propDate >= currentDate
+            })
+            
+            return filteredData ?? null;
+        },
+        queryKey: ['savedProps'],
+    })
 
     useEffect(() => {
         const getPicks = async () => {
@@ -53,8 +84,105 @@ export default function () {
 
             setUfcData(filteredData ?? [])
         }
-        getPicks()
+
+        if (selectedLeague === 'ufc') getPicks()
     }, [])
+
+    const genNFLParlays = () => {
+        if (!nflProps) return
+        setLoading(true)
+
+        // 1. Get all possible combinations of the nflProps based on the selected parlayLegs (between 2 and 6)
+        const allCombinations = []
+        if (parlayLegs === 2) {
+            for (let i = 0; i < nflProps.length; i++) {
+                for (let j = i + 1; j < nflProps.length; j++) {
+                    allCombinations.push([nflProps[i], nflProps[j]])
+                }
+            }
+        }
+        if (parlayLegs === 3) {
+            for (let i = 0; i < nflProps.length; i++) {
+                for (let j = i + 1; j < nflProps.length; j++) {
+                    for (let k = j + 1; k < nflProps.length; k++) {
+                        allCombinations.push([nflProps[i], nflProps[j], nflProps[k]])
+                    }
+                }
+            }
+        }
+        if (parlayLegs === 4) {
+            for (let i = 0; i < nflProps.length; i++) {
+                for (let j = i + 1; j < nflProps.length; j++) {
+                    for (let k = j + 1; k < nflProps.length; k++) {
+                        for (let l = k + 1; l < nflProps.length; l++) {
+                            allCombinations.push([nflProps[i], nflProps[j], nflProps[k], nflProps[l]])
+                        }
+                    }
+                }
+            }
+        }
+        if (parlayLegs === 5) {
+            for (let i = 0; i < nflProps.length; i++) {
+                for (let j = i + 1; j < nflProps.length; j++) {
+                    for (let k = j + 1; k < nflProps.length; k++) {
+                        for (let l = k + 1; l < nflProps.length; l++) {
+                            for (let m = l + 1; m < nflProps.length; m++) {
+                                allCombinations.push([nflProps[i], nflProps[j], nflProps[k], nflProps[l], nflProps[m]])
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Filter out the ones that don't meet the minPayout
+        const validParlays = allCombinations.filter((parlay) => {
+            const parlayOdds = parlay.reduce((acc, curr) => {
+                if (!curr.americanOdds) return -1
+                if (acc === -1) return -1
+
+                if (acc === 0) {
+                    return curr.americanOdds
+                }
+
+                const newOddsPerc = convertToProbability(acc) * convertToProbability(curr.americanOdds)
+                const newOdds = convertToAmerican(newOddsPerc * 100)
+                return newOdds
+            }, 0)
+
+            if (parlayOdds === -1) return false
+            if (minPayout === null) return true
+            return parlayOdds >= minPayout
+        })
+
+        // reset the generatedParlays
+        setGeneratedParlays([])
+        for (const parlay of validParlays) {
+            const payout = parlay.reduce((acc, curr) => {
+                if (!curr.americanOdds) return -1
+                if (acc === -1) return -1
+
+                if (acc === 0) {
+                    return curr.americanOdds
+                }
+
+                const newOddsPerc = convertToProbability(acc) * convertToProbability(curr.americanOdds)
+                const newOdds = convertToAmerican(newOddsPerc * 100)
+                return newOdds
+            }, 0)
+
+            const propId = uuid().toString()
+            setGeneratedParlays((prev) => [...prev, { picks: parlay, payout, probability: payout, id: propId }])
+        }
+
+        // set any sorting to false
+        setSortByProbability(false)
+        setSortByPayout(false)
+        setSortByAgreement(false)
+
+        // create a short artificial delay to show the loading spinner
+        setTimeout(() => setLoading(false), 500)
+    }
 
     const genParlays = () => {
         // get all possible combinations of the ufcData
@@ -65,44 +193,44 @@ export default function () {
         // 1. Get all possible combinations of the ufcData based on the selected parlayLegs (between 2 and 6)
         const allCombinations = []
         if (parlayLegs === 2) {
-        for (let i = 0; i < ufcData.length; i++) {
-            for (let j = i + 1; j < ufcData.length; j++) {
-                allCombinations.push([ufcData[i], ufcData[j]])
-            }
-        }
-        }
-        if (parlayLegs === 3) {
-        for (let i = 0; i < ufcData.length; i++) {
-            for (let j = i + 1; j < ufcData.length; j++) {
-                for (let k = j + 1; k < ufcData.length; k++) {
-                    allCombinations.push([ufcData[i], ufcData[j], ufcData[k]])
+            for (let i = 0; i < ufcData.length; i++) {
+                for (let j = i + 1; j < ufcData.length; j++) {
+                    allCombinations.push([ufcData[i], ufcData[j]])
                 }
             }
         }
-        }
-        if (parlayLegs === 4) {
-        for (let i = 0; i < ufcData.length; i++) {
-            for (let j = i + 1; j < ufcData.length; j++) {
-                for (let k = j + 1; k < ufcData.length; k++) {
-                    for (let l = k + 1; l < ufcData.length; l++) {
-                        allCombinations.push([ufcData[i], ufcData[j], ufcData[k], ufcData[l]])
+        if (parlayLegs === 3) {
+            for (let i = 0; i < ufcData.length; i++) {
+                for (let j = i + 1; j < ufcData.length; j++) {
+                    for (let k = j + 1; k < ufcData.length; k++) {
+                        allCombinations.push([ufcData[i], ufcData[j], ufcData[k]])
                     }
                 }
             }
         }
-        }
-        if (parlayLegs === 5) {
-        for (let i = 0; i < ufcData.length; i++) {
-            for (let j = i + 1; j < ufcData.length; j++) {
-                for (let k = j + 1; k < ufcData.length; k++) {
-                    for (let l = k + 1; l < ufcData.length; l++) {
-                        for (let m = l + 1; m < ufcData.length; m++) {
-                            allCombinations.push([ufcData[i], ufcData[j], ufcData[k], ufcData[l], ufcData[m]])
+        if (parlayLegs === 4) {
+            for (let i = 0; i < ufcData.length; i++) {
+                for (let j = i + 1; j < ufcData.length; j++) {
+                    for (let k = j + 1; k < ufcData.length; k++) {
+                        for (let l = k + 1; l < ufcData.length; l++) {
+                            allCombinations.push([ufcData[i], ufcData[j], ufcData[k], ufcData[l]])
                         }
                     }
                 }
             }
         }
+        if (parlayLegs === 5) {
+            for (let i = 0; i < ufcData.length; i++) {
+                for (let j = i + 1; j < ufcData.length; j++) {
+                    for (let k = j + 1; k < ufcData.length; k++) {
+                        for (let l = k + 1; l < ufcData.length; l++) {
+                            for (let m = l + 1; m < ufcData.length; m++) {
+                                allCombinations.push([ufcData[i], ufcData[j], ufcData[k], ufcData[l], ufcData[m]])
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         // 2. Filter out the ones that don't meet the minPayout
@@ -171,7 +299,7 @@ export default function () {
             }, 0)
 
             const fightId = uuid().toString()
-            setGeneratedParlays((prev) => [...prev, { fights: parlay, payout, probability, id: fightId }])
+            setGeneratedParlays((prev) => [...prev, { picks: parlay, payout, probability, id: fightId }])
         }
 
         // sorting by largest payout-probability discrepancy
@@ -221,7 +349,10 @@ export default function () {
                         w='fit-content'
                         groupLabels={['Select League']}
                         value={[selectedLeague]}
-                        onValueChange={(value) => setSelectedLeague(value.value[0])}
+                        onValueChange={(value) => {
+                            setGeneratedParlays([])
+                            setSelectedLeague(value.value[0])
+                        }}
                         items={[
                             { label: 'UFC', value: 'ufc' },
                             { label: 'NFL', value: 'nfl' },
@@ -239,7 +370,10 @@ export default function () {
                     <Select
                         groupLabels={['Select League']}
                         value={[selectedLeague]}
-                        onValueChange={(value) => setSelectedLeague(value.value[0])}
+                        onValueChange={(value) => {
+                            setGeneratedParlays([])
+                            setSelectedLeague(value.value[0])
+                        }}
                         items={[
                             { label: 'UFC', value: 'ufc' },
                             { label: 'NFL', value: 'nfl' },
@@ -286,7 +420,10 @@ export default function () {
                     }
                 />
             </HStack>
-            <Button w={['100%', '100%', '70%', '50%', '50%', '40%']} onClick={genParlays} fontWeight={700}>
+            <Button w={['100%', '100%', '70%', '50%', '50%', '40%']} onClick={() => {
+                if (selectedLeague === 'ufc') genParlays()
+                if (selectedLeague === 'nfl') genNFLParlays()
+            }} fontWeight={700}>
                 {loading ? 'loading...' : 'Generate'}
             </Button>
             <HStack>
@@ -313,12 +450,25 @@ export default function () {
                     Sort by Payout
                 </Switch>
             </HStack>
-            { generatedParlays && (
-              <VStack mt={8} w={['100%', '100%', '70%', '50%', '50%', '40%']}>
-                { generatedParlays.slice(0, 25).map((parlay, i) => (
-                  <ParlayCard key={`${i}-${parlay.id}`} parlay={parlay} idx={i} />
-                ))}
-              </VStack>
+            { selectedLeague === 'nfl' && !nflProps && !isLoading ? (
+                <Text>No saved NFL Props!</Text>
+            ) : selectedLeague === 'nfl' && !nflProps && isLoading ? (
+                <HStack mt='10vh'>
+                    <Spinner />
+                    <Text>Loading NFL Props...</Text>
+                </HStack>
+            )
+            :
+            (
+                <>
+                { generatedParlays && (
+                  <VStack mt={8} w={['100%', '100%', '70%', '50%', '50%', '40%']}>
+                    { generatedParlays.slice(0, 25).map((parlay, i) => (
+                      <ParlayCard key={`${i}-${parlay.id}`} parlay={parlay} idx={i} league={selectedLeague} />
+                    ))}
+                  </VStack>
+                )}
+                </>
             )}
         </VStack>
     )

@@ -5,7 +5,7 @@ import { Avatar } from "~/components/ui/avatar"
 import { Text } from "~/components/ui/text"
 import { Database } from "~/types/supabase"
 
-export function ParlayLegCard({
+export function UFCParlayLegCard({
     fight,
     idx
 }:{
