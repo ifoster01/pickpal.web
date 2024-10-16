@@ -6,47 +6,43 @@ import { Text } from "~/components/ui/text";
 import { Prop } from "~/types/clientTypes";
 import { format } from "date-fns";
 import { Database } from "~/types/supabase";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useIsFetching, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "~/utils/supabase/client";
+import { useEffect, useState } from "react";
 
 export function PropCard({
     prop,
-    savedProps,
+    savedId,
+    liked,
     userId,
 }:{
     prop: Prop
-    savedProps: Database['public']['Tables']['liked_props']['Row'][] | null
+    savedId: string
+    liked: boolean
     userId: string
 }) {
     const queryClient = useQueryClient();
 
-    let liked = false;
-    let savedId = '';
-    // check if prop is in savedProps
-    if (savedProps) {
-        // find the prop in savedProps
-        const savedProp = savedProps.find((savedProp) => {
-            return (
-                savedProp.americanOdds === prop.americanOdds &&
-                savedProp.eventName === prop.eventName &&
-                savedProp.leagueId === prop.leagueId &&
-                savedProp.eventId === prop.eventId &&
-                savedProp.category === prop.category &&
-                new Date(savedProp.eventDate ?? '').getTime() === new Date(prop.eventDate).getTime() &&
-                savedProp.label === prop.label &&
-                savedProp.propLabel === prop.propLabel
-            )
-        });
-
-        if (savedProp) {
-            liked = true;
-            savedId = savedProp.id;
-        }
-    }
-
     const likeMutation = useMutation({
         mutationFn: async () => {
             const supabase = createClient();
+            // checking the the prop is not already saved
+            const { data: saved, error: savedError } = await supabase
+                .from('liked_props')
+                .select('*')
+                .eq('userId', userId)
+                .eq('americanOdds', prop.americanOdds)
+                .eq('eventName', prop.eventName)
+                .eq('leagueId', prop.leagueId)
+                .eq('eventId', prop.eventId)
+                .eq('category', prop.category)
+                .eq('eventDate', prop.eventDate)
+                .eq('label', prop.label)
+                .eq('propLabel', prop.propLabel);
+            
+            if (savedError) throw new Error('Error getting prop');
+            if (saved.length > 0) return;
+
             const { data, error } = await supabase
                 .from('liked_props')
                 .insert([
@@ -121,7 +117,7 @@ export function PropCard({
                     <Text>{prop.americanOdds}</Text>
                 </VStack>
             </Grid> }
-            <Text>{format(prop.eventDate, 'PP')}</Text>
+            <Text>{format(prop.eventDate, 'PPpp')}</Text>
             <Button
                 w='full'
                 color='white'

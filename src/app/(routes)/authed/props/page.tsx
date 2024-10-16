@@ -47,9 +47,17 @@ export default function () {
             });
             const data = await res.json();
             const props = JSON.parse(data.body);
-            setPropsList(props);
-            setFilteredProps(props);
-            setCurrentProps(props.slice(0, 20));
+
+            // filtering out the props that have already passed
+            const currentDate = new Date();
+            const filteredProps = props.filter((prop: Prop) => {
+                const eventDate = new Date(prop.eventDate ?? '');
+                return currentDate <= eventDate;
+            });
+
+            setPropsList(filteredProps);
+            setFilteredProps(filteredProps);
+            setCurrentProps(filteredProps.slice(0, 20));
             setLoading(false);
         }
 
@@ -69,7 +77,8 @@ export default function () {
             return data ?? null;
         },
         queryKey: ['savedProps'],
-    })
+        refetchInterval: 5000,
+    });
 
     // getting the previous or next 20 picks based on the current page
     const handlePageChange = async (page: number) => {
@@ -245,9 +254,35 @@ export default function () {
                         w='full'
                         gridTemplateColumns={['minmax(0, 1fr)', 'minmax(0, 1fr)', 'minmax(0, 1fr) minmax(0, 1fr)', 'minmax(0, 1fr) minmax(0, 1fr)', 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)', 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)']}
                     >
-                        { currentProps.slice(0, 25).map((prop, idx) => (
-                            <PropCard key={`${idx}-${prop.leagueId}-${prop.eventId}-${prop.propLabel}`} prop={prop} savedProps={savedProps ?? null} userId={user.user!.id} />
-                        ))}
+                        { currentProps.map((prop, idx) => {
+                            let savedId = '';
+                            let liked = false;
+
+                            if (savedProps) {
+                                // find the prop in savedProps
+                                const savedProp = savedProps.find((savedProp) => {
+                                    return (
+                                        savedProp.americanOdds === prop.americanOdds &&
+                                        savedProp.eventName === prop.eventName &&
+                                        savedProp.leagueId === prop.leagueId &&
+                                        savedProp.eventId === prop.eventId &&
+                                        savedProp.category === prop.category &&
+                                        new Date(savedProp.eventDate ?? '').getTime() === new Date(prop.eventDate).getTime() &&
+                                        savedProp.label === prop.label &&
+                                        savedProp.propLabel === prop.propLabel
+                                    )
+                                });
+                        
+                                if (savedProp) {
+                                    liked = true;
+                                    savedId = savedProp.id;
+                                }
+                            }
+
+                            return (
+                                <PropCard key={`${idx}-${prop.leagueId}-${prop.eventId}-${prop.propLabel}`} prop={prop} savedId={savedId} liked={liked} userId={user.user!.id} />
+                            )
+                        })}
                     </Grid>
                     <Pagination
                         count={filteredProps.length}
