@@ -1,4 +1,5 @@
 export type Prop = {
+    providerOutcomeId: string,
     leagueId: number,
     leagueName: string,
     eventName: string,

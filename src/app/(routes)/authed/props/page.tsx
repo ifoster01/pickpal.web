@@ -92,16 +92,24 @@ export default function () {
     const handleApplyFilters = () => {
         let filteredProps = propsList;
 
-        if (teamFilter) {
+        if (teamFilter?.length) {
             filteredProps = filteredProps.filter((prop) => {
                 for (const team of teamFilter) {
                     if (prop.eventName.includes(team))
+                        return true;
+                    if (team === 'NYG' && prop.eventName.includes('Giants'))
+                        return true;
+                    if (team === 'NYJ' && prop.eventName.includes('Jets'))
+                        return true;
+                    if (team === 'LAC' && prop.eventName.includes('Chargers'))
+                        return true;
+                    if (team === 'LAR' && prop.eventName.includes('Rams'))
                         return true;
                 }
             });
         }
 
-        if (categoryFilter) {
+        if (categoryFilter?.length) {
             filteredProps = filteredProps.filter((prop) => {
                 for (const category of categoryFilter) {
                     if (prop.category === category)
@@ -115,14 +123,8 @@ export default function () {
                 if (!savedProps) return false;
                 return savedProps.find((savedProp) => {
                     return (
-                        savedProp.americanOdds === prop.americanOdds &&
-                        savedProp.eventName === prop.eventName &&
-                        savedProp.leagueId === prop.leagueId &&
-                        savedProp.eventId === prop.eventId &&
-                        savedProp.category === prop.category &&
-                        new Date(savedProp.eventDate ?? '').getTime() === new Date(prop.eventDate).getTime() &&
-                        savedProp.label === prop.label &&
-                        savedProp.propLabel === prop.propLabel
+                        savedProp.providerOutcomeId === prop.providerOutcomeId &&
+                        savedProp.eventId === prop.eventId
                     )
                 });
             });
@@ -178,6 +180,7 @@ export default function () {
                                 onClick={() => {
                                     setTeamFilter(null);
                                     setCategoryFilter(null);
+                                    setFilterSaved(false);
                                     setFilteredProps(propsList);
                                     setCurrentProps(propsList.slice(0, 20));
                                 }}
@@ -262,14 +265,8 @@ export default function () {
                                 // find the prop in savedProps
                                 const savedProp = savedProps.find((savedProp) => {
                                     return (
-                                        savedProp.americanOdds === prop.americanOdds &&
-                                        savedProp.eventName === prop.eventName &&
-                                        savedProp.leagueId === prop.leagueId &&
-                                        savedProp.eventId === prop.eventId &&
-                                        savedProp.category === prop.category &&
-                                        new Date(savedProp.eventDate ?? '').getTime() === new Date(prop.eventDate).getTime() &&
-                                        savedProp.label === prop.label &&
-                                        savedProp.propLabel === prop.propLabel
+                                        savedProp.providerOutcomeId === prop.providerOutcomeId &&
+                                        savedProp.eventId === prop.eventId
                                     )
                                 });
                         

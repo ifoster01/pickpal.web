@@ -30,15 +30,8 @@ export function PropCard({
             const { data: saved, error: savedError } = await supabase
                 .from('liked_props')
                 .select('*')
-                .eq('userId', userId)
-                .eq('americanOdds', prop.americanOdds)
-                .eq('eventName', prop.eventName)
-                .eq('leagueId', prop.leagueId)
-                .eq('eventId', prop.eventId)
-                .eq('category', prop.category)
-                .eq('eventDate', prop.eventDate)
-                .eq('label', prop.label)
-                .eq('propLabel', prop.propLabel);
+                .eq('providerOutcomeId', prop.providerOutcomeId)
+                .eq('eventId', prop.eventId);
             
             if (savedError) throw new Error('Error getting prop');
             if (saved.length > 0) return;
@@ -48,6 +41,7 @@ export function PropCard({
                 .insert([
                     {
                         userId,
+                        providerOutcomeId: prop.providerOutcomeId,
                         americanOdds: prop.americanOdds,
                         eventName: prop.eventName,
                         leagueId: prop.leagueId,
@@ -98,11 +92,12 @@ export function PropCard({
             <Text fontWeight='semibold' fontSize='xl'>{prop.eventName}</Text>
             <HStack>
                 <Text>{prop.label}</Text>
+                <Text>-</Text>
                 <Text>{prop.propLabel}</Text>
             </HStack>
             { !prop.line ?
             <VStack w='25%' p={2} borderRadius='8px' border='1px solid gray'>
-                <Text>{prop.americanOdds}</Text>
+                <Text>{prop.americanOdds > 0 ? `+${prop.americanOdds}` : prop.americanOdds}</Text>
             </VStack>
             :
             <Grid
@@ -114,7 +109,7 @@ export function PropCard({
                     <Text>{prop.line}</Text>
                 </VStack>
                 <VStack w='full' p={2} borderRadius='0px 8px 8px 0px' border='1px solid gray' borderLeft='none'>
-                    <Text>{prop.americanOdds}</Text>
+                    <Text>{prop.americanOdds > 0 ? `+${prop.americanOdds}` : prop.americanOdds}</Text>
                 </VStack>
             </Grid> }
             <Text>{format(prop.eventDate, 'PPpp')}</Text>
