@@ -46,13 +46,7 @@ export function NFLGameAccordian({
             <Accordion.ItemTrigger _focus={{ outline: 'none', boxShadow: 'outline' }}>
                 <HStack w='full' justify='space-around'>
                     {/* <Avatar src={game.team_pic_url ?? ''} name={game.team_name ?? ''} objectFit={'scale-down'} objectPosition={'top'} /> */}
-                    {game.team_pic_url ? <Image src={game.team_pic_url ?? ''} alt={game.team_name ?? ''} width={100} height={100} className={css({
-                        borderRadius: 'full',
-                        objectFit: 'cover',
-                        objectPosition: 'top',
-                        height: '100px',
-                        width: '100px',
-                    })} /> : <Avatar name={game.team_name ?? ''} />}
+                    <Avatar src={game.team_pic_url ?? ''} name={game.team_name ?? ''} />
                     <VStack w='full' gap={0} textAlign='center'>
                         <Text>{game.team_name}</Text>
                         <Text>{game.odds1 > 0 ? '+' : ''}{game.odds1}</Text>
@@ -62,13 +56,7 @@ export function NFLGameAccordian({
                         <Text>{game.opp_name}</Text>
                         <Text>{game.odds2 > 0 ? '+' : ''}{game.odds2}</Text>
                     </VStack>
-                    {game.opp_pic_url ? <Image src={game.opp_pic_url ?? ''} alt={game.opp_name ?? ''} width={100} height={100} className={css({
-                        borderRadius: 'full',
-                        objectFit: 'cover',
-                        objectPosition: 'top',
-                        height: '100px',
-                        width: '100px',
-                    })} /> : <Avatar name={game.opp_name ?? ''} />}
+                    <Avatar src={game.opp_pic_url ?? ''} name={game.opp_name ?? ''} />
                 </HStack>
                 <Accordion.ItemIndicator>
                     <ChevronDownIcon />
