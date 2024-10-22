@@ -133,6 +133,57 @@ export type Database = {
         }
         Relationships: []
       }
+      upcoming_nfl_odds: {
+        Row: {
+          created_at: string
+          game_date: string | null
+          game_id: string
+          game_name: string | null
+          odds1: number | null
+          odds2: number | null
+          opp: string | null
+          opp_book_odds: number | null
+          opp_name: string | null
+          opp_pic_url: string | null
+          team: string | null
+          team_book_odds: number | null
+          team_name: string | null
+          team_pic_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          game_date?: string | null
+          game_id: string
+          game_name?: string | null
+          odds1?: number | null
+          odds2?: number | null
+          opp?: string | null
+          opp_book_odds?: number | null
+          opp_name?: string | null
+          opp_pic_url?: string | null
+          team?: string | null
+          team_book_odds?: number | null
+          team_name?: string | null
+          team_pic_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          game_date?: string | null
+          game_id?: string
+          game_name?: string | null
+          odds1?: number | null
+          odds2?: number | null
+          opp?: string | null
+          opp_book_odds?: number | null
+          opp_name?: string | null
+          opp_pic_url?: string | null
+          team?: string | null
+          team_book_odds?: number | null
+          team_name?: string | null
+          team_pic_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
