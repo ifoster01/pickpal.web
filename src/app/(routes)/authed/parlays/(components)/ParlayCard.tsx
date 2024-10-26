@@ -6,6 +6,7 @@ import { Input } from "~/components/ui/input"
 import { convertToProbability } from "~/utils/functions"
 import { UFCParlayLegCard } from "./UFCParlayLegCard"
 import { Database } from "~/types/supabase"
+import { NFLPropParlayLegCard } from "./NFLPropParlayLegCard"
 import { NFLParlayLegCard } from "./NFLParlayLegCard"
 
 export function ParlayCard({
@@ -32,9 +33,14 @@ export function ParlayCard({
                 <Text fontWeight={700}>Parlay {idx + 1}</Text>
                 <VStack w='full'>
                     { parlay.picks.map((pick, j) => {
+                        if (league === 'nflprops') {
+                            return (
+                                <NFLPropParlayLegCard key={`${j}-${parlay.id}-${j * (new Date().getUTCMilliseconds())}`} pick={pick as Database['public']['Tables']['liked_props']['Row']} idx={j} />
+                            )
+                        }
                         if (league === 'nfl') {
                             return (
-                                <NFLParlayLegCard key={`${j}-${parlay.id}-${j * (new Date().getUTCMilliseconds())}`} pick={pick as Database['public']['Tables']['liked_props']['Row']} idx={j} />
+                                <NFLParlayLegCard key={`${j}-${parlay.id}-${j * (new Date().getUTCMilliseconds())}`} game={pick as Database['public']['Tables']['upcoming_nfl_odds']['Row']} idx={j} />
                             )
                         }
                         return (

@@ -17,7 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Spinner } from "~/components/ui/spinner";
 
 export type Parlay = {
-    picks: Database['public']['Tables']['upcoming_fight_odds']['Row'][] | Database['public']['Tables']['liked_props']['Row'][];
+    picks: Database['public']['Tables']['upcoming_fight_odds']['Row'][] | Database['public']['Tables']['upcoming_nfl_odds']['Row'][] | Database['public']['Tables']['liked_props']['Row'][];
     payout: number;
     probability: number;
     id: string;
@@ -26,6 +26,7 @@ export type Parlay = {
 export default function () {
     const { user } = useAuth();
     const [ufcData, setUfcData] = useState<Database['public']['Tables']['upcoming_fight_odds']['Row'][]>([]);
+    const [nflData, setNflData] = useState<Database['public']['Tables']['upcoming_nfl_odds']['Row'][]>([]);
     const [parlayLegs, setParlayLegs] = useState<number>(3);
     const [minPayout, setMinPayout] = useState<number | null>(400);
     const [generatedParlays, setGeneratedParlays] = useState<Parlay[]>([]);
@@ -71,6 +72,10 @@ export default function () {
                 .select('*')
                 .order('id', { ascending: true })
             
+            if (error) {
+                console.error('Server Error', 'There was an issue fetching data from our server.')
+            }
+
             // filtering the data so only dates that are in the future are shown
             const filteredData = upcoming_fight_odds?.filter((fight) => {
                 const fightDate = new Date(fight.fight_date ?? '')
@@ -78,18 +83,30 @@ export default function () {
                 const currentDate = new Date(new Date().getTime() - 2 * 24 * 60 * 60 * 1000)
                 return fightDate >= currentDate
             })
+
+            const { data: upcoming_nfl_odds, error: nflError } = await supabase
+                .from('upcoming_nfl_odds')
+                .select('*')
             
-            if (error) {
+            if (nflError) {
                 console.error('Server Error', 'There was an issue fetching data from our server.')
             }
 
+            const filteredNFLData = upcoming_nfl_odds?.filter((game) => {
+                const gameDate = new Date(game.game_date ?? '')
+                // adding a day to the fight date to account for time zone differences
+                const currentDate = new Date(new Date().getTime() - 2 * 24 * 60 * 60 * 1000)
+                return gameDate >= currentDate
+            })
+
             setUfcData(filteredData ?? [])
+            setNflData(filteredNFLData ?? [])
         }
 
         if (selectedLeague === 'ufc') getPicks()
     }, [])
 
-    const genNFLParlays = () => {
+    const genNFLPropParlays = () => {
         if (!nflProps) return
         setLoading(true)
 
@@ -175,6 +192,138 @@ export default function () {
             const propId = uuid().toString()
             setGeneratedParlays((prev) => [...prev, { picks: parlay, payout, probability: payout, id: propId }])
         }
+
+        // set any sorting to false
+        setSortByProbability(false)
+        setSortByPayout(false)
+        setSortByAgreement(false)
+
+        // create a short artificial delay to show the loading spinner
+        setTimeout(() => setLoading(false), 500)
+    }
+
+    const genNFLParlays = () => {
+        // get all possible combinations of the ufcData
+        // filter out the ones that don't meet the minPayout
+        // display the ones that do
+        setLoading(true)
+
+        // 1. Get all possible combinations of the ufcData based on the selected parlayLegs (between 2 and 6)
+        const allCombinations = []
+        if (parlayLegs === 2) {
+            for (let i = 0; i < nflData.length; i++) {
+                for (let j = i + 1; j < nflData.length; j++) {
+                    allCombinations.push([nflData[i], nflData[j]])
+                }
+            }
+        }
+        if (parlayLegs === 3) {
+            for (let i = 0; i < nflData.length; i++) {
+                for (let j = i + 1; j < nflData.length; j++) {
+                    for (let k = j + 1; k < nflData.length; k++) {
+                        allCombinations.push([nflData[i], nflData[j], nflData[k]])
+                    }
+                }
+            }
+        }
+        if (parlayLegs === 4) {
+            for (let i = 0; i < nflData.length; i++) {
+                for (let j = i + 1; j < nflData.length; j++) {
+                    for (let k = j + 1; k < nflData.length; k++) {
+                        for (let l = k + 1; l < nflData.length; l++) {
+                            allCombinations.push([nflData[i], nflData[j], nflData[k], nflData[l]])
+                        }
+                    }
+                }
+            }
+        }
+        if (parlayLegs === 5) {
+            for (let i = 0; i < nflData.length; i++) {
+                for (let j = i + 1; j < nflData.length; j++) {
+                    for (let k = j + 1; k < nflData.length; k++) {
+                        for (let l = k + 1; l < nflData.length; l++) {
+                            for (let m = l + 1; m < nflData.length; m++) {
+                                allCombinations.push([nflData[i], nflData[j], nflData[k], nflData[l], nflData[m]])
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Filter out the ones that don't meet the minPayout
+        const validParlays = allCombinations.filter((parlay) => {
+            const parlayOdds = parlay.reduce((acc, curr) => {
+                if (!curr.odds1 || !curr.odds2 || !curr.team_book_odds || !curr.opp_book_odds) return -1
+                if (acc === -1) return -1
+
+                // getting who we're betting on
+                const fighter = curr.odds1 < 0 ? 0 : 1
+                
+                if (acc === 0) {
+                    return fighter === 0 ? curr.team_book_odds : curr.opp_book_odds
+                }
+
+                // getting the percent book odds of who we're betting on
+                const percentOdds = convertToProbability(fighter === 0 ? curr.team_book_odds : curr.opp_book_odds)
+                const accOdds = convertToProbability(acc)
+                const newOdds = (accOdds * percentOdds) * 100
+
+                return convertToAmerican(newOdds)
+            }, 0)
+
+            if (parlayOdds === -1) return false
+            if (minPayout === null) return true
+            return parlayOdds >= minPayout
+        })
+
+        // reset the generatedParlays
+        setGeneratedParlays([])
+        for (const parlay of validParlays) {
+            const payout = parlay.reduce((acc, curr) => {
+                if (!curr.odds1 || !curr.odds2 || !curr.team_book_odds || !curr.opp_book_odds) return -1
+
+                // getting who we're betting on
+                const fighter = curr.odds1 < 0 ? 0 : 1
+                
+                if (acc === 0) {
+                    return fighter === 0 ? curr.team_book_odds : curr.opp_book_odds
+                }
+
+                // getting the percent book odds of who we're betting on
+                const percentOdds = convertToProbability(fighter === 0 ? curr.team_book_odds : curr.opp_book_odds)
+                const accOdds = convertToProbability(acc)
+                const newOdds = (accOdds * percentOdds) * 100
+
+                return convertToAmerican(newOdds)
+            }, 0)
+
+            const probability = parlay.reduce((acc, curr) => {
+                if (!curr.odds1 || !curr.odds2 || !curr.team_book_odds || !curr.opp_book_odds) return -1
+
+                // getting who we're betting on
+                const fighter = curr.odds1 < 0 ? 0 : 1
+                
+                if (acc === 0) {
+                    return fighter === 0 ? curr.odds1 : curr.odds2
+                }
+
+                // getting the percent book odds of who we're betting on
+                const percentOdds = convertToProbability(fighter === 0 ? curr.odds1 : curr.odds2)
+                const accOdds = convertToProbability(acc)
+                const newOdds = (accOdds * percentOdds) * 100
+
+                return convertToAmerican(newOdds)
+            }, 0)
+
+            const gameId = uuid().toString()
+            setGeneratedParlays((prev) => [...prev, { picks: parlay, payout, probability, id: gameId }])
+        }
+
+        // sorting by largest payout-probability discrepancy
+        setGeneratedParlays((prev) => prev.sort((a, b) => {
+            return (b.payout - b.probability) - (a.payout - a.probability)
+        }))
 
         // set any sorting to false
         setSortByProbability(false)
@@ -357,6 +506,7 @@ export default function () {
                         items={[
                             { label: 'UFC', value: 'ufc' },
                             { label: 'NFL', value: 'nfl' },
+                            { label: 'NFL Props', value: 'nflprops' },
                         ]}
                     />
                 }
@@ -378,6 +528,7 @@ export default function () {
                         items={[
                             { label: 'UFC', value: 'ufc' },
                             { label: 'NFL', value: 'nfl' },
+                            { label: 'NFL Props', value: 'nflprops' },
                         ]}
                     />
                 }
@@ -424,6 +575,7 @@ export default function () {
             <Button w={['100%', '100%', '70%', '50%', '50%', '40%']} onClick={() => {
                 if (selectedLeague === 'ufc') genParlays()
                 if (selectedLeague === 'nfl') genNFLParlays()
+                if (selectedLeague === 'nfl') genNFLPropParlays()
             }} fontWeight={700}>
                 {loading ? 'loading...' : 'Generate'}
             </Button>
@@ -451,9 +603,9 @@ export default function () {
                     Sort by Payout
                 </Switch>
             </HStack>
-            { selectedLeague === 'nfl' && !nflProps && !isLoading ? (
+            { selectedLeague === 'nflprops' && !nflProps && !isLoading ? (
                 <Text>No saved NFL Props!</Text>
-            ) : selectedLeague === 'nfl' && !nflProps && isLoading ? (
+            ) : selectedLeague === 'nflprops' && !nflProps && isLoading ? (
                 <HStack mt='10vh'>
                     <Spinner />
                     <Text>Loading NFL Props...</Text>
