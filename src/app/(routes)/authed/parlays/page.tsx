@@ -556,16 +556,14 @@ export default function () {
                     input={
                         <Input
                             width='100%'
-                            type='number'
-                            value={minPayout ?? 0}
+                            value={minPayout ? '+' + minPayout : 0}
                             placeholder='Min odds'
                             onChange={(e) => {
                                 const text = e.target.value
-        
+
                                 if (isNaN(parseInt(text)) && text !== '' && text !== '+') return
                                 if (isNaN(parseInt(text)) && text === '+') return setMinPayout(null)
                                 if (isNaN(parseInt(text))) return setMinPayout(null)
-        
                                 setMinPayout(parseInt(text))
                             }}
                         />
