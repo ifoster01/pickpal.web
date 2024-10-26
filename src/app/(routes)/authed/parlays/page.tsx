@@ -575,7 +575,7 @@ export default function () {
             <Button w={['100%', '100%', '70%', '50%', '50%', '40%']} onClick={() => {
                 if (selectedLeague === 'ufc') genParlays()
                 if (selectedLeague === 'nfl') genNFLParlays()
-                if (selectedLeague === 'nfl') genNFLPropParlays()
+                if (selectedLeague === 'nflprops') genNFLPropParlays()
             }} fontWeight={700}>
                 {loading ? 'loading...' : 'Generate'}
             </Button>
