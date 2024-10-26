@@ -57,7 +57,6 @@ export default function () {
 
                 return propDate >= currentDate
             })
-            console.log('got:', filteredData)
             
             return filteredData ?? null;
         },

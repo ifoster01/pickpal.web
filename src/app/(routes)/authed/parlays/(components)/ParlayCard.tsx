@@ -52,7 +52,7 @@ export function ParlayCard({
                     <Text>Book Payout:</Text>
                     <Text fontWeight={700}>{payoutString} ({payoutProbability}%)</Text>
                 </HStack>
-                { league === 'ufc' && <HStack justify='space-between' w='full'>
+                { league !== 'nflprops' && <HStack justify='space-between' w='full'>
                     <Text>Predicted Probability:</Text>
                     <Text fontWeight={700}>{probabilityString} ({predictedProbability}%)</Text>
                 </HStack> }
