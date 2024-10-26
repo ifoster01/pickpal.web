@@ -84,6 +84,8 @@ export default function () {
                 return fightDate >= currentDate
             })
 
+            setUfcData(filteredData ?? [])
+
             const { data: upcoming_nfl_odds, error: nflError } = await supabase
                 .from('upcoming_nfl_odds')
                 .select('*')
@@ -99,11 +101,10 @@ export default function () {
                 return gameDate >= currentDate
             })
 
-            setUfcData(filteredData ?? [])
             setNflData(filteredNFLData ?? [])
         }
 
-        if (selectedLeague === 'ufc') getPicks()
+        if (selectedLeague === 'ufc' || selectedLeague === 'nfl') getPicks()
     }, [])
 
     const genNFLPropParlays = () => {
