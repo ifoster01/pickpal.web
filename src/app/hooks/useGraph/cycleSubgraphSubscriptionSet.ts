@@ -1,5 +1,5 @@
 import { GenericNodeShape, GenericSubgraphDefinition, subgraphRecursion } from "@thinairthings/uix"
-import { nodeDefinitionMap, NodeKey } from "~/uix/generated/staticObjects"
+import { nodeDefinitionMap, NodeKey } from "@/uix/generated/staticObjects"
 import { graphStore } from "./graphStore"
 import { produce } from "immer"
 import { createSubgraphFromGraphStore, Subgraph } from "./createSubgraphFromGraphStore"

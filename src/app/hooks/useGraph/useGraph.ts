@@ -1,8 +1,8 @@
 import { AnySubgraphDefinition, ExtractOutputTree, GenericNodeShape, GenericSubgraphDefinition, QueryError, removeRelationshipEntries, reverseRelationshipMapKey, SubgraphDefinition, SubgraphPathDefinition, subgraphRecursion } from "@thinairthings/uix";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ConfiguredNodeDefinitionMap, nodeDefinitionMap, NodeKey } from "~/uix/generated/staticObjects";
+import { ConfiguredNodeDefinitionMap, nodeDefinitionMap, NodeKey } from "@/uix/generated/staticObjects";
 import { useQuery, skipToken, useQueryClient } from "@tanstack/react-query"
-import { extractSubgraph } from "~/uix/generated/functionModule";
+import { extractSubgraph } from "@/uix/generated/functionModule";
 import _ from "lodash";
 import { mergeSubgraphToGraphStore } from "./mergeSubgraphToGraphStore";
 import { cycleSubgraphSubscriptions } from "./cycleSubgraphSubscriptionSet";

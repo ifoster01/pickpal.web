@@ -1,7 +1,7 @@
 import { GenericNodeShape, removeRelationshipEntries, subgraphRecursion } from "@thinairthings/uix"
 import { graphStore } from "./graphStore"
 import _ from "lodash"
-import { nodeDefinitionMap } from "~/uix/generated/staticObjects"
+import { nodeDefinitionMap } from "@/uix/generated/staticObjects"
 import { AnyZodObject } from "zod"
 import { produce } from "immer"
 
