@@ -21,25 +21,25 @@ export function FightAccordian({
         } else {
             return 100 / ((Math.abs(odds) + 100))
         }
-        }
+    }
     
-        let odds1_diff = convertToProbability(fight.odds1) - convertToProbability(fight.f1_book_odds ?? 0)
-        let odds2_diff = convertToProbability(fight.odds2) - convertToProbability(fight.f2_book_odds ?? 0)
-        if (fight.f1_book_odds === 0 || fight.f2_book_odds === 0) {
+    let odds1_diff = convertToProbability(fight.odds1) - convertToProbability(fight.f1_book_odds ?? 0)
+    let odds2_diff = convertToProbability(fight.odds2) - convertToProbability(fight.f2_book_odds ?? 0)
+    if (fight.f1_book_odds === 0 || fight.f2_book_odds === 0) {
         odds1_diff = 0
         odds2_diff = 0
-        }
-    
-        let value = odds1_diff > 0 ? -1*odds1_diff : odds2_diff
-        if (odds1_diff === 0 && odds2_diff < 0 || odds1_diff < 0 && odds2_diff === 0) {
-        value = 0
-        }
+    }
 
-        const betText = Math.abs(value) > 0.4 ? 'huge' :
-                        Math.abs(value) > 0.3 ? 'large' :
-                        Math.abs(value) > 0.1 ? 'medium' :
-                        Math.abs(value) > 0.05 ? 'small' :
-                        'almost no'
+    let value = odds1_diff > 0 ? -1*odds1_diff : odds2_diff
+    if (odds1_diff === 0 && odds2_diff < 0 || odds1_diff < 0 && odds2_diff === 0) {
+        value = 0
+    }
+
+    const betText = Math.abs(value) > 0.4 ? 'huge' :
+                    Math.abs(value) > 0.3 ? 'large' :
+                    Math.abs(value) > 0.1 ? 'medium' :
+                    Math.abs(value) > 0.05 ? 'small' :
+                    'almost no'
 
     return (
         <Accordion.Item key={fight.fight_id} value={fight.fight_id}>

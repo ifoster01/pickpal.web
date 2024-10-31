@@ -4,14 +4,7 @@ import { createClient } from "~/utils/supabase/client";
 import { useEffect, useState } from "react";
 import { Accordion } from "~/components/ui/accordion";
 import { Text } from "~/components/ui/text";
-import { ChevronDownIcon } from "lucide-react";
 import { Database } from "~/types/supabase";
-import { Avatar } from "~/components/ui/avatar";
-import Image from "next/image";
-import { css } from "@/styled-system/css";
-import { convertToProbability } from "~/utils/functions";
-import { Progress } from "~/components/ui/progress";
-import { Scale } from "~/components/general/Scale";
 import { LabeledInput } from "~/components/general/LabaledInput";
 import { Select } from "~/components/general/Select";
 import { FightAccordian } from "./(components)/Picks/FightAccordian";
@@ -19,6 +12,7 @@ import { NFLGameAccordian } from "./(components)/Picks/NFLGameAccordian";
 
 export default function () {
     const [ufcData, setUfcData] = useState<Database['public']['Tables']['upcoming_fight_odds']['Row'][] | null>(null);
+    const [ufcSaves, setUfcSaves] = useState<Database['public']['Tables']['liked_fights']['Row'][] | null>(null);
     const [nflData, setNflData] = useState<Database['public']['Tables']['upcoming_nfl_odds']['Row'][] | null>(null);
     const [league, setLeague] = useState<'ufc' | 'nfl'>('ufc')
 
@@ -29,7 +23,6 @@ export default function () {
                 .from('upcoming_fight_odds')
                 .select('*')
                 .order('id', { ascending: true })
-            
             // filtering the data so only dates that are in the future are shown
             const fightFilteredData = upcoming_fight_odds?.filter((fight) => {
                 const fightDate = new Date(fight.fight_date ?? '')
@@ -37,12 +30,21 @@ export default function () {
                 const currentDate = new Date(new Date().getTime() - 2 * 24 * 60 * 60 * 1000)
                 return fightDate >= currentDate
             })
-            
             if (fight_error) {
                 throw new Error('Server Error: There was an issue fetching fighter data from our server.');
             }
-
             setUfcData(fightFilteredData ?? null)
+
+            const { data: liked_ufc_data, error: liked_fight_error } = await supabase
+                .from('liked_fights')
+                .select('*')
+            // filtering the data so only dates that are in the future are shown
+            const likedFightFilteredData = liked_ufc_data?.filter((fight) => {
+                const fightDate = new Date(fight.fight_date ?? '')
+                // adding a day to the fight date to account for time zone differences
+                const currentDate = new Date(new Date().getTime() - 2 * 24 * 60 * 60 * 1000)
+                return fightDate >= currentDate
+            })
 
             const { data: upcoming_nfl_odds, error: nfl_error } = await supabase
                 .from('upcoming_nfl_odds')

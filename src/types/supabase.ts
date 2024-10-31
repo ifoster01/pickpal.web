@@ -34,6 +34,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      liked_fights: {
+        Row: {
+          created_at: string
+          f1_book_odds: number | null
+          f1_pic_url: string | null
+          f2_book_odds: number | null
+          f2_pic_url: string | null
+          fight_date: string | null
+          fight_id: string | null
+          fight_name: string | null
+          fighter1: string | null
+          fighter2: string | null
+          id: number
+          odds1: number | null
+          odds2: number | null
+        }
+        Insert: {
+          created_at?: string
+          f1_book_odds?: number | null
+          f1_pic_url?: string | null
+          f2_book_odds?: number | null
+          f2_pic_url?: string | null
+          fight_date?: string | null
+          fight_id?: string | null
+          fight_name?: string | null
+          fighter1?: string | null
+          fighter2?: string | null
+          id?: number
+          odds1?: number | null
+          odds2?: number | null
+        }
+        Update: {
+          created_at?: string
+          f1_book_odds?: number | null
+          f1_pic_url?: string | null
+          f2_book_odds?: number | null
+          f2_pic_url?: string | null
+          fight_date?: string | null
+          fight_id?: string | null
+          fight_name?: string | null
+          fighter1?: string | null
+          fighter2?: string | null
+          id?: number
+          odds1?: number | null
+          odds2?: number | null
+        }
+        Relationships: []
+      }
       liked_props: {
         Row: {
           americanOdds: number | null
