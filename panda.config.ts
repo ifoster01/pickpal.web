@@ -8,7 +8,7 @@ export default defineConfig({
     createPreset({
       accentColor: 'neutral',
       grayColor: 'sand',
-      additionalColors: ['red', 'green'],
+      additionalColors: ['red', 'green', 'blue', 'gray'],
     }),
   ],
   include: ['./src/**/*.{js,jsx,ts,tsx}', './pages/**/*.{js,jsx,ts,tsx}'],

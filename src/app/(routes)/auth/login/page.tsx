@@ -1,5 +1,5 @@
 "use client";
-import { VStack } from "@/styled-system/jsx";
+import { HStack, VStack } from "@/styled-system/jsx";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { createClient } from "~/utils/supabase/client";
@@ -7,10 +7,12 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Text } from "~/components/ui/text";
 import { LabeledInput } from "~/components/general/LabaledInput";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function () {
     const router = useRouter();
+    const [showPassword, setShowPassword] = useState(false);
 
     const {
         register,
@@ -38,12 +40,25 @@ export default function () {
             {errors.email && <Text color='red'>{errors.email.message}</Text>}
             <LabeledInput
                 label="Password"
+                w='full'
                 input={
-                    <Input
-                        type="password"
-                        {...register("password", { required: true })}
-                        placeholder="123456789"
-                    />
+                    <HStack w='full' border='1px solid' borderColor='#cfceca' borderRadius='md' pr={2}>
+                        <Input
+                            type={showPassword ? "text" : "password"}
+                            {...register("password", { required: true })}
+                            placeholder="123456789"
+                            border='none'
+                            _focus={{
+                                boxShadow: 'none',
+                            }}
+                        />
+                        {
+                            showPassword ?
+                                <EyeOff onClick={() => setShowPassword(false)} />
+                                :
+                                <Eye onClick={() => setShowPassword(true)} />
+                        }
+                    </HStack>
                 }
             />
             {errors.password && <Text color='red'>{errors.password.message}</Text>}
