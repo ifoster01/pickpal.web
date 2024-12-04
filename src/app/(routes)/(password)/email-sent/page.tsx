@@ -12,6 +12,7 @@ const EmailSent = () => {
     const router = useRouter();
     const email = useSearchParams().get('email');
     const [emailError, setEmailError] = useState(false);
+    const [emailResent, setEmailResent] = useState(false);
 
     if (!email) {
         return <Text>No email provided</Text>;
@@ -34,8 +35,9 @@ const EmailSent = () => {
                         setEmailError(true);
                         return;
                     }
-                    router.push(`/email-sent?email=${email}`);
+                    setEmailResent(true);
                 }}>Resend Email</Button>
+                {emailResent && <Text color='fg.success'>Email resent successfully!</Text>}
             </VStack>
         </VStack>
     )

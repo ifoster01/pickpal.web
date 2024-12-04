@@ -3,7 +3,7 @@ import { HStack, VStack } from "@/styled-system/jsx";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { createClient } from "~/utils/supabase/client";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Text } from "~/components/ui/text";
 import { LabeledInput } from "~/components/general/LabaledInput";
@@ -12,7 +12,7 @@ import Image from "next/image";
 import { css } from "@/styled-system/css";
 import { Eye, EyeOff } from "lucide-react";
 
-export default function () {
+const ResetPassword = () => {
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -118,7 +118,10 @@ export default function () {
     )
 }
 
-function ParamsMessage() {
-    const params = useSearchParams();
-    return params.get('message') ? <Text color='red'>{params.get('message')}</Text> : null;
+export default function () {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ResetPassword />
+        </Suspense>
+    )
 }
