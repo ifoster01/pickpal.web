@@ -14,7 +14,6 @@ import { Eye, EyeOff } from "lucide-react";
 
 export default function () {
     const router = useRouter();
-
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -94,6 +93,12 @@ export default function () {
                     }
                     
                     const supabase = createClient();
+
+                    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+                    if (userError) {
+                        return router.push("/forgot-password?message=A user with that email already exists! Please try again with a different email.");
+                    }
 
                     const { error } = await supabase.auth.updateUser({
                         password: password,
