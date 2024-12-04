@@ -18,8 +18,8 @@ export default function () {
         <VStack minH='screen' maxW='screen' overflow='auto' pt={8} justify='center'>
             <VStack px='10%'>
                 <Image src='/logos/pickpockt long.svg' alt='Pickpockt' width={200} height={100} onClick={() => router.push('/')} className={css({ cursor: 'pointer' })} />
-                <Text mt={4} fontSize='3xl'>Reset Password</Text>
-                <Text>Enter the email associated with your account and we&apos;ll send you instructions to reset your password.</Text>
+                <Text mt={4} fontSize='3xl'>Forgot Password</Text>
+                <Text textAlign={'center'}>Enter the email associated with your account and we&apos;ll send you instructions to reset your password.</Text>
                 <LabeledInput
                     label="Email"
                     input={
