@@ -1,17 +1,10 @@
 "use client";
-import { Box, HStack, VStack } from "@/styled-system/jsx";
+import { VStack } from "@/styled-system/jsx";
 import { createClient } from "~/utils/supabase/client";
 import { useEffect, useState } from "react";
 import { Accordion } from "~/components/ui/accordion";
 import { Text } from "~/components/ui/text";
-import { ChevronDownIcon } from "lucide-react";
 import { Database } from "~/types/supabase";
-import { Avatar } from "~/components/ui/avatar";
-import Image from "next/image";
-import { css } from "@/styled-system/css";
-import { convertToProbability } from "~/utils/functions";
-import { Progress } from "~/components/ui/progress";
-import { Scale } from "~/components/general/Scale";
 import { LabeledInput } from "~/components/general/LabaledInput";
 import { Select } from "~/components/general/Select";
 import { FightAccordian } from "./(components)/Picks/FightAccordian";
@@ -113,8 +106,11 @@ export default function () {
                     />
                 }
             />
-            <Accordion.Root multiple>
-                { league === 'ufc' && ufcData ? ufcData.map((fight) => (
+            { league === 'ufc' && !ufcData ? <Text mt={12}>Upcoming UFC fights have not yet been predicted.</Text> :
+                league === 'nfl' && !nflData ? <Text mt={12}>Upcoming NFL games have not yet been predicted.</Text> :
+                <>
+                <Accordion.Root multiple>
+                    { league === 'ufc' && ufcData ? ufcData.map((fight) => (
                     <FightAccordian fight={fight} key={fight.fight_id} />
                 ))
                     : league === 'nfl' ? nflData?.map((game) => (
@@ -122,8 +118,10 @@ export default function () {
                     ))
                     :
                     <Text>Loading...</Text>
-                }
-            </Accordion.Root>
+                    }
+                </Accordion.Root>
+                </>
+            }
         </VStack>
     )
 }
