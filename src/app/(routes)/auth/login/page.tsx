@@ -50,6 +50,7 @@ export default function () {
             <Suspense fallback={<Text>Loading...</Text>}>
                 <ParamsMessage />
             </Suspense>
+            <Button alignSelf='flex-end' variant='link' onClick={() => router.push("/forgot-password")}>Forgot Password?</Button>
             <Button w='full' mt={4} onClick={handleSubmit(async (data) => {
                 const { email, password } = data;
                 console.log('here')
