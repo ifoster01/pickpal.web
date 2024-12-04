@@ -4,17 +4,13 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { css } from "@/styled-system/css";
 import { Text } from "~/components/ui/text";
-import { LabeledInput } from "~/components/general/LabaledInput";
-import { useForm } from "react-hook-form";
-import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { createClient } from "~/utils/supabase/client";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 
-export default function () {
+const EmailSent = () => {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const email = searchParams.get('email');
+    const email = useSearchParams().get('email');
     const [emailError, setEmailError] = useState(false);
 
     if (!email) {
@@ -42,5 +38,13 @@ export default function () {
                 }}>Resend Email</Button>
             </VStack>
         </VStack>
+    )
+}
+
+export default function () {
+    return (
+        <Suspense fallback={<Text>Loading...</Text>}>
+            <EmailSent />
+        </Suspense>
     )
 }
