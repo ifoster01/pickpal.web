@@ -27,7 +27,7 @@ export default function () {
                 <Image src='/logos/pickpockt long.svg' alt='Pickpockt' width={200} height={100} onClick={() => router.push('/')} className={css({ cursor: 'pointer' })} />
                 <Text mt={4} fontSize='3xl'>Email Sent</Text>
                 <Text fontSize='xl'>Check your email for instructions to reset your password.</Text>
-                <Text>If you don't see an email in 3 minutes, please check your spam folder or try again.</Text>
+                <Text>If you don&apos;t see an email in 3 minutes, please check your spam folder or try again.</Text>
                 {emailError && <Text color='fg.error'>Something went wrong. Please try again.</Text>}
                 <Button mt={4} px={12} onClick={async () => {
                     const supabase = createClient();
