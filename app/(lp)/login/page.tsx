@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
+import Image from "next/image";
 
 const schema = z.object({
   email: z.string().email(),
@@ -84,9 +85,10 @@ export default function Login() {
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full gap-2"
             onClick={() => {/* Implement Google login */}}
           >
+            <Image src="/google-colored.svg" alt="Google" width={20} height={20} />
             Continue with Google
           </Button>
 

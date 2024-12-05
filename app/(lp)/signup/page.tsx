@@ -12,6 +12,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft } from "lucide-react";
+import Image from "next/image";
 
 const schema = z.object({
   firstName: z.string().min(2),
@@ -159,9 +160,10 @@ export default function SignUp() {
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full gap-2"
             onClick={() => {/* Implement Google signup */}}
           >
+            <Image src="/google-colored.svg" alt="Google" width={20} height={20} />
             Continue with Google
           </Button>
 
