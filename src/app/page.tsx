@@ -25,7 +25,7 @@ export default function Home() {
         <Button mt={10} w='full' onClick={() => router.push('/auth/login')}>Login</Button>
         <Button w='full' variant='outline' onClick={() => router.push('/auth/signup')}>Sign up</Button>
 
-        <VStack mt={10}>
+        <VStack my={10}>
           <Text textAlign={'center'}>A more complete version of Pickpockt is available <Link className={css({ fontWeight: 'bold' })} href='https://apps.apple.com/us/app/pickpockt/id6736374764' target="_blank">on iOS</Link>.</Text>
           <Box borderRadius='24px' border='1px solid' borderColor='border.default' p={4}>
             <Link href='https://apps.apple.com/us/app/pickpockt/id6736374764' target="_blank">

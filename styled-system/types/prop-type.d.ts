@@ -199,7 +199,7 @@ export interface UtilityValues {
 	srOnly: boolean;
 	debug: boolean;
 	containerName: CssProperties["containerName"];
-	colorPalette: "current" | "black" | "white" | "transparent" | "gray" | "gray.light" | "gray.dark" | "green" | "green.light" | "green.dark" | "red" | "red.light" | "red.dark" | "sand" | "sand.light" | "sand.dark" | "neutral" | "neutral.light" | "neutral.dark" | "accent" | "bg" | "fg" | "border";
+	colorPalette: "current" | "black" | "white" | "transparent" | "blue" | "blue.light" | "blue.dark" | "gray" | "gray.light" | "gray.dark" | "green" | "green.light" | "green.dark" | "red" | "red.light" | "red.dark" | "sand" | "sand.light" | "sand.dark" | "neutral" | "neutral.light" | "neutral.dark" | "accent" | "bg" | "fg" | "border";
 	textStyle: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl";
 }
 
