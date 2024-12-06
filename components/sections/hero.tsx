@@ -81,7 +81,7 @@ export function Hero() {
             transition={{ delay: 0.6 }}
             className="text-xl mb-8 text-muted-foreground"
           >
-              Experience the next generation of digital interaction with our cutting-edge platform
+              Experience the next generation of sports betting insights with our cutting-edge technology.
           </motion.p>
 
           <motion.div

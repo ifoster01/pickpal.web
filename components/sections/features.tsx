@@ -2,35 +2,25 @@
 
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { Smartphone, Shield, Zap, Trophy, BarChart, Clock } from "lucide-react";
+import { Smartphone, Shield, Zap, Trophy, BarChart, Clock, Heart, Rocket } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 const features = [
   {
-    icon: <Zap className="h-6 w-6" />,
-    title: "Lightning Fast",
-    description: "Get instant access to advanced analytics and predictions"
+    icon: <Trophy className="h-6 w-6" />,
+    title: "AI Picks",
+    description: "Get AI generated picks for your favorite sports"
   },
   {
-    icon: <Shield className="h-6 w-6" />,
-    title: "Secure",
-    description: "Enterprise-grade security protecting your data"
+    icon: <Heart className="h-6 w-6" />,
+    title: "Save Favorites",
+    description: "Save your favorite picks for easy access"
   },
   {
-    icon: <BarChart className="h-6 w-6" />,
-    title: "Advanced Analytics",
-    description: "Powerful insights driven by machine learning"
+    icon: <Rocket className="h-6 w-6" />,
+    title: "Parlay Generator",
+    description: "Generate parlay bets for your favorite sports"
   },
-  // {
-  //   icon: <Trophy className="h-6 w-6" />,
-  //   title: "Expert Picks",
-  //   description: "Curated selections from industry experts"
-  // },
-  // {
-  //   icon: <Clock className="h-6 w-6" />,
-  //   title: "Real-time Updates",
-  //   description: "Stay informed with instant notifications"
-  // },
   {
     icon: <Smartphone className="h-6 w-6" />,
     title: "Mobile First",

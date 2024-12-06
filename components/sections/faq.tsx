@@ -50,7 +50,7 @@ export function FAQ() {
     },
     {
       question: "What sports are covered?",
-      answer: "We cover all major sports including football, basketball, baseball, hockey, and soccer. Our platform is continuously expanding to include more sports and leagues."
+      answer: "We currently cover the NFL and UFC but are currently working on expanding to other sports."
     },
     {
       question: "Is there a mobile app available?",
@@ -58,7 +58,7 @@ export function FAQ() {
     },
     {
       question: "What makes your platform unique?",
-      answer: "We combine cutting-edge technology with user-friendly design to deliver actionable insights. Our platform stands out through its real-time analytics, personalized recommendations, and comprehensive data visualization."
+      answer: "We combine cutting-edge technology with user-friendly design to deliver actionable insights. Our platform stands out through its real-time analytics, personalized parlay generation, and comprehensive data visualization."
     }
   ];
 
