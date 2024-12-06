@@ -22,7 +22,7 @@ export function About() {
         >
           <h2 className="text-4xl font-bold mb-4">Our Story</h2>
           <p className="text-xl text-muted-foreground">
-            Building the future of intelligent decision making
+            Building the future of casual sports betting
           </p>
         </motion.div>
 
@@ -36,14 +36,14 @@ export function About() {
           >
             <h3 className="text-2xl font-semibold">Our Mission</h3>
             <p className="text-muted-foreground">
-              Founded in 2023, we set out to revolutionize the way people make decisions. 
-              Our team of experts combines advanced machine learning with deep industry knowledge 
+              Founded in 2024, we set out to revolutionize the way people make sports bets.
+              Our team of experts combines advanced machine learning with deep industry knowledge
               to provide unparalleled insights.
             </p>
             <h3 className="text-2xl font-semibold">Our Vision</h3>
             <p className="text-muted-foreground">
-              We're building a future where advanced analytics are accessible to everyone. 
-              Through continuous innovation and dedication to our users, we're making that 
+              We're building a future where advanced analytics are accessible to everyone.
+              Through continuous innovation and dedication to our users, we're making that
               vision a reality.
             </p>
           </motion.div>

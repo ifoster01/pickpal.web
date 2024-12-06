@@ -21,16 +21,16 @@ const features = [
     title: "Advanced Analytics",
     description: "Powerful insights driven by machine learning"
   },
-  {
-    icon: <Trophy className="h-6 w-6" />,
-    title: "Expert Picks",
-    description: "Curated selections from industry experts"
-  },
-  {
-    icon: <Clock className="h-6 w-6" />,
-    title: "Real-time Updates",
-    description: "Stay informed with instant notifications"
-  },
+  // {
+  //   icon: <Trophy className="h-6 w-6" />,
+  //   title: "Expert Picks",
+  //   description: "Curated selections from industry experts"
+  // },
+  // {
+  //   icon: <Clock className="h-6 w-6" />,
+  //   title: "Real-time Updates",
+  //   description: "Stay informed with instant notifications"
+  // },
   {
     icon: <Smartphone className="h-6 w-6" />,
     title: "Mobile First",
@@ -55,7 +55,7 @@ export function Features() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
           {features.map((feature, index) => (
             <FeatureCard key={index} {...feature} index={index} />
           ))}
@@ -77,8 +77,9 @@ function FeatureCard({ icon, title, description, index }: any) {
       initial={{ opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
+      className="h-full"
     >
-      <Card className="p-6 hover:shadow-lg transition-shadow">
+      <Card className="p-6 h-full hover:shadow-lg transition-shadow">
         <div className="rounded-full bg-primary/10 w-12 h-12 flex items-center justify-center mb-4">
           {icon}
         </div>

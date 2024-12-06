@@ -41,12 +41,15 @@ export function Navbar() {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="items-center w-fit">
-            <Image src="/pickpockt long.svg" alt="Pickpockt" width={200} height={50} />
-          </Link>
+          {/* Logo Section */}
+          <div className="w-[200px]">
+            <Link href="/" className="items-center w-fit">
+              <Image src="/pickpockt long.svg" alt="Pickpockt" width={200} height={50} />
+            </Link>
+          </div>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8">
+          {/* Desktop Menu - Centered */}
+          <div className="hidden md:flex flex-1 items-center justify-center space-x-8">
             <button
               onClick={() => scrollToSection("features")}
               className="text-foreground/80 hover:text-foreground transition-colors"
@@ -65,6 +68,22 @@ export function Navbar() {
             >
               Mobile App
             </button>
+            <button
+              onClick={() => scrollToSection("faq")}
+              className="text-foreground/80 hover:text-foreground transition-colors"
+            >
+              FAQ
+            </button>
+            <button
+              onClick={() => scrollToSection("contact")}
+              className="text-foreground/80 hover:text-foreground transition-colors"
+            >
+              Contact
+            </button>
+          </div>
+
+          {/* Auth Buttons Section */}
+          <div className="hidden md:flex items-center space-x-4 w-[200px] justify-end">
             <Button variant="ghost" onClick={() => router.push("/login")}>
               Sign In
             </Button>
@@ -112,6 +131,18 @@ export function Navbar() {
                 className="block w-full text-left py-2"
               >
                 Mobile App
+              </button>
+              <button
+                onClick={() => scrollToSection("faq")}
+                className="block w-full text-left py-2"
+              >
+                FAQ
+              </button>
+              <button
+                onClick={() => scrollToSection("contact")}
+                className="block w-full text-left py-2"
+              >
+                Contact
               </button>
               <div className="grid grid-cols-2 gap-4 pt-4">
                 <Button variant="outline" onClick={() => router.push("/login")}>

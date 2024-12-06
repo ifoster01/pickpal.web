@@ -1,9 +1,36 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 
+const scrollToSection = (id: string) => {
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: "smooth" });
+  }
+};
+
+const useScrollNavigation = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleNavigation = (id: string) => {
+    if (pathname !== "/") {
+      // Store the target section in sessionStorage
+      sessionStorage.setItem("scrollTarget", id);
+      router.push("/");
+    } else {
+      scrollToSection(id);
+    }
+  };
+
+  return handleNavigation;
+};
+
 export function Footer() {
+  const handleNavigation = useScrollNavigation();
+
   return (
     <footer className="bg-background border-t">
       <div className="container mx-auto px-4 py-8">
@@ -12,14 +39,20 @@ export function Footer() {
             <h3 className="text-lg font-semibold">Company</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
+                <button
+                  onClick={() => handleNavigation("about")}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
                   About Us
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
+                <button
+                  onClick={() => handleNavigation("features")}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
                   Features
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
@@ -28,9 +61,12 @@ export function Footer() {
             <h3 className="text-lg font-semibold">Product</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#mobile-app" className="text-muted-foreground hover:text-foreground transition-colors">
+                <button
+                  onClick={() => handleNavigation("mobile-app")}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
                   Mobile App
-                </Link>
+                </button>
               </li>
               <li>
                 <Link href="/pricing" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -44,14 +80,20 @@ export function Footer() {
             <h3 className="text-lg font-semibold">Support</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
+                <button
+                  onClick={() => handleNavigation("contact")}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
                   Contact
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/faq" className="text-muted-foreground hover:text-foreground transition-colors">
+                <button
+                  onClick={() => handleNavigation("faq")}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
                   FAQ
-                </Link>
+                </button>
               </li>
             </ul>
           </div>

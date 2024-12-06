@@ -2,15 +2,43 @@
 
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { BackgroundAnimation } from "@/components/ui/background-animation";
+
+const FloatingBlob = ({ delay = 0, top, left, color = "from-purple-500 to-indigo-500" }: { delay: number, top: string, left: string, color?: string }) => (
+  <motion.div
+    className={`absolute opacity-75 blur-[100px] bg-gradient-to-br ${color}`}
+    style={{
+      width: "45rem",
+      height: "45rem",
+      top,
+      left,
+    }}
+    animate={{
+      scale: [1, 1.3, 0.6, 1],
+      x: [20, 50, 80, 20],
+      y: [0, 30, 0],
+    }}
+    transition={{
+      duration: 15,
+      repeat: Infinity,
+      repeatType: "reverse",
+      ease: "easeInOut",
+      delay,
+    }}
+  />
+);
 
 export function Hero() {
   return (
     <section className="min-h-screen relative overflow-hidden flex items-center">
-      <BackgroundAnimation />
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-background/95 -z-10" />
+      <div className="absolute inset-0 overflow-hidden" style={{ zIndex: 0 }}>
+        <FloatingBlob delay={0} top="10%" left="20%" color="from-violet-600 to-purple-600" />
+        <FloatingBlob delay={5} top="60%" left="50%" color="from-purple-600 to-indigo-600" />
+        <FloatingBlob delay={10} top="30%" left="70%" color="from-indigo-600 to-violet-600" />
+      </div>
+
+      <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/70 to-background" style={{ zIndex: 1 }} />
       
-      <div className="container mx-auto px-4 py-32">
+      <div className="container relative mx-auto px-4 py-32" style={{ zIndex: 2 }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -43,9 +71,9 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="text-xl text-muted-foreground mb-8"
+            className="text-xl mb-8 text-muted-foreground"
           >
-            Experience the next generation of digital interaction with our cutting-edge platform
+              Experience the next generation of digital interaction with our cutting-edge platform
           </motion.p>
 
           <motion.div

@@ -36,9 +36,8 @@ export function MobileApp() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="relative h-[600px] mx-auto w-full max-w-[300px]"
+            className="relative mx-auto w-full max-w-[300px]"
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent rounded-3xl" />
             <Image
               src="/pickpockt-icon.png"
               alt="Mobile App"
