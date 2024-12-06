@@ -1,28 +1,45 @@
 'use client';
 
-import * as React from 'react';
-import * as ProgressPrimitive from '@radix-ui/react-progress';
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
-import { cn } from '@/lib/utils';
+interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
+  value?: number;
+  className?: string;
+}
 
-const Progress = React.forwardRef<
-  React.ElementRef<typeof ProgressPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
->(({ className, value, ...props }, ref) => (
-  <ProgressPrimitive.Root
-    ref={ref}
-    className={cn(
-      'relative h-4 w-full overflow-hidden rounded-full bg-secondary',
-      className
-    )}
-    {...props}
-  >
-    <ProgressPrimitive.Indicator
-      className="h-full w-full flex-1 bg-primary transition-all"
-      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
-    />
-  </ProgressPrimitive.Root>
-));
-Progress.displayName = ProgressPrimitive.Root.displayName;
+const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
+  ({ value = 0, className, ...props }, ref) => {
+    // Ensure value is between 0 and 100
+    const normalizedValue = React.useMemo(() => {
+      if (typeof value !== "number") return 0;
+      return Math.min(Math.max(value, 0), 100);
+    }, [value]);
+
+    return (
+      <div
+        ref={ref}
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={normalizedValue}
+        className={cn(
+          "relative h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800",
+          className
+        )}
+        {...props}
+      >
+        <div
+          className="h-full w-full bg-slate-900 dark:bg-slate-50 transition-transform duration-500 ease-in-out"
+          style={{
+            transform: `translateX(-${100 - normalizedValue}%)`
+          }}
+        />
+      </div>
+    );
+  }
+);
+
+Progress.displayName = "Progress";
 
 export { Progress };

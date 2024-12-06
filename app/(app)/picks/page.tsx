@@ -54,8 +54,7 @@ const fights: Fight[] = [
       image: "https://images.unsplash.com/photo-1547941126-3d5322b218b0?auto=format&fit=crop&q=80&w=200&h=200"
     },
     discrepancy: "medium"
-  },
-  // Add more fights as needed
+  }
 ];
 
 export default function PicksPage() {
