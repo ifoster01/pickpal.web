@@ -2,16 +2,37 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
 
+const useScrollNavigation = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleNavigation = (id: string) => {
+    if (pathname !== "/") {
+      // Store the target section in sessionStorage
+      sessionStorage.setItem("scrollTarget", id);
+      router.push("/");
+    } else {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
+
+  return handleNavigation;
+};
+
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const handleNavigation = useScrollNavigation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,14 +42,6 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-    setIsMobileMenuOpen(false);
-  };
 
   return (
     <motion.nav
@@ -51,31 +64,31 @@ export function Navbar() {
           {/* Desktop Menu - Centered */}
           <div className="hidden md:flex flex-1 items-center justify-center space-x-8">
             <button
-              onClick={() => scrollToSection("features")}
+              onClick={() => handleNavigation("features")}
               className="text-foreground/80 hover:text-foreground transition-colors"
             >
               Features
             </button>
             <button
-              onClick={() => scrollToSection("about")}
+              onClick={() => handleNavigation("about")}
               className="text-foreground/80 hover:text-foreground transition-colors"
             >
               About
             </button>
             <button
-              onClick={() => scrollToSection("mobile-app")}
+              onClick={() => handleNavigation("mobile-app")}
               className="text-foreground/80 hover:text-foreground transition-colors"
             >
               Mobile App
             </button>
             <button
-              onClick={() => scrollToSection("faq")}
+              onClick={() => handleNavigation("faq")}
               className="text-foreground/80 hover:text-foreground transition-colors"
             >
               FAQ
             </button>
             <button
-              onClick={() => scrollToSection("contact")}
+              onClick={() => handleNavigation("contact")}
               className="text-foreground/80 hover:text-foreground transition-colors"
             >
               Contact
@@ -115,31 +128,31 @@ export function Navbar() {
           >
             <div className="container mx-auto px-4 py-4 space-y-4">
               <button
-                onClick={() => scrollToSection("features")}
+                onClick={() => handleNavigation("features")}
                 className="block w-full text-left py-2"
               >
                 Features
               </button>
               <button
-                onClick={() => scrollToSection("about")}
+                onClick={() => handleNavigation("about")}
                 className="block w-full text-left py-2"
               >
                 About
               </button>
               <button
-                onClick={() => scrollToSection("mobile-app")}
+                onClick={() => handleNavigation("mobile-app")}
                 className="block w-full text-left py-2"
               >
                 Mobile App
               </button>
               <button
-                onClick={() => scrollToSection("faq")}
+                onClick={() => handleNavigation("faq")}
                 className="block w-full text-left py-2"
               >
                 FAQ
               </button>
               <button
-                onClick={() => scrollToSection("contact")}
+                onClick={() => handleNavigation("contact")}
                 className="block w-full text-left py-2"
               >
                 Contact

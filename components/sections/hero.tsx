@@ -2,6 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import Link from "next/link";
+
+const scrollToSection = (id: string) => {
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: "smooth" });
+  }
+};
 
 const FloatingBlob = ({ delay = 0, top, left, color = "from-purple-500 to-indigo-500" }: { delay: number, top: string, left: string, color?: string }) => (
   <motion.div
@@ -82,10 +90,17 @@ export function Hero() {
             transition={{ delay: 0.8 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Button size="lg" className="text-lg">
-              Get Started
+            <Button size="lg" className="text-lg" asChild>
+              <Link href="/signup">
+                Get Started
+              </Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="text-lg"
+              onClick={() => scrollToSection("features")}
+            >
               Learn More
             </Button>
           </motion.div>

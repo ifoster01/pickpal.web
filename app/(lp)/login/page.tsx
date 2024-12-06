@@ -76,7 +76,7 @@ export default function Login() {
             Forgot your password?
           </Link>
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" asChild>
             <Link href="/picks">
               Sign In
             </Link>
