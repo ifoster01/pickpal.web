@@ -5,8 +5,15 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
 import Image from "next/image";
+import { useSupabase } from "@/components/providers/supabase-provider";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const useScrollNavigation = () => {
   const router = useRouter();
@@ -33,6 +40,7 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
   const handleNavigation = useScrollNavigation();
+  const { user, signOut } = useSupabase();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -97,10 +105,36 @@ export function Navbar() {
 
           {/* Auth Buttons Section */}
           <div className="hidden md:flex items-center space-x-4 w-[200px] justify-end">
-            <Button variant="ghost" onClick={() => router.push("/login")}>
-              Sign In
-            </Button>
-            <Button onClick={() => router.push("/signup")}>Sign Up</Button>
+            {user ? (
+              <>
+                <Button variant="ghost" onClick={() => router.push("/picks")}>
+                  Return to App
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile">Profile</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={signOut}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" onClick={() => router.push("/login")}>
+                  Sign In
+                </Button>
+                <Button onClick={() => router.push("/signup")}>Sign Up</Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -157,12 +191,23 @@ export function Navbar() {
               >
                 Contact
               </button>
-              <div className="grid grid-cols-2 gap-4 pt-4">
-                <Button variant="outline" onClick={() => router.push("/login")}>
-                  Sign In
-                </Button>
-                <Button onClick={() => router.push("/signup")}>Sign Up</Button>
-              </div>
+              {user ? (
+                <div className="grid grid-cols-2 gap-4 pt-4">
+                  <Button variant="outline" onClick={() => router.push("/picks")}>
+                    Return to App
+                  </Button>
+                  <Button onClick={signOut}>
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-4 pt-4">
+                  <Button variant="outline" onClick={() => router.push("/login")}>
+                    Sign In
+                  </Button>
+                  <Button onClick={() => router.push("/signup")}>Sign Up</Button>
+                </div>
+              )}
             </div>
           </motion.div>
         )}

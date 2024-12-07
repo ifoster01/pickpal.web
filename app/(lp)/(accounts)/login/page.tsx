@@ -12,20 +12,63 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
+import { createClient } from "@/utils/supabase/client";
+import { toast } from "sonner";
 
 const schema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
+  email: z.string().email("Please enter a valid email"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
+
+type LoginFormData = z.infer<typeof schema>;
 
 export default function Login() {
   const router = useRouter();
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const [isLoading, setIsLoading] = useState(false);
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      setIsLoading(true);
+      const supabase = createClient();
+      
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+
+      if (error) throw error;
+
+      // Navigation is handled by the SupabaseProvider
+    } catch (error) {
+      console.error("Error signing in:", error);
+      toast.error("Failed to sign in. Please check your credentials and try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsLoading(true);
+      const supabase = createClient();
+      
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+      toast.error("Failed to sign in with Google. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -53,9 +96,10 @@ export default function Login() {
               type="email"
               {...register("email")}
               className="mt-1"
+              disabled={isLoading}
             />
             {errors.email && (
-              <p className="text-destructive text-sm mt-1">{errors.email.message as string}</p>
+              <p className="text-destructive text-sm mt-1">{errors.email.message}</p>
             )}
           </div>
 
@@ -66,9 +110,10 @@ export default function Login() {
               type="password"
               {...register("password")}
               className="mt-1"
+              disabled={isLoading}
             />
             {errors.password && (
-              <p className="text-destructive text-sm mt-1">{errors.password.message as string}</p>
+              <p className="text-destructive text-sm mt-1">{errors.password.message}</p>
             )}
           </div>
 
@@ -76,17 +121,16 @@ export default function Login() {
             Forgot your password?
           </Link>
 
-          <Button type="submit" className="w-full" asChild>
-            <Link href="/picks">
-              Sign In
-            </Link>
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Signing in..." : "Sign In"}
           </Button>
 
           <Button
             type="button"
             variant="outline"
             className="w-full gap-2"
-            onClick={() => {/* Implement Google login */}}
+            onClick={handleGoogleSignIn}
+            disabled={isLoading}
           >
             <Image src="/google-colored.svg" alt="Google" width={20} height={20} />
             Continue with Google

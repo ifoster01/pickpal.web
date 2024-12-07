@@ -1,16 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import { 
-  BarChart, 
-  BookMarked, 
-  LayoutGrid,
-  LogOut,
-  Menu,
-  User
-} from "lucide-react";
+import { useSupabase } from "@/components/providers/supabase-provider";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,19 +10,34 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-const navItems = [
-  { href: "/picks", label: "Picks", icon: BarChart },
-  { href: "/saved", label: "Saved", icon: BookMarked },
-  { href: "/parlay", label: "Parlay", icon: LayoutGrid },
-];
+import { Menu, User, LogOut } from "lucide-react";
+import Link from "next/link";
 
 export default function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
+  const { user, loading, signOut } = useSupabase();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -45,45 +52,29 @@ export default function AppLayout({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-[200px]">
-                {navItems.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <DropdownMenuItem key={item.href} asChild>
-                      <Link href={item.href} className="flex items-center">
-                        <Icon className="mr-2 h-4 w-4" />
-                        {item.label}
-                      </Link>
-                    </DropdownMenuItem>
-                  );
-                })}
+                <DropdownMenuItem asChild>
+                  <Link href="/picks">Picks</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">Profile</Link>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
 
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`relative flex items-center space-x-2 transition-colors hover:text-foreground/80 ${
-                    isActive ? "text-foreground" : "text-foreground/60"
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span>{item.label}</span>
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeTab"
-                      className="absolute -bottom-[21px] left-0 right-0 h-0.5 bg-foreground"
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                </Link>
-              );
-            })}
+            <Link
+              href="/picks"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Picks
+            </Link>
+            <Link
+              href="/profile"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Profile
+            </Link>
           </nav>
 
           <div className="ml-auto flex items-center space-x-4">
@@ -94,7 +85,7 @@ export default function AppLayout({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={signOut}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Logout
                 </DropdownMenuItem>
