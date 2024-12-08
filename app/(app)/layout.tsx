@@ -20,8 +20,8 @@ import { QueryProvider } from "@/components/providers/query-provider";
 
 const navItems = [
   { href: "/picks", label: "Picks", icon: Trophy },
-  { href: "/parlay", label: "Parlay", icon: Rocket },
   { href: "/saved", label: "Saved", icon: Heart },
+  { href: "/parlay", label: "Parlay", icon: Rocket },
 ];
 
 
