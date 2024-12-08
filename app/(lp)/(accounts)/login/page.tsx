@@ -54,6 +54,10 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
+
+      // set "google_auth" to true in the session storage
+      sessionStorage.setItem("google_auth", "true");
+
       const supabase = createClient();
       
       const { error } = await supabase.auth.signInWithOAuth({

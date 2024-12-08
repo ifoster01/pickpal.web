@@ -113,10 +113,13 @@ export default function ProfilePage() {
     
     try {
       setLoading(true);
-
+      
       // Delete user's auth account
       const { error } = await supabase.rpc('delete_user')
       if (error) throw error
+
+      // sign out the user
+      await signOut();
       
       // After signing out, redirect to login page
       router.push('/login');
