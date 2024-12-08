@@ -33,7 +33,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
 
       if (event === "SIGNED_IN") {
-        if (pathname === "/" || pathname.startsWith("/login") || pathname.startsWith("/signup")) {
+        if (pathname.startsWith("/login") || pathname.startsWith("/signup")) {
           router.push("/picks");
         }
       }
@@ -47,7 +47,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
       setUser(session?.user ?? null);
       setLoading(false);
       
-      if (session?.user && pathname === "/") {
+      if (session?.user && (pathname.startsWith("/login") || pathname.startsWith("/signup"))) {
         router.push("/picks");
       }
     });

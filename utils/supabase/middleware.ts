@@ -33,29 +33,54 @@ export const updateSession = async (request: NextRequest) => {
       },
     );
 
-    // This will refresh session if expired - required for Server Components
-    const { data: { user } } = await supabase.auth.getUser();
+    // Get the current pathname and search params
+    const pathname = request.nextUrl.pathname;
+    const searchParams = request.nextUrl.searchParams;
 
-    // Protected routes
-    if ((request.nextUrl.pathname.startsWith("/picks") ||
-        request.nextUrl.pathname.startsWith("/parlay") ||
-        request.nextUrl.pathname.startsWith("/saved") ||
-        request.nextUrl.pathname.startsWith("/profile")) &&
-        !user) {
-      return NextResponse.redirect(new URL("/login", request.url));
+    // Get and refresh the session
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    // First, handle auth callbacks - these should always redirect to /picks when successful
+    if (pathname.startsWith('/auth/callback')) {
+      if (user) {
+        const redirectUrl = new URL('/picks', request.url);
+        // Preserve the provider param for the client to handle
+        if (searchParams.has('provider')) {
+          redirectUrl.searchParams.set('provider', searchParams.get('provider')!);
+        }
+        return NextResponse.redirect(redirectUrl);
+      }
+      return response;
     }
 
-    // Auth routes (when already logged in)
-    if ((request.nextUrl.pathname.startsWith("/login") || 
-         request.nextUrl.pathname.startsWith("/signup")) && 
-        user) {
-      return NextResponse.redirect(new URL("/picks", request.url));
+    // Then, handle auth routes (login/signup)
+    // Authenticated users should not be able to access these
+    if (pathname.startsWith('/login') || pathname.startsWith('/signup')) {
+      if (user) {
+        return NextResponse.redirect(new URL('/picks', request.url));
+      }
+      return response;
     }
 
+    // Handle protected routes
+    const protectedRoutes = ['/picks', '/parlay', '/saved', '/profile'];
+    if (protectedRoutes.some(route => pathname.startsWith(route))) {
+      if (!user) {
+        return NextResponse.redirect(new URL('/login', request.url));
+      }
+      return response;
+    }
+
+    // For all other routes (including the landing page '/'),
+    // allow access regardless of authentication status
     return response;
+
   } catch (e) {
-    // If you are here, a Supabase client could not be created!
-    // This is likely because you have not set up environment variables.
+    console.error('Middleware error:', e);
+    // If you are here, a Supabase client could not be created
+    // Return the unmodified response
     return NextResponse.next({
       request: {
         headers: request.headers,
