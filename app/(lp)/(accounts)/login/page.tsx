@@ -10,14 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
 
 const schema = z.object({
   email: z.string().email("Please enter a valid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(1, "Password is required"),
 });
 
 type LoginFormData = z.infer<typeof schema>;
@@ -25,6 +25,7 @@ type LoginFormData = z.infer<typeof schema>;
 export default function Login() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(schema),
   });
@@ -42,7 +43,7 @@ export default function Login() {
       if (error) throw error;
 
       // Navigation is handled by the SupabaseProvider
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error signing in:", error);
       toast.error("Failed to sign in. Please check your credentials and try again.");
     } finally {
@@ -63,7 +64,7 @@ export default function Login() {
       });
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error signing in with Google:", error);
       toast.error("Failed to sign in with Google. Please try again.");
     } finally {
@@ -105,13 +106,28 @@ export default function Login() {
 
           <div>
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              {...register("password")}
-              className="mt-1"
-              disabled={isLoading}
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                {...register("password")}
+                className="mt-1 pr-10"
+                disabled={isLoading}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-[4px] h-9 w-9 px-3"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
             {errors.password && (
               <p className="text-destructive text-sm mt-1">{errors.password.message}</p>
             )}

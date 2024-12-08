@@ -1,35 +1,48 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
 import Image from "next/image";
+import { createClient } from "@/utils/supabase/client";
+import { toast } from "sonner";
 
 const schema = z.object({
-  firstName: z.string().min(2),
-  lastName: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(8),
+  firstName: z.string().min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
 });
 
+type SignUpFormData = z.infer<typeof schema>;
+
 export default function SignUp() {
   const router = useRouter();
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const supabase = createClient();
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm({
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<SignUpFormData>({
     resolver: zodResolver(schema),
   });
 
@@ -43,9 +56,53 @@ export default function SignUp() {
   };
 
   const password = watch("password");
-  
-  const onSubmit = (data: any) => {
-    console.log(data);
+
+  const onSubmit = async (data: SignUpFormData) => {
+    try {
+      setIsLoading(true);
+      
+      const { error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            full_name: `${data.firstName} ${data.lastName}`,
+            first_name: data.firstName,
+            last_name: data.lastName,
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success("Account created successfully! Please check your email to verify your account.");
+      router.push('/login');
+    } catch (error: any) {
+      console.error("Error signing up:", error);
+      toast.error(error.message || "Failed to create account. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    try {
+      setIsLoading(true);
+      
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (error: any) {
+      console.error("Error signing up with Google:", error);
+      toast.error("Failed to sign up with Google. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -73,9 +130,10 @@ export default function SignUp() {
                 id="firstName"
                 {...register("firstName")}
                 className="mt-1"
+                disabled={isLoading}
               />
               {errors.firstName && (
-                <p className="text-destructive text-sm mt-1">{errors.firstName.message as string}</p>
+                <p className="text-destructive text-sm mt-1">{errors.firstName.message}</p>
               )}
             </div>
 
@@ -85,9 +143,10 @@ export default function SignUp() {
                 id="lastName"
                 {...register("lastName")}
                 className="mt-1"
+                disabled={isLoading}
               />
               {errors.lastName && (
-                <p className="text-destructive text-sm mt-1">{errors.lastName.message as string}</p>
+                <p className="text-destructive text-sm mt-1">{errors.lastName.message}</p>
               )}
             </div>
           </div>
@@ -99,69 +158,87 @@ export default function SignUp() {
               type="email"
               {...register("email")}
               className="mt-1"
+              disabled={isLoading}
             />
             {errors.email && (
-              <p className="text-destructive text-sm mt-1">{errors.email.message as string}</p>
+              <p className="text-destructive text-sm mt-1">{errors.email.message}</p>
             )}
           </div>
 
           <div>
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              {...register("password", {
-                onChange: (e) => setPasswordStrength(calculatePasswordStrength(e.target.value))
-              })}
-              className="mt-1"
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                {...register("password", {
+                  onChange: (e) => setPasswordStrength(calculatePasswordStrength(e.target.value))
+                })}
+                className="mt-1 pr-10"
+                disabled={isLoading}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-[4px] h-9 w-9 px-3"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
             <Progress value={passwordStrength} className="mt-2" />
             <p className="text-sm text-muted-foreground mt-1">
               Password strength: {passwordStrength === 100 ? "Strong" : passwordStrength >= 50 ? "Medium" : "Weak"}
             </p>
             {errors.password && (
-              <p className="text-destructive text-sm mt-1">{errors.password.message as string}</p>
+              <p className="text-destructive text-sm mt-1">{errors.password.message}</p>
             )}
           </div>
 
           <div>
             <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              {...register("confirmPassword")}
-              className="mt-1"
-            />
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                {...register("confirmPassword")}
+                className="mt-1 pr-10"
+                disabled={isLoading}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-[4px] h-9 w-9 px-3"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
             {errors.confirmPassword && (
-              <p className="text-destructive text-sm mt-1">{errors.confirmPassword.message as string}</p>
+              <p className="text-destructive text-sm mt-1">{errors.confirmPassword.message}</p>
             )}
           </div>
 
-          <div className="flex items-center space-x-2">
-            <label htmlFor="acceptTerms" className="text-sm text-muted-foreground">
-              By signing up, you agree to our{" "}
-              <Link href="/terms-of-service" className="text-primary hover:underline">
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link href="/privacy-policy" className="text-primary hover:underline">
-                Privacy Policy
-              </Link>
-            </label>
-          </div>
-          {errors.acceptTerms && (
-            <p className="text-destructive text-sm">{errors.acceptTerms.message as string}</p>
-          )}
-
-          <Button type="submit" className="w-full">
-            Sign Up
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Creating Account..." : "Sign Up"}
           </Button>
 
           <Button
             type="button"
             variant="outline"
             className="w-full gap-2"
-            onClick={() => {/* Implement Google signup */}}
+            onClick={handleGoogleSignUp}
+            disabled={isLoading}
           >
             <Image src="/google-colored.svg" alt="Google" width={20} height={20} />
             Continue with Google

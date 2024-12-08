@@ -33,7 +33,9 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
 
       if (event === "SIGNED_IN") {
-        router.push("/picks");
+        if (pathname === "/" || pathname.startsWith("/login") || pathname.startsWith("/signup")) {
+          router.push("/picks");
+        }
       }
       if (event === "SIGNED_OUT") {
         router.push("/");
@@ -44,12 +46,16 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      if (session?.user && pathname === "/") {
+        router.push("/picks");
+      }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase, router]);
+  }, [supabase, router, pathname]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
