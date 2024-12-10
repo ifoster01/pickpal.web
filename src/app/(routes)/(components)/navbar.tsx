@@ -42,7 +42,7 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
   const handleNavigation = useScrollNavigation();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -109,7 +109,7 @@ export function Navbar() {
           <div className="hidden md:flex items-center space-x-4 w-[200px] justify-end">
             {user ? (
               <>
-                <Button variant="ghost" onClick={() => router.push("/picks")}>
+                <Button variant="ghost" onClick={() => router.push("/authed/picks")}>
                   Return to App
                 </Button>
                 <DropdownMenu>
@@ -122,11 +122,7 @@ export function Navbar() {
                     <DropdownMenuItem asChild>
                       <Link href="/profile">Profile</Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => {
-                        const supabase = createClient();
-                        supabase.auth.signOut();
-                        toast.success("Signed out successfully!");
-                    }}>
+                    <DropdownMenuItem onClick={signOut}>
                       <LogOut className="mr-2 h-4 w-4" />
                       Logout
                     </DropdownMenuItem>
@@ -199,14 +195,10 @@ export function Navbar() {
               </button>
               {user ? (
                 <div className="grid grid-cols-2 gap-4 pt-4">
-                  <Button variant="outline" onClick={() => router.push("/picks")}>
+                  <Button variant="outline" onClick={() => router.push("/authed/picks")}>
                     Return to App
                   </Button>
-                  <Button onClick={() => {
-                        const supabase = createClient();
-                        supabase.auth.signOut();
-                        toast.success("Signed out successfully!");
-                    }}>
+                  <Button onClick={signOut}>
                     Sign Out
                   </Button>
                 </div>

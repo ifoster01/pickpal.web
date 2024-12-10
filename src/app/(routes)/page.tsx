@@ -27,13 +27,6 @@ export default function LandingPage() {
         }
       }, 100);
     }
-
-    if (sessionStorage.getItem("google_auth")) {
-      router.push("/picks");
-
-      // remove "google_auth" from the session storage
-      sessionStorage.removeItem("google_auth");
-    }
   }, []);
 
   return (
