@@ -44,14 +44,29 @@ export function useLikedFights() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      // First, get the liked fights
+      const { data: likedFights, error: likedError } = await supabase
         .from('liked_fights')
-        .select('*, upcoming_fight_odds(*)')
+        .select('*')
         .eq('saving_user_id', user.id)
         .order('saved_at', { ascending: false });
 
-      if (error) throw error;
-      return data as (LikedFight & { upcoming_fight_odds: Database["public"]["Tables"]["upcoming_fight_odds"]["Row"] })[];
+      if (likedError) throw likedError;
+
+      // Then, get all the fight odds
+      const { data: fightOdds, error: oddsError } = await supabase
+        .from('upcoming_fight_odds')
+        .select('*');
+
+      if (oddsError) throw oddsError;
+
+      // Manually join the data
+      const enrichedLikes = likedFights.map(like => ({
+        ...like,
+        upcoming_fight_odds: fightOdds.find(odds => odds.fight_id === like.fight_id) || null
+      }));
+
+      return enrichedLikes as (LikedFight & { upcoming_fight_odds: Database["public"]["Tables"]["upcoming_fight_odds"]["Row"] })[];
     },
     enabled: !!user,
   });
@@ -202,14 +217,29 @@ export function useLikedNFLGames() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      // First, get the liked NFL games
+      const { data: likedGames, error: likedError } = await supabase
         .from('liked_nfl_games')
-        .select('*, upcoming_nfl_odds(*)')
+        .select('*')
         .eq('saving_user_id', user.id)
         .order('saved_at', { ascending: false });
 
-      if (error) throw error;
-      return data as (LikedNFLGame & { upcoming_nfl_odds: Database["public"]["Tables"]["upcoming_nfl_odds"]["Row"] })[];
+      if (likedError) throw likedError;
+
+      // Then, get all the NFL odds
+      const { data: nflOdds, error: oddsError } = await supabase
+        .from('upcoming_nfl_odds')
+        .select('*');
+
+      if (oddsError) throw oddsError;
+
+      // Manually join the data
+      const enrichedLikes = likedGames.map(like => ({
+        ...like,
+        upcoming_nfl_odds: nflOdds.find(odds => odds.game_id === like.game_id) || null
+      }));
+
+      return enrichedLikes as (LikedNFLGame & { upcoming_nfl_odds: Database["public"]["Tables"]["upcoming_nfl_odds"]["Row"] })[];
     },
     enabled: !!user,
   });

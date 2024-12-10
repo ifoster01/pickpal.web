@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import type { PropsWithChildren } from 'react'
 import './globals.css'
+import { ThemeProvider } from '@/providers/ThemeProvider';
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
