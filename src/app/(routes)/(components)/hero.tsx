@@ -38,7 +38,7 @@ const FloatingBlob = ({ delay = 0, top, left, color = "from-purple-500 to-indigo
 export function Hero() {
   return (
     <section className="min-h-screen relative overflow-hidden flex items-center">
-      <div className="absolute inset-0 overflow-hidden" style={{ zIndex: 0 }}>
+      <div className="hidden md:block absolute inset-0 overflow-hidden" style={{ zIndex: 0 }}>
         <FloatingBlob delay={0} top="10%" left="20%" color="from-violet-600 to-purple-600" />
         <FloatingBlob delay={5} top="60%" left="50%" color="from-purple-600 to-indigo-600" />
         <FloatingBlob delay={10} top="30%" left="70%" color="from-indigo-600 to-violet-600" />
@@ -91,7 +91,7 @@ export function Hero() {
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
             <Button size="lg" className="text-lg" asChild>
-              <Link href="/signup">
+              <Link href="/auth/signup">
                 Get Started
               </Link>
             </Button>

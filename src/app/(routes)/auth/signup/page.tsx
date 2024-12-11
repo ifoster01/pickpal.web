@@ -76,8 +76,8 @@ export default function SignUp() {
 
       if (error) throw error;
 
-      toast.success("Account created successfully! Please check your email to verify your account.");
-      router.push('/auth/login');
+      toast.success("Account created successfully!");
+      router.push('/authed/picks');
     } catch (error: any) {
       console.error("Error signing up:", error);
       toast.error(error.message || "Failed to create account. Please try again.");

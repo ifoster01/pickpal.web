@@ -43,7 +43,7 @@ export default function Login() {
 
       if (error) throw error;
 
-      // Navigation is handled by the SupabaseProvider
+      router.push("/authed/picks");
     } catch (error: any) {
       console.error("Error signing in:", error);
       toast.error("Failed to sign in. Please check your credentials and try again.");
@@ -152,7 +152,7 @@ export default function Login() {
 
           <p className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-primary hover:underline">
+            <Link href="/auth/signup" className="text-primary hover:underline">
               Sign up
             </Link>
           </p>

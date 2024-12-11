@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
+import { useState } from "react";
 
 interface ParlayFiltersProps {
   minLegs: number;
@@ -43,6 +44,24 @@ export function ParlayFilters({
   onMinProbabilityChange,
   onMaxProbabilityChange,
 }: ParlayFiltersProps) {
+  // Local state for odds input fields
+  const [minOddsInput, setMinOddsInput] = useState(minOdds.toString());
+  const [maxOddsInput, setMaxOddsInput] = useState(maxOdds.toString());
+
+  // Handle odds input changes with validation
+  const handleOddsInput = (value: string, setter: (value: string) => void, callback: (value: number) => void) => {
+    // Allow empty string, minus sign, or numbers with optional minus sign
+    if (value === '' || value === '-' || /^-?\d*$/.test(value)) {
+      setter(value);
+      
+      // Only call the callback if we have a valid number
+      const numValue = parseInt(value);
+      if (!isNaN(numValue)) {
+        callback(numValue);
+      }
+    }
+  };
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -93,22 +112,67 @@ export function ParlayFilters({
               <div className="space-y-2">
                 <Label className="text-sm text-muted-foreground">Min Odds</Label>
                 <Input
-                  type="number"
-                  value={minOdds}
-                  onChange={(e) => onMinOddsChange(parseInt(e.target.value))}
+                  type="text"
+                  inputMode="numeric"
+                  value={minOddsInput}
+                  onChange={(e) => handleOddsInput(
+                    e.target.value,
+                    setMinOddsInput,
+                    onMinOddsChange
+                  )}
+                  onKeyDown={(e) => {
+                    // Only allow numbers, backspace, delete, minus sign, and arrow keys
+                    if (
+                      !/[\d\-]/.test(e.key) && 
+                      !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)
+                    ) {
+                      e.preventDefault();
+                    }
+                    // Only allow one minus sign at the start
+                    if (e.key === '-' && e.currentTarget.value.includes('-')) {
+                      e.preventDefault();
+                    }
+                    if (e.key === '-' && e.currentTarget.selectionStart !== 0) {
+                      e.preventDefault();
+                    }
+                  }}
                   placeholder="-200"
                 />
               </div>
               <div className="space-y-2">
                 <Label className="text-sm text-muted-foreground">Max Odds</Label>
                 <Input
-                  type="number"
-                  value={maxOdds}
-                  onChange={(e) => onMaxOddsChange(parseInt(e.target.value))}
+                  type="text"
+                  inputMode="numeric"
+                  value={maxOddsInput}
+                  onChange={(e) => handleOddsInput(
+                    e.target.value,
+                    setMaxOddsInput,
+                    onMaxOddsChange
+                  )}
+                  onKeyDown={(e) => {
+                    // Only allow numbers, backspace, delete, minus sign, and arrow keys
+                    if (
+                      !/[\d\-]/.test(e.key) && 
+                      !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)
+                    ) {
+                      e.preventDefault();
+                    }
+                    // Only allow one minus sign at the start
+                    if (e.key === '-' && e.currentTarget.value.includes('-')) {
+                      e.preventDefault();
+                    }
+                    if (e.key === '-' && e.currentTarget.selectionStart !== 0) {
+                      e.preventDefault();
+                    }
+                  }}
                   placeholder="+1000"
                 />
               </div>
             </div>
+            <p className="text-xs text-muted-foreground">
+              Enter American odds (e.g., -150 or +120)
+            </p>
           </div>
 
           {/* Probability Range */}
