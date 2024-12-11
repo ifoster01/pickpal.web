@@ -20,15 +20,18 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useUpcomingFightOdds, useUpcomingNFLOdds, EventStatus } from "@/hooks/api/use-odds";
+import { useUpcomingFightOdds, useUpcomingNFLOdds } from "@/hooks/api/use-odds";
 import { useLikedFights, useLikedNFLGames } from "@/hooks/api/use-likes";
 import { cn } from "@/utils/cn";
 import { useAuth } from "@/providers/AuthProvider";
-import { useState } from "react";
 import { RadioGroup, RadioGroupCard } from "@/components/ui/radio-group";
 import { PickCard } from "@/app/(routes)/authed/picks/(component)/pick-card";
+import { useLeague } from "@/providers/LeagueProvider";
+import { useFilter } from "@/providers/FilterProvider";
+import { EventFilter } from "@/components/general/event-filter";
 
 type League = 'UFC' | 'NFL';
+type Filter = 'upcoming' | 'past' | 'all';
 
 function isEventUpcoming(eventDate: string | null): boolean {
   if (!eventDate) return true;
@@ -37,20 +40,22 @@ function isEventUpcoming(eventDate: string | null): boolean {
 
 export default function PicksPage() {
   const { user } = useAuth();
-  const [league, setLeague] = useState<League>('UFC');
-  const [status, setStatus] = useState<EventStatus>('upcoming');
+  const { league, setLeague } = useLeague();
+  const { filter, setFilter } = useFilter();
 
   // UFC Data
-  const { data: fights, isLoading: isLoadingFights } = useUpcomingFightOdds(status);
+  const { data: fights, isLoading: isLoadingFights } = useUpcomingFightOdds(filter);
   const { data: likedFights, likeFight, unlikeFight, isLiking: isLikingFight, isUnliking: isUnlikingFight } = useLikedFights();
   const likedFightIds = likedFights?.map(like => like.fight_id) || [];
 
   // NFL Data
-  const { data: games, isLoading: isLoadingGames } = useUpcomingNFLOdds(status);
+  const { data: games, isLoading: isLoadingGames } = useUpcomingNFLOdds(filter);
   const { data: likedGames, likeGame, unlikeGame, isLiking: isLikingGame, isUnliking: isUnlikingGame } = useLikedNFLGames();
   const likedGameIds = likedGames?.map(like => like.game_id) || [];
 
   const isLoading = league === 'UFC' ? isLoadingFights : isLoadingGames;
+
+  console.log(filter);
 
   if (isLoading) {
     return (
@@ -89,58 +94,7 @@ export default function PicksPage() {
       <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex justify-between sm:justify-start items-center gap-4">
           <h1 className="text-3xl font-bold">Model Picks</h1>
-          <div className="block sm:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Filter className="h-4 w-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent>
-                <SheetHeader>
-                  <SheetTitle>Filters</SheetTitle>
-                  <SheetDescription>
-                    Filter events by status
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="py-6">
-                  <RadioGroup 
-                    value={status} 
-                    onValueChange={(value: EventStatus) => setStatus(value)}
-                    className="grid grid-cols-1 gap-4"
-                  >
-                    <RadioGroupCard value="upcoming" className="flex items-center justify-between">
-                      <div className="flex flex-col">
-                        <span className="text-base font-semibold">Upcoming</span>
-                        <span className="text-sm text-muted-foreground">Show future events</span>
-                      </div>
-                      {status === 'upcoming' && (
-                        <Check className="h-4 w-4 text-primary" />
-                      )}
-                    </RadioGroupCard>
-                    <RadioGroupCard value="completed" className="flex items-center justify-between">
-                      <div className="flex flex-col">
-                        <span className="text-base font-semibold">Completed</span>
-                        <span className="text-sm text-muted-foreground">Show past events</span>
-                      </div>
-                      {status === 'completed' && (
-                        <Check className="h-4 w-4 text-primary" />
-                      )}
-                    </RadioGroupCard>
-                    <RadioGroupCard value="all" className="flex items-center justify-between">
-                      <div className="flex flex-col">
-                        <span className="text-base font-semibold">All Events</span>
-                        <span className="text-sm text-muted-foreground">Show all events</span>
-                      </div>
-                      {status === 'all' && (
-                        <Check className="h-4 w-4 text-primary" />
-                      )}
-                    </RadioGroupCard>
-                  </RadioGroup>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+          <EventFilter />
         </div>
         <div className="flex items-center gap-4">
           <Select value={league} onValueChange={(value: League) => setLeague(value)}>
@@ -152,58 +106,7 @@ export default function PicksPage() {
               <SelectItem value="NFL">NFL</SelectItem>
             </SelectContent>
           </Select>
-          <div className="hidden sm:block">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Filter className="h-4 w-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent>
-                <SheetHeader>
-                  <SheetTitle>Filters</SheetTitle>
-                  <SheetDescription>
-                    Filter events by status
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="py-6">
-                  <RadioGroup 
-                    value={status} 
-                    onValueChange={(value: EventStatus) => setStatus(value)}
-                    className="grid grid-cols-1 gap-4"
-                  >
-                    <RadioGroupCard value="upcoming" className="flex items-center justify-between">
-                      <div className="flex flex-col">
-                        <span className="text-base font-semibold">Upcoming</span>
-                        <span className="text-sm text-muted-foreground">Show future events</span>
-                      </div>
-                      {status === 'upcoming' && (
-                        <Check className="h-4 w-4 text-primary" />
-                      )}
-                    </RadioGroupCard>
-                    <RadioGroupCard value="completed" className="flex items-center justify-between">
-                      <div className="flex flex-col">
-                        <span className="text-base font-semibold">Completed</span>
-                        <span className="text-sm text-muted-foreground">Show past events</span>
-                      </div>
-                      {status === 'completed' && (
-                        <Check className="h-4 w-4 text-primary" />
-                      )}
-                    </RadioGroupCard>
-                    <RadioGroupCard value="all" className="flex items-center justify-between">
-                      <div className="flex flex-col">
-                        <span className="text-base font-semibold">All Events</span>
-                        <span className="text-sm text-muted-foreground">Show all events</span>
-                      </div>
-                      {status === 'all' && (
-                        <Check className="h-4 w-4 text-primary" />
-                      )}
-                    </RadioGroupCard>
-                  </RadioGroup>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+          <EventFilter className="hidden sm:block" />
         </div>
       </div>
 
