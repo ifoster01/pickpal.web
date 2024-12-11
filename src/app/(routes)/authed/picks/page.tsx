@@ -12,19 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { useUpcomingFightOdds, useUpcomingNFLOdds } from "@/hooks/api/use-odds";
 import { useLikedFights, useLikedNFLGames } from "@/hooks/api/use-likes";
 import { cn } from "@/utils/cn";
 import { useAuth } from "@/providers/AuthProvider";
-import { RadioGroup, RadioGroupCard } from "@/components/ui/radio-group";
 import { PickCard } from "@/app/(routes)/authed/picks/(component)/pick-card";
 import { useLeague } from "@/providers/LeagueProvider";
 import { useFilter } from "@/providers/FilterProvider";

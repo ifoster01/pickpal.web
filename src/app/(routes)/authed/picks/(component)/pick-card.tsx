@@ -135,7 +135,7 @@ export function PickCard({ event, type, isLiked, onLike, onUnlike, league }: Pic
                 <div className="text-2xl font-bold text-primary flex items-center">
                   {fighter1.odds && fighter1.odds > 0 ? "+" : ""}{fighter1.odds}
                   <span className="text-sm text-muted-foreground ml-2">
-                    ({fighter1.bookOdds && fighter1.bookOdds > 0 ? "+" : ""}{fighter1.bookOdds})
+                    ({fighter1.bookOdds && fighter1.bookOdds > 0 ? "+" : ""}{fighter1.bookOdds} book)
                   </span>
                 </div>
               </div>
@@ -176,7 +176,7 @@ export function PickCard({ event, type, isLiked, onLike, onUnlike, league }: Pic
                 <h3 className={cn("font-semibold", league === 'UFC' ? "text-lg" : "text-2xl")}>{league === 'UFC' ? fighter2.name : fighter2.name?.split(" ").at(-1)}</h3>
                 <div className="text-2xl font-bold text-primary flex items-center">
                   <span className="text-sm text-muted-foreground mr-2">
-                    ({fighter2.bookOdds && fighter2.bookOdds > 0 ? "+" : ""}{fighter2.bookOdds})
+                    ({fighter2.bookOdds && fighter2.bookOdds > 0 ? "+" : ""}{fighter2.bookOdds} book)
                   </span>
                   {fighter2.odds && fighter2.odds > 0 ? "+" : ""}{fighter2.odds}
                 </div>

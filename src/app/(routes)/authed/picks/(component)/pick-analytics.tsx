@@ -91,11 +91,11 @@ export function PickAnalytics({ event, type, fighter1, fighter2, discrepancy }: 
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Edge vs Market</p>
+              <p className="text-sm text-muted-foreground">Edge vs Book</p>
               <p className="text-lg font-semibold text-green-500">+{edgeVsMarket}%</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Discrepancy Level</p>
+              <p className="text-sm text-muted-foreground">Model Advantage</p>
               <p className="text-lg font-semibold capitalize">{discrepancy}</p>
             </div>
           </div>
