@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Heart } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 import { PickAnalytics } from "./pick-analytics";
 import { calculateProbabilityFromOdds } from "@/utils/odds";
 import Image from "next/image";

@@ -55,8 +55,6 @@ export default function PicksPage() {
 
   const isLoading = league === 'UFC' ? isLoadingFights : isLoadingGames;
 
-  console.log(filter);
-
   if (isLoading) {
     return (
       <div className="space-y-8">
