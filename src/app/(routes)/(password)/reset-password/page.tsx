@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { toast } from "sonner";
 
 const schema = z.object({
   password: z.string().min(8),
@@ -69,6 +70,7 @@ export default function ResetPassword() {
       return;
     }
 
+    toast.success("Password updated successfully!");
     return router.push("/auth/login");
   };
 
