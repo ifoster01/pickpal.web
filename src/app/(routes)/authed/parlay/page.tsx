@@ -155,7 +155,7 @@ export default function ParlayPage() {
           <Card className="p-6">
             <p className="text-center text-muted-foreground">
               {parlayLegs.length === 0
-                ? `Save some ${league} events to start building parlays`
+                ? `Save some upcoming ${league} events to start building parlays`
                 : "No parlays match your current filters"}
             </p>
           </Card>
