@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Mail } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 
 const schema = z.object({
   email: z.string().email(),
@@ -20,13 +21,23 @@ export default function ForgotPassword() {
   const router = useRouter();
   const [isEmailSent, setIsEmailSent] = useState(false);
   
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, setError, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: any) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const { email } = data;
+    const supabase = createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+    })
+    if (error) {
+        setError("email", {
+            type: "manual",
+            message: "Invalid email address! Please try again",
+        });
+        return;
+    }
     setIsEmailSent(true);
   };
 
