@@ -1,4 +1,5 @@
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Session, User } from "@supabase/supabase-js";
 
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContext>({
 });
 
 export default function AuthProvider({ children }: PropsWithChildren) {
+    const router = useRouter();
     const [session, setSession] = useState<Session | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -38,6 +40,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     const signOut = async () => {
         const supabase = createClient();
         await supabase.auth.signOut();
+        router.push("/auth/login");
     };
 
     return (
