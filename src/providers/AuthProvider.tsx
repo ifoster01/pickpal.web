@@ -30,17 +30,41 @@ export default function AuthProvider({ children }: PropsWithChildren) {
             setSession(session);
         });
 
-        supabase.auth.onAuthStateChange((_event, session) => {
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
+            
+            // If session is null (signed out), redirect to login
+            if (!session) {
+                router.push("/auth/login");
+            }
         });
 
         setLoading(false);
-    }, []);
+
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, [router]);
 
     const signOut = async () => {
-        const supabase = createClient();
-        await supabase.auth.signOut();
-        router.push("/auth/login");
+        try {
+            const supabase = createClient();
+            
+            // First, clear the session from context to prevent middleware race
+            setSession(null);
+            
+            // Then sign out from Supabase
+            await supabase.auth.signOut();
+            
+            // Force a hard redirect to login page
+            window.location.href = "/auth/login";
+        } catch (error) {
+            console.error("Error signing out:", error);
+            // Still redirect even if there's an error
+            window.location.href = "/auth/login";
+        }
     };
 
     return (
