@@ -34,6 +34,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: number
+          message: string | null
+          name: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: number
+          message?: string | null
+          name?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: number
+          message?: string | null
+          name?: string | null
+        }
+        Relationships: []
+      }
+      liked_fights: {
+        Row: {
+          fight_id: string | null
+          id: number
+          saved_at: string
+          saving_user_id: string | null
+        }
+        Insert: {
+          fight_id?: string | null
+          id?: number
+          saved_at?: string
+          saving_user_id?: string | null
+        }
+        Update: {
+          fight_id?: string | null
+          id?: number
+          saved_at?: string
+          saving_user_id?: string | null
+        }
+        Relationships: []
+      }
+      liked_nfl_games: {
+        Row: {
+          game_id: string | null
+          id: number
+          saved_at: string
+          saving_user_id: string | null
+        }
+        Insert: {
+          game_id?: string | null
+          id?: number
+          saved_at?: string
+          saving_user_id?: string | null
+        }
+        Update: {
+          game_id?: string | null
+          id?: number
+          saved_at?: string
+          saving_user_id?: string | null
+        }
+        Relationships: []
+      }
       liked_props: {
         Row: {
           americanOdds: number | null
@@ -189,7 +255,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_user: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

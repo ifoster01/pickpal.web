@@ -1,127 +1,104 @@
 "use client";
-import { HStack, VStack } from "@/styled-system/jsx";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { createClient } from "~/utils/supabase/client";
+
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { Text } from "~/components/ui/text";
-import { LabeledInput } from "~/components/general/LabaledInput";
-import { Suspense, useState } from "react";
-import Image from "next/image";
-import { css } from "@/styled-system/css";
-import { Eye, EyeOff } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import { ArrowLeft } from "lucide-react";
 
-const ResetPassword = () => {
-    const router = useRouter();
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+const schema = z.object({
+  password: z.string().min(8),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
 
-    const {
-        register,
-        handleSubmit,
-        setError,
-        formState: { errors },
-    } = useForm({
-        defaultValues: {
-            password: "",
-            confirmPassword: "",
-        }
-    });
+export default function ResetPassword() {
+  const router = useRouter();
+  
+  const { register, handleSubmit, watch, formState: { errors } } = useForm({
+    resolver: zodResolver(schema),
+  });
 
-    return (
-        <VStack minH='screen' maxW='screen' overflow='auto' pt={8} justify='center'>
-            <VStack px='10%'>
-                <Image src='/logos/pickpockt long.svg' alt='Pickpockt' width={200} height={100} onClick={() => router.push('/')} className={css({ cursor: 'pointer' })} />
-                <LabeledInput
-                    label="Password"
-                    w='full'
-                    input={
-                        <HStack w='full' border='1px solid' borderColor='gray.200' borderRadius='md' pr={2}>
-                            <Input
-                                type={showPassword ? "text" : "password"}
-                                {...register("password", { required: true })}
-                                placeholder="123456789"
-                                border='none'
-                                _focus={{
-                                    boxShadow: 'none',
-                                }}
-                            />
-                            {
-                                showPassword ?
-                                    <EyeOff onClick={() => setShowPassword(false)} />
-                                    :
-                                    <Eye onClick={() => setShowPassword(true)} />
-                            }
-                        </HStack>
-                    }
-                />
-                {errors.password && <Text color='red'>{errors.password.message}</Text>}
-                <LabeledInput
-                    label="Confirm Password"
-                    w='full'
-                    input={
-                        <HStack w='full' border='1px solid' borderColor='gray.200' borderRadius='md' pr={2}>
-                            <Input
-                                type={showConfirmPassword ? "text" : "password"}
-                                {...register("confirmPassword", { required: true })}
-                                placeholder="123456789"
-                                border='none'
-                                _focus={{
-                                    boxShadow: 'none',
-                                }}
-                            />
-                            {
-                                showConfirmPassword ?
-                                    <EyeOff onClick={() => setShowConfirmPassword(false)} />
-                                    :
-                                    <Eye onClick={() => setShowConfirmPassword(true)} />
-                            }
-                        </HStack>
-                    }
-                />
-                {errors.confirmPassword && <Text color='red'>{errors.confirmPassword.message}</Text>}
-                <Button w='full' mt={4} onClick={handleSubmit(async (data) => {
-                    const { password, confirmPassword } = data;
+  const calculatePasswordStrength = (password: string) => {
+    let strength = 0;
+    if (password.length >= 8) strength += 25;
+    if (password.match(/[A-Z]/)) strength += 25;
+    if (password.match(/[0-9]/)) strength += 25;
+    if (password.match(/[^A-Za-z0-9]/)) strength += 25;
+    return strength;
+  };
 
-                    if (password !== confirmPassword) {
-                        // set error message
-                        setError("confirmPassword", {
-                            type: "manual",
-                            message: "Passwords do not match!",
-                        });
-                    }
-                    
-                    const supabase = createClient();
+  const password = watch("password", "");
+  const passwordStrength = calculatePasswordStrength(password);
 
-                    const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const onSubmit = async (data: any) => {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    router.push("/auth/login");
+  };
 
-                    if (userError) {
-                        return router.push("/forgot-password?message=A user with that email already exists! Please try again with a different email.");
-                    }
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Button
+        variant="ghost"
+        className="absolute top-4 left-4"
+        onClick={() => router.push("/auth/login")}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Back to Login
+      </Button>
 
-                    const { error } = await supabase.auth.updateUser({
-                        password: password,
-                    })
+      <Card className="w-full max-w-md p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold">Set New Password</h1>
+          <p className="text-muted-foreground mt-2">
+            Please enter your new password
+          </p>
+        </div>
 
-                    if (error) {
-                        return router.push("/forgot-password?message=A user with that email already exists! Please try again with a different email.");
-                    }
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div>
+            <Label htmlFor="password">New Password</Label>
+            <Input
+              id="password"
+              type="password"
+              {...register("password")}
+              className="mt-1"
+            />
+            <Progress value={passwordStrength} className="mt-2" />
+            <p className="text-sm text-muted-foreground mt-1">
+              Password strength: {passwordStrength === 100 ? "Strong" : passwordStrength >= 50 ? "Medium" : "Weak"}
+            </p>
+            {errors.password && (
+              <p className="text-destructive text-sm mt-1">{errors.password?.message as string}</p>
+            )}
+          </div>
 
-                    return router.push("/auth/login");
-                })}>
-                    Reset Password
-                </Button>
-                <Text textAlign='center'>Remember your password? <Button variant='link' onClick={() => router.push("/auth/login")}>Return to Log In</Button></Text>
-            </VStack>
-        </VStack>
-    )
-}
+          <div>
+            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              {...register("confirmPassword")}
+              className="mt-1"
+            />
+            {errors.confirmPassword && (
+              <p className="text-destructive text-sm mt-1">{errors.confirmPassword?.message as string}</p>
+            )}
+          </div>
 
-export default function () {
-    return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <ResetPassword />
-        </Suspense>
-    )
+          <Button type="submit" className="w-full">
+            Reset Password
+          </Button>
+        </form>
+      </Card>
+    </div>
+  );
 }

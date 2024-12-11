@@ -1,0 +1,102 @@
+{
+  "defaultFileLayout": {
+    "app": {
+      "(auth)": {
+        "login": ["page.tsx", "layout.tsx"],
+        "register": ["page.tsx", "layout.tsx"]
+      },
+      "(dashboard)": {
+        "layout.tsx": true,
+        "page.tsx": true
+      },
+      "api": {
+        "[[...route]]": {
+          "route.ts": true
+        }
+      }
+    },
+    "components": {
+      "atoms": {},
+      "molecules": {},
+      "organisms": {},
+      "templates": {},
+      "providers": {
+        "query-provider.tsx": true,
+        "supabase-provider.tsx": true
+      }
+    },
+    "lib": {
+      "supabase": {
+        "client.ts": true,
+        "server.ts": true
+      },
+      "utils": {
+        "api.ts": true
+      },
+      "store": {
+        "index.ts": true
+      }
+    },
+    "types": {
+      "supabase.ts": true,
+      "schema.ts": true
+    }
+  },
+  "fileAssociations": {
+    "page.tsx": ["layout.tsx", "loading.tsx", "error.tsx"],
+    "schema.ts": ["types/*.ts"],
+    "api/*.ts": ["types/*.ts", "lib/utils/api.ts"]
+  },
+  "snippets": {
+    "typescript": {
+      "rq": {
+        "prefix": "rquery",
+        "body": [
+          "export const use${1:Query} = () => {",
+          "  return useQuery({",
+          "    queryKey: ['${2:key}'],",
+          "    queryFn: async () => {",
+          "      $0",
+          "    }",
+          "  })",
+          "}"
+        ]
+      },
+      "zs": {
+        "prefix": "zstore",
+        "body": [
+          "import { create } from 'zustand'",
+          "",
+          "interface ${1:Store}State {",
+          "  $0",
+          "}",
+          "",
+          "export const use${1:Store} = create<${1:Store}State>((set) => ({",
+          "}))"
+        ]
+      }
+    }
+  },
+  "importSuggestions": {
+    "react-query": {
+      "useQuery": ["@tanstack/react-query"],
+      "useMutation": ["@tanstack/react-query"]
+    },
+    "zustand": {
+      "create": ["zustand"]
+    },
+    "zod": {
+      "z": ["zod"]
+    }
+  },
+  "recommendations": {
+    "patterns": {
+      "components/atoms/**": "Small, single-purpose components (Button, Input)",
+      "components/molecules/**": "Combinations of atoms (SearchBar, FormField)",
+      "components/organisms/**": "Complex components (Header, Sidebar)",
+      "components/templates/**": "Page layouts and structures",
+      "lib/store/**": "Zustand store definitions",
+      "types/**": "Type definitions and Zod schemas"
+    }
+  }
+}

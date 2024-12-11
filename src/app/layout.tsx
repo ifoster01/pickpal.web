@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import type { PropsWithChildren } from 'react'
-import './global.css'
+import './globals.css'
+import { ThemeProvider } from '@/providers/ThemeProvider';
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -9,7 +10,7 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: 'Pickpockt',
-  description: 'Sports betting made simple.',
+  description: 'Enrich your sports betting.',
 }
 
 const RootLayout = (props: PropsWithChildren) => {

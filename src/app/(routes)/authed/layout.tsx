@@ -1,94 +1,133 @@
 "use client";
-import { Grid, HStack, VStack } from "@/styled-system/jsx";
-import { ReactNode, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "~/providers/AuthProvider";
-// import { Navbar } from "./(components)/Navigation/Navbar";
-import Image from "next/image";
-import { Button } from "~/components/ui/button";
-import { createClient } from "~/utils/supabase/client";
-import { IconButton } from "~/components/ui/icon-button";
-import { LogOutIcon, MenuIcon, XIcon } from "lucide-react";
-import { Drawer } from "~/components/ui/drawer";
-import { Text } from "~/components/ui/text";
 
-export default function ({children}:{children: ReactNode}) {
-    const router = useRouter();
+import { useAuth } from "@/providers/AuthProvider";
+import { useRouter, usePathname } from "next/navigation";
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Menu, User, LogOut, Trophy, Rocket, Heart, UserCircle } from "lucide-react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { cn } from "@/utils/cn";
 
-    const handleSignOut = async () => {
-        const supabase = createClient();
-        await supabase.auth.signOut();
-        router.push('/auth/login');
-    }
+const navItems = [
+  { href: "/authed/picks", label: "Picks", icon: Trophy },
+  { href: "/authed/saved", label: "Saved", icon: Heart },
+  { href: "/authed/parlay", label: "Parlay", icon: Rocket },
+];
 
+
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const { user, loading, signOut } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  if (loading) {
     return (
-        <VStack minH='screen' maxW='screen' overflow='auto'>
-            {/* Navbar */}
-            {/* <Navbar /> */}
-            <HStack px='10%' py={4} w='full' display={["flex", "flex", "flex", "none", "none", "none"]} justify='space-between'>
-                <Image src='/logos/pickpockt long.svg' alt='Pickpockt' width={200} height={100} onClick={() => router.push('/authed')} />
-                <Drawer.Root>
-                    <Drawer.Trigger asChild>
-                        <IconButton w='fit-content'>
-                            <MenuIcon size={24} />
-                        </IconButton>
-                    </Drawer.Trigger>
-                    <Drawer.Backdrop />
-                    <Drawer.Positioner>
-                        <Drawer.Content>
-                            <Drawer.Header>
-                                <Drawer.Title>
-                                    <Image src='/logos/pickpockt long.svg' alt='Pickpockt' width={200} height={100} onClick={() => router.push('/authed')} />
-                                </Drawer.Title>
-                                <Drawer.CloseTrigger asChild position="absolute" top="3" right="4">
-                                    <IconButton variant="ghost">
-                                        <XIcon height={48} width={48} />
-                                    </IconButton>
-                                </Drawer.CloseTrigger>
-                            </Drawer.Header>
-                            <Drawer.Body>
-                                <VStack>
-                                    <Drawer.CloseTrigger asChild>
-                                        <Button w='full' variant='outline' cursor='pointer' onClick={() => router.push('/authed')}>Model&apos;s Picks</Button>
-                                    </Drawer.CloseTrigger>
-                                    <Drawer.CloseTrigger asChild>
-                                        <Button w='full' variant='outline' cursor='pointer' onClick={() => router.push('/authed/parlays')}>Parlay Center</Button>
-                                    </Drawer.CloseTrigger>
-                                    <Drawer.CloseTrigger asChild>
-                                        <Button w='full' variant='outline' cursor='pointer' onClick={() => router.push('/authed/props')}>Select Props</Button>
-                                    </Drawer.CloseTrigger>
-                                    <Button w='full' onClick={handleSignOut}>
-                                        <LogOutIcon size={24} />
-                                        Sign Out
-                                    </Button>
-                                </VStack>
-                            </Drawer.Body>
-                        </Drawer.Content>
-                    </Drawer.Positioner>
-                </Drawer.Root>
-            </HStack>
-            <VStack w='full' display={["none", "none", "none", "flex", "flex", "flex"]}>
-                <Grid
-                    gridTemplateColumns={['175px minmax(0, 1fr) 175px']}
-                    w='full'
-                    py={4}
-                    px={['15%']}
-                    gap={4}
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+  
+  return (
+    <div className="min-h-screen bg-background">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex h-14 items-center px-4 md:px-6">
+        <div className="mr-4 flex md:hidden">
+            <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                <Menu className="h-5 w-5" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-[200px]">
+                {navItems.map((item) => (
+                <DropdownMenuItem
+                    key={item.href}
+                    asChild
+                    className={cn(
+                    "flex items-center",
+                    pathname === item.href && "bg-accent"
+                    )}
                 >
-                    <Image src='/logos/pickpockt long.svg' alt='Pickpockt' width={400} height={200} onClick={() => router.push('/authed')} />
-                    <HStack w='full' justify='center' gap={8}>
-                        <Button variant='link' cursor='pointer' onClick={() => router.push('/authed')}>Model&apos;s Picks</Button>
-                        <Button variant='link' cursor='pointer' onClick={() => router.push('/authed/parlays')}>Parlay Center</Button>
-                        <Button variant='link' cursor='pointer' onClick={() => router.push('/authed/props')}>Select Props</Button>
-                    </HStack>
-                    <HStack w='full' justify='flex-end'>
-                        <Button w='fit-content' alignSelf='flex-end' onClick={handleSignOut}>
-                            Sign Out
-                        </Button>
-                    </HStack>
-                </Grid>
-            </VStack>
-            {children}
-        </VStack>
-    )
+                    <Link href={item.href} className="flex items-center">
+                    <item.icon className="mr-2 h-4 w-4" />
+                    {item.label}
+                    </Link>
+                </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
+
+        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+            {navItems.map((item) => (
+            <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                "relative py-4 transition-colors hover:text-foreground/80 flex items-center space-x-1",
+                pathname === item.href ? "text-foreground" : "text-foreground/60"
+                )}
+            >
+                <item.icon className="h-4 w-4" />
+                <span>{item.label}</span>
+                {pathname === item.href && (
+                <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground"
+                    layoutId="navbar-indicator"
+                    transition={{
+                    type: "spring",
+                    stiffness: 350,
+                    damping: 30,
+                    }}
+                />
+                )}
+            </Link>
+            ))}
+        </nav>
+
+        <div className="ml-auto flex items-center space-x-4">
+            <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                <User className="h-5 w-5" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[200px]">
+                <DropdownMenuLabel>Account</DropdownMenuLabel>
+                <DropdownMenuItem asChild>
+                <Link href="/authed/profile" className="flex items-center cursor-pointer">
+                    <UserCircle className="mr-2 h-4 w-4" />
+                    Profile Settings
+                </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={signOut} className="text-red-600">
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
+        </div>
+    </header>
+
+    <main className="flex-1 w-full px-4 md:px-6 py-6 mx-auto max-w-7xl">
+        {children}
+    </main>
+    </div>
+  );
 }

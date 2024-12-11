@@ -1,51 +1,30 @@
-import { forwardRef } from 'react'
-import * as StyledCheckbox from './styled/checkbox'
+"use client";
 
-export interface CheckboxProps extends StyledCheckbox.RootProps {}
+import * as React from "react";
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { Check } from "lucide-react";
 
-export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>((props, ref) => {
-  const { children, ...rootProps } = props
+import { cn } from "@/utils/cn";
 
-  return (
-    <StyledCheckbox.Root ref={ref} {...rootProps}>
-      <StyledCheckbox.Control>
-        <StyledCheckbox.Indicator>
-          <CheckIcon />
-        </StyledCheckbox.Indicator>
-        <StyledCheckbox.Indicator indeterminate>
-          <MinusIcon />
-        </StyledCheckbox.Indicator>
-      </StyledCheckbox.Control>
-      {children && <StyledCheckbox.Label>{children}</StyledCheckbox.Label>}
-      <StyledCheckbox.HiddenInput />
-    </StyledCheckbox.Root>
-  )
-})
+const Checkbox = React.forwardRef<
+  React.ElementRef<typeof CheckboxPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
+>(({ className, ...props }, ref) => (
+  <CheckboxPrimitive.Root
+    ref={ref}
+    className={cn(
+      "peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
+      className,
+    )}
+    {...props}
+  >
+    <CheckboxPrimitive.Indicator
+      className={cn("flex items-center justify-center text-current")}
+    >
+      <Check className="h-4 w-4" />
+    </CheckboxPrimitive.Indicator>
+  </CheckboxPrimitive.Root>
+));
+Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
-Checkbox.displayName = 'Checkbox'
-
-const CheckIcon = () => (
-  <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <title>Check Icon</title>
-    <path
-      d="M11.6666 3.5L5.24992 9.91667L2.33325 7"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
-
-const MinusIcon = () => (
-  <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <title>Minus Icon</title>
-    <path
-      d="M2.91675 7H11.0834"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
+export { Checkbox };

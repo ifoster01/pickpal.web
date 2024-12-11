@@ -1,96 +1,163 @@
 "use client";
-import { HStack, VStack } from "@/styled-system/jsx";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { createClient } from "~/utils/supabase/client";
-import { useSearchParams, useRouter } from "next/navigation";
+
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { Text } from "~/components/ui/text";
-import { LabeledInput } from "~/components/general/LabaledInput";
-import { Suspense, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import Image from "next/image";
+import { createClient } from "@/utils/supabase/client";
+import { toast } from "sonner";
+import GoogleLogo from "~/assets/logos/google-colored.svg";
 
-export default function () {
-    const router = useRouter();
-    const [showPassword, setShowPassword] = useState(false);
+const schema = z.object({
+  email: z.string().email("Please enter a valid email"),
+  password: z.string().min(1, "Password is required"),
+});
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm({
-        defaultValues: {
-            email: "",
-            password: "",
-        }
+type LoginFormData = z.infer<typeof schema>;
+
+export default function Login() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      setIsLoading(true);
+      const supabase = createClient();
+      
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+
+      if (error) throw error;
+
+      // Navigation is handled by the SupabaseProvider
+    } catch (error: any) {
+      console.error("Error signing in:", error);
+      toast.error("Failed to sign in. Please check your credentials and try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    const supabase = createClient();
+    const origin = window.location.origin;
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+            redirectTo: `${origin}/auth/callback`,
+        },
     });
 
-    return (
-        <VStack justify='center'>
-            <LabeledInput
-                label="Email"
-                input={
-                    <Input
-                        type="email"
-                        {...register("email", { required: true })}
-                        placeholder="test@example.com"
-                    />
-                }
+    if (error) {
+        return router.push("/login?message=An error occurred! Please try again");
+    }
+
+    return router.push(data.url);
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Button
+        variant="ghost"
+        className="absolute top-4 left-4"
+        onClick={() => router.push("/")}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Back to Home
+      </Button>
+
+      <Card className="w-full max-w-md p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold">Welcome Back</h1>
+          <p className="text-muted-foreground mt-2">Sign in to your account</p>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              {...register("email")}
+              className="mt-1"
+              disabled={isLoading}
             />
-            {errors.email && <Text color='red'>{errors.email.message}</Text>}
-            <LabeledInput
-                label="Password"
-                w='full'
-                input={
-                    <HStack w='full' border='1px solid' borderColor='#cfceca' borderRadius='md' pr={2}>
-                        <Input
-                            type={showPassword ? "text" : "password"}
-                            {...register("password", { required: true })}
-                            placeholder="123456789"
-                            border='none'
-                            _focus={{
-                                boxShadow: 'none',
-                            }}
-                        />
-                        {
-                            showPassword ?
-                                <EyeOff onClick={() => setShowPassword(false)} />
-                                :
-                                <Eye onClick={() => setShowPassword(true)} />
-                        }
-                    </HStack>
-                }
-            />
-            {errors.password && <Text color='red'>{errors.password.message}</Text>}
-            <Suspense fallback={<Text>Loading...</Text>}>
-                <ParamsMessage />
-            </Suspense>
-            <Button alignSelf='flex-end' variant='link' onClick={() => router.push("/forgot-password")}>Forgot Password?</Button>
-            <Button w='full' mt={4} onClick={handleSubmit(async (data) => {
-                const { email, password } = data;
-                console.log('here')
-                
-                const supabase = createClient();
+            {errors.email && (
+              <p className="text-destructive text-sm mt-1">{errors.email.message}</p>
+            )}
+          </div>
 
-                const { error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                });
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                {...register("password")}
+                className="mt-1 pr-10"
+                disabled={isLoading}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-[4px] h-9 w-9 px-3"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            {errors.password && (
+              <p className="text-destructive text-sm mt-1">{errors.password.message}</p>
+            )}
+          </div>
 
-                if (error) {
-                    return router.push("/auth/login?message=Invalid username and/or password! Please try again");
-                }
+          <Link href="/forgot-password" className="text-sm text-primary hover:underline block">
+            Forgot your password?
+          </Link>
 
-                return router.push("/authed");
-            })}>
-                Log In
-            </Button>
-            <Text textAlign='center'>Don&apos;t have an account? <Button variant='link' onClick={() => router.push("/auth/signup")}>Sign Up</Button></Text>
-        </VStack>
-    )
-}
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Signing in..." : "Sign In"}
+          </Button>
 
-function ParamsMessage() {
-    const params = useSearchParams();
-    return params.get('message') ? <Text color='red'>{params.get('message')}</Text> : null;
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full gap-2"
+            onClick={handleGoogleSignIn}
+            disabled={isLoading}
+          >
+            <Image src={GoogleLogo} alt="Google" width={20} height={20} />
+            Continue with Google
+          </Button>
+
+          <p className="text-center text-sm text-muted-foreground">
+            Don&apos;t have an account?{" "}
+            <Link href="/signup" className="text-primary hover:underline">
+              Sign up
+            </Link>
+          </p>
+        </form>
+      </Card>
+    </div>
+  );
 }
