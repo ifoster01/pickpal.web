@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { motion } from "framer-motion";
 
 const scrollToSection = (id: string) => {
   const element = document.getElementById(id);
