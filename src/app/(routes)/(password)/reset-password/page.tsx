@@ -9,7 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
+import { createClient } from "@/utils/supabase/client";
 
 const schema = z.object({
   password: z.string().min(8),
@@ -21,8 +23,11 @@ const schema = z.object({
 
 export default function ResetPassword() {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
-  const { register, handleSubmit, watch, formState: { errors } } = useForm({
+  const { register, handleSubmit, setError, watch, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
   });
 
@@ -39,9 +44,32 @@ export default function ResetPassword() {
   const passwordStrength = calculatePasswordStrength(password);
 
   const onSubmit = async (data: any) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    router.push("/auth/login");
+    const { password, confirmPassword } = data;
+
+    if (password !== confirmPassword) {
+      // set error message
+      setError("confirmPassword", {
+          type: "manual",
+          message: "Passwords do not match!",
+      });
+      return;
+    }
+    
+    const supabase = createClient();
+
+    const { error } = await supabase.auth.updateUser({
+      password: password,
+    })
+
+    if (error) {
+      setError("password", {
+        type: "manual",
+        message: "Failed to update password",
+      });
+      return;
+    }
+
+    return router.push("/auth/login");
   };
 
   return (
@@ -64,37 +92,69 @@ export default function ResetPassword() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
-            <Label htmlFor="password">New Password</Label>
-            <Input
-              id="password"
-              type="password"
-              {...register("password")}
-              className="mt-1"
-            />
+        <div>
+            <Label htmlFor="password">Password</Label>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                {...register("password")}
+                className="mt-1 pr-10"
+                disabled={isLoading}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-[4px] h-9 w-9 px-3"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
             <Progress value={passwordStrength} className="mt-2" />
             <p className="text-sm text-muted-foreground mt-1">
               Password strength: {passwordStrength === 100 ? "Strong" : passwordStrength >= 50 ? "Medium" : "Weak"}
             </p>
             {errors.password && (
-              <p className="text-destructive text-sm mt-1">{errors.password?.message as string}</p>
+              <p className="text-destructive text-sm mt-1">{String(errors.password.message)}</p>
             )}
           </div>
 
           <div>
             <Label htmlFor="confirmPassword">Confirm New Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              {...register("confirmPassword")}
-              className="mt-1"
-            />
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                {...register("confirmPassword")}
+                className="mt-1 pr-10"
+                disabled={isLoading}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-[4px] h-9 w-9 px-3"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
             {errors.confirmPassword && (
               <p className="text-destructive text-sm mt-1">{errors.confirmPassword?.message as string}</p>
             )}
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button className="w-full" onClick={handleSubmit(onSubmit)}>
             Reset Password
           </Button>
         </form>
