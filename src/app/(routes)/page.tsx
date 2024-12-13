@@ -11,7 +11,6 @@ import { Contact } from './(components)/contact';
 import { useRouter } from "next/navigation";
 
 export default function LandingPage() {
-  const router = useRouter();
 
   useEffect(() => {
     // Check if there's a scroll target in sessionStorage

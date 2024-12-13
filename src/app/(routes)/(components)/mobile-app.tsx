@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, Link2 } from "lucide-react";
 import Link from "next/link";
 import PickpocktIcon from "~/assets/logos/pickpockt-icon.png";
 export function MobileApp() {
@@ -27,6 +27,12 @@ export function MobileApp() {
               <Download className="h-5 w-5" />
               <Link href="https://apps.apple.com/us/app/pickpockt/id6736374764" target="_blank">
                 Download on iOS
+              </Link>
+            </Button>
+            <Button size="lg" variant='outline' className="ml-4 gap-2">
+              <Link2 className="h-5 w-5" />
+              <Link href="https://testflight.apple.com/join/YpgPyVs5" target="_blank">
+                Test Flight Beta
               </Link>
             </Button>
           </motion.div>
