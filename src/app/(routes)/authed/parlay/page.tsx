@@ -12,14 +12,9 @@ import { ParlayFilters } from "./(components)/parlay-filters";
 import { generateParlayCombinations, getBetterSide, type Parlay } from "@/utils/parlay";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/cn";
-
+import { isEventUpcoming } from "@/hooks/api/use-odds";
 type League = 'UFC' | 'NFL';
 type SortOption = 'payout' | 'value' | 'probability';
-
-function isEventUpcoming(eventDate: string | null): boolean {
-  if (!eventDate) return true;
-  return new Date(eventDate) > new Date();
-}
 
 export default function ParlayPage() {
   const { league, setLeague } = useLeague();
