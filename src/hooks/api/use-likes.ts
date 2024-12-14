@@ -3,11 +3,50 @@ import { createClient } from "@/utils/supabase/client";
 import { Database } from "@/types/supabase";
 import { useEffect } from "react";
 import { useAuth } from "@/providers/AuthProvider";
+import { useFilter } from "@/providers/FilterProvider";
+import { isEventUpcoming } from "./use-odds";
 
 type LikedFight = Database["public"]["Tables"]["liked_fights"]["Row"];
 type LikedNFLGame = Database["public"]["Tables"]["liked_nfl_games"]["Row"];
+type FightOdds = Database["public"]["Tables"]["upcoming_fight_odds"]["Row"];
+type NFLOdds = Database["public"]["Tables"]["upcoming_nfl_odds"]["Row"];
 
-export function useLikedFights() {
+type EnrichedLikedFight = LikedFight & {
+  upcoming_fight_odds: FightOdds | null;
+};
+
+type EnrichedLikedNFLGame = LikedNFLGame & {
+  upcoming_nfl_odds: NFLOdds | null;
+};
+
+type Filter = 'upcoming' | 'past' | 'all';
+
+// Helper function to filter events based on filter type
+function filterEvents<T extends EnrichedLikedFight | EnrichedLikedNFLGame>(
+  events: T[],
+  filter: Filter
+): T[] {
+  return events.filter(event => {
+    const date = 'upcoming_fight_odds' in event 
+      ? event.upcoming_fight_odds?.fight_date 
+      : event.upcoming_nfl_odds?.game_date;
+
+    if (!date) return true;
+    const isUpcoming = isEventUpcoming(date);
+
+    switch (filter) {
+      case 'upcoming':
+        return isUpcoming;
+      case 'past':
+        return !isUpcoming;
+      case 'all':
+      default:
+        return true;
+    }
+  });
+}
+
+export function useLikedFights(filter: Filter = 'upcoming') {
   const { user } = useAuth();
   const supabase = createClient();
   const queryClient = useQueryClient();
@@ -28,7 +67,7 @@ export function useLikedFights() {
         },
         () => {
           // Refetch the liked fights when changes occur
-          queryClient.invalidateQueries({ queryKey: ['liked_fights', user.id] });
+          queryClient.invalidateQueries({ queryKey: ['liked_fights', user.id, filter] });
         }
       )
       .subscribe();
@@ -36,11 +75,11 @@ export function useLikedFights() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, user, queryClient]);
+  }, [supabase, user, queryClient, filter]);
 
   // Query for liked fights
-  const query = useQuery({
-    queryKey: ['liked_fights', user?.id],
+  const query = useQuery<EnrichedLikedFight[]>({
+    queryKey: ['liked_fights', user?.id, filter],
     queryFn: async () => {
       if (!user) return [];
 
@@ -61,12 +100,13 @@ export function useLikedFights() {
       if (oddsError) throw oddsError;
 
       // Manually join the data
-      const enrichedLikes = likedFights.map(like => ({
+      const enrichedLikes: EnrichedLikedFight[] = likedFights.map(like => ({
         ...like,
         upcoming_fight_odds: fightOdds.find(odds => odds.fight_id === like.fight_id) || null
       }));
 
-      return enrichedLikes as (LikedFight & { upcoming_fight_odds: Database["public"]["Tables"]["upcoming_fight_odds"]["Row"] })[];
+      // Apply filtering
+      return filterEvents(enrichedLikes, filter);
     },
     enabled: !!user,
   });
@@ -93,38 +133,38 @@ export function useLikedFights() {
       if (!user) return;
 
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['liked_fights', user.id] });
+      await queryClient.cancelQueries({ queryKey: ['liked_fights', user.id, filter] });
 
       // Snapshot the previous value
-      const previousLikes = queryClient.getQueryData(['liked_fights', user.id]);
+      const previousLikes = queryClient.getQueryData<EnrichedLikedFight[]>(['liked_fights', user.id, filter]);
 
       // Optimistically update to the new value
-      const newLike = {
+      const newLike: EnrichedLikedFight = {
         fight_id: fightId,
         saving_user_id: user.id,
         saved_at: new Date().toISOString(),
         id: Math.random(), // temporary ID
         upcoming_fight_odds: queryClient
-          .getQueryData<any[]>(['upcoming_fight_odds'])
-          ?.find(fight => fight.fight_id === fightId),
+          .getQueryData<FightOdds[]>(['upcoming_fight_odds'])
+          ?.find(fight => fight.fight_id === fightId) || null,
       };
 
-      queryClient.setQueryData(['liked_fights', user.id], (old: any[] = []) => [
-        newLike,
-        ...old,
-      ]);
+      queryClient.setQueryData<EnrichedLikedFight[]>(['liked_fights', user.id, filter], (old = []) => {
+        const newData = [newLike, ...old];
+        return filterEvents(newData, filter);
+      });
 
       // Return a context object with the snapshotted value
       return { previousLikes };
     },
     onError: (err, newFight, context) => {
       if (context?.previousLikes && user) {
-        queryClient.setQueryData(['liked_fights', user.id], context.previousLikes);
+        queryClient.setQueryData<EnrichedLikedFight[]>(['liked_fights', user.id, filter], context.previousLikes);
       }
     },
     onSettled: () => {
       if (user) {
-        queryClient.invalidateQueries({ queryKey: ['liked_fights', user.id] });
+        queryClient.invalidateQueries({ queryKey: ['liked_fights', user.id, filter] });
       }
     },
   });
@@ -146,27 +186,28 @@ export function useLikedFights() {
       if (!user) return;
 
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['liked_fights', user.id] });
+      await queryClient.cancelQueries({ queryKey: ['liked_fights', user.id, filter] });
 
       // Snapshot the previous value
-      const previousLikes = queryClient.getQueryData(['liked_fights', user.id]);
+      const previousLikes = queryClient.getQueryData<EnrichedLikedFight[]>(['liked_fights', user.id, filter]);
 
       // Optimistically update to the new value
-      queryClient.setQueryData(['liked_fights', user.id], (old: any[] = []) => 
-        old.filter(like => like.fight_id !== fightId)
-      );
+      queryClient.setQueryData<EnrichedLikedFight[]>(['liked_fights', user.id, filter], (old = []) => {
+        const newData = old.filter(like => like.fight_id !== fightId);
+        return filterEvents(newData, filter);
+      });
 
       // Return a context object with the snapshotted value
       return { previousLikes };
     },
     onError: (err, fightId, context) => {
       if (context?.previousLikes && user) {
-        queryClient.setQueryData(['liked_fights', user.id], context.previousLikes);
+        queryClient.setQueryData<EnrichedLikedFight[]>(['liked_fights', user.id, filter], context.previousLikes);
       }
     },
     onSettled: () => {
       if (user) {
-        queryClient.invalidateQueries({ queryKey: ['liked_fights', user.id] });
+        queryClient.invalidateQueries({ queryKey: ['liked_fights', user.id, filter] });
       }
     },
   });
@@ -180,7 +221,7 @@ export function useLikedFights() {
   };
 }
 
-export function useLikedNFLGames() {
+export function useLikedNFLGames(filter: Filter = 'upcoming') {
   const { user } = useAuth();
   const supabase = createClient();
   const queryClient = useQueryClient();
@@ -201,7 +242,7 @@ export function useLikedNFLGames() {
         },
         () => {
           // Refetch the liked games when changes occur
-          queryClient.invalidateQueries({ queryKey: ['liked_nfl_games', user.id] });
+          queryClient.invalidateQueries({ queryKey: ['liked_nfl_games', user.id, filter] });
         }
       )
       .subscribe();
@@ -209,11 +250,11 @@ export function useLikedNFLGames() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, user, queryClient]);
+  }, [supabase, user, queryClient, filter]);
 
   // Query for liked NFL games
-  const query = useQuery({
-    queryKey: ['liked_nfl_games', user?.id],
+  const query = useQuery<EnrichedLikedNFLGame[]>({
+    queryKey: ['liked_nfl_games', user?.id, filter],
     queryFn: async () => {
       if (!user) return [];
 
@@ -234,12 +275,13 @@ export function useLikedNFLGames() {
       if (oddsError) throw oddsError;
 
       // Manually join the data
-      const enrichedLikes = likedGames.map(like => ({
+      const enrichedLikes: EnrichedLikedNFLGame[] = likedGames.map(like => ({
         ...like,
         upcoming_nfl_odds: nflOdds.find(odds => odds.game_id === like.game_id) || null
       }));
 
-      return enrichedLikes as (LikedNFLGame & { upcoming_nfl_odds: Database["public"]["Tables"]["upcoming_nfl_odds"]["Row"] })[];
+      // Apply filtering
+      return filterEvents(enrichedLikes, filter);
     },
     enabled: !!user,
   });
@@ -266,38 +308,38 @@ export function useLikedNFLGames() {
       if (!user) return;
 
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['liked_nfl_games', user.id] });
+      await queryClient.cancelQueries({ queryKey: ['liked_nfl_games', user.id, filter] });
 
       // Snapshot the previous value
-      const previousLikes = queryClient.getQueryData(['liked_nfl_games', user.id]);
+      const previousLikes = queryClient.getQueryData<EnrichedLikedNFLGame[]>(['liked_nfl_games', user.id, filter]);
 
       // Optimistically update to the new value
-      const newLike = {
+      const newLike: EnrichedLikedNFLGame = {
         game_id: gameId,
         saving_user_id: user.id,
         saved_at: new Date().toISOString(),
         id: Math.random(), // temporary ID
         upcoming_nfl_odds: queryClient
-          .getQueryData<any[]>(['upcoming_nfl_odds'])
-          ?.find(game => game.game_id === gameId),
+          .getQueryData<NFLOdds[]>(['upcoming_nfl_odds'])
+          ?.find(game => game.game_id === gameId) || null,
       };
 
-      queryClient.setQueryData(['liked_nfl_games', user.id], (old: any[] = []) => [
-        newLike,
-        ...old,
-      ]);
+      queryClient.setQueryData<EnrichedLikedNFLGame[]>(['liked_nfl_games', user.id, filter], (old = []) => {
+        const newData = [newLike, ...old];
+        return filterEvents(newData, filter);
+      });
 
       // Return a context object with the snapshotted value
       return { previousLikes };
     },
     onError: (err, newGame, context) => {
       if (context?.previousLikes && user) {
-        queryClient.setQueryData(['liked_nfl_games', user.id], context.previousLikes);
+        queryClient.setQueryData<EnrichedLikedNFLGame[]>(['liked_nfl_games', user.id, filter], context.previousLikes);
       }
     },
     onSettled: () => {
       if (user) {
-        queryClient.invalidateQueries({ queryKey: ['liked_nfl_games', user.id] });
+        queryClient.invalidateQueries({ queryKey: ['liked_nfl_games', user.id, filter] });
       }
     },
   });
@@ -319,27 +361,28 @@ export function useLikedNFLGames() {
       if (!user) return;
 
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['liked_nfl_games', user.id] });
+      await queryClient.cancelQueries({ queryKey: ['liked_nfl_games', user.id, filter] });
 
       // Snapshot the previous value
-      const previousLikes = queryClient.getQueryData(['liked_nfl_games', user.id]);
+      const previousLikes = queryClient.getQueryData<EnrichedLikedNFLGame[]>(['liked_nfl_games', user.id, filter]);
 
       // Optimistically update to the new value
-      queryClient.setQueryData(['liked_nfl_games', user.id], (old: any[] = []) => 
-        old.filter(like => like.game_id !== gameId)
-      );
+      queryClient.setQueryData<EnrichedLikedNFLGame[]>(['liked_nfl_games', user.id, filter], (old = []) => {
+        const newData = old.filter(like => like.game_id !== gameId);
+        return filterEvents(newData, filter);
+      });
 
       // Return a context object with the snapshotted value
       return { previousLikes };
     },
     onError: (err, gameId, context) => {
       if (context?.previousLikes && user) {
-        queryClient.setQueryData(['liked_nfl_games', user.id], context.previousLikes);
+        queryClient.setQueryData<EnrichedLikedNFLGame[]>(['liked_nfl_games', user.id, filter], context.previousLikes);
       }
     },
     onSettled: () => {
       if (user) {
-        queryClient.invalidateQueries({ queryKey: ['liked_nfl_games', user.id] });
+        queryClient.invalidateQueries({ queryKey: ['liked_nfl_games', user.id, filter] });
       }
     },
   });

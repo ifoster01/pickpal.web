@@ -13,18 +13,26 @@ import { useLeague } from "@/providers/LeagueProvider";
 import { PickCard } from "../picks/(component)/pick-card";
 import { cn } from "@/utils/cn";
 import { isEventUpcoming } from "@/hooks/api/use-odds";
+import { useFilter } from "@/providers/FilterProvider";
 
 export default function SavedPage() {
   const { user } = useAuth();
   const { league, setLeague } = useLeague();
+  const { filter } = useFilter();
+
   const { 
     data: likedFights,
     unlikeFight,
-  } = useLikedFights();
+    isLoading: isLoadingFights,
+  } = useLikedFights(filter);
+
   const { 
     data: likedGames,
     unlikeGame,
-  } = useLikedNFLGames();
+    isLoading: isLoadingGames,
+  } = useLikedNFLGames(filter);
+
+  const isLoading = isLoadingFights || isLoadingGames;
 
   if (!user) {
     return (
@@ -42,12 +50,35 @@ export default function SavedPage() {
     );
   }
 
+  if (isLoading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="w-full"
+      >
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold mb-8">Saved Picks</h1>
+          <EventFilter className="block sm:block" />
+        </div>
+        <Card className="w-full p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-muted rounded w-1/3" />
+            <div className="h-32 bg-muted rounded" />
+          </div>
+        </Card>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
       className="w-full"
+      key={`${league}-${filter}`}
     >
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold mb-8">Saved Picks</h1>

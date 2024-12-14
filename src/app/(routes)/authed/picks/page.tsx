@@ -31,12 +31,12 @@ export default function PicksPage() {
 
   // UFC Data
   const { data: fights, isLoading: isLoadingFights } = useUpcomingFightOdds(filter);
-  const { data: likedFights, likeFight, unlikeFight, isLiking: isLikingFight, isUnliking: isUnlikingFight } = useLikedFights();
+  const { data: likedFights, likeFight, unlikeFight } = useLikedFights(filter);
   const likedFightIds = likedFights?.map(like => like.fight_id) || [];
 
   // NFL Data
   const { data: games, isLoading: isLoadingGames } = useUpcomingNFLOdds(filter);
-  const { data: likedGames, likeGame, unlikeGame, isLiking: isLikingGame, isUnliking: isUnlikingGame } = useLikedNFLGames();
+  const { data: likedGames, likeGame, unlikeGame } = useLikedNFLGames(filter);
   const likedGameIds = likedGames?.map(like => like.game_id) || [];
 
   const isLoading = league === 'UFC' ? isLoadingFights : isLoadingGames;
