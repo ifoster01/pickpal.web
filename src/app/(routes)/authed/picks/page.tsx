@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useUpcomingFightOdds, useUpcomingNFLOdds } from "@/hooks/api/use-odds";
+import { isEventUpcoming, useUpcomingFightOdds, useUpcomingNFLOdds } from "@/hooks/api/use-odds";
 import { useLikedFights, useLikedNFLGames } from "@/hooks/api/use-likes";
 import { cn } from "@/utils/cn";
 import { useAuth } from "@/providers/AuthProvider";
@@ -23,11 +23,6 @@ import { EventFilter } from "@/components/general/event-filter";
 
 type League = 'UFC' | 'NFL';
 type Filter = 'upcoming' | 'past' | 'all';
-
-function isEventUpcoming(eventDate: string | null): boolean {
-  if (!eventDate) return true;
-  return new Date(eventDate) > new Date();
-}
 
 export default function PicksPage() {
   const { user } = useAuth();

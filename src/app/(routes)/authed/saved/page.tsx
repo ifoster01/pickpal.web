@@ -12,24 +12,18 @@ import { EventFilter } from "@/components/general/event-filter";
 import { useLeague } from "@/providers/LeagueProvider";
 import { PickCard } from "../picks/(component)/pick-card";
 import { cn } from "@/utils/cn";
-
-function isEventUpcoming(eventDate: string | null): boolean {
-  if (!eventDate) return true;
-  return new Date(eventDate) > new Date();
-}
+import { isEventUpcoming } from "@/hooks/api/use-odds";
 
 export default function SavedPage() {
   const { user } = useAuth();
   const { league, setLeague } = useLeague();
   const { 
-    data: likedFights, 
-    unlikeFight, 
-    isUnliking: isUnlikingFight 
+    data: likedFights,
+    unlikeFight,
   } = useLikedFights();
   const { 
-    data: likedGames, 
-    unlikeGame, 
-    isUnliking: isUnlikingGame 
+    data: likedGames,
+    unlikeGame,
   } = useLikedNFLGames();
 
   if (!user) {

@@ -7,9 +7,10 @@ type NFLOdds = Database["public"]["Tables"]["upcoming_nfl_odds"]["Row"];
 
 export type Filter = 'upcoming' | 'past' | 'all';
 
-function isEventUpcoming(eventDate: string | null): boolean {
+export function isEventUpcoming(eventDate: string | null): boolean {
   if (!eventDate) return true; // Consider events without dates as upcoming
-  return new Date(eventDate) > new Date();
+  // new date - 12 hours
+  return new Date(eventDate) > new Date(new Date().getTime() - 6 * 60 * 60 * 1000);
 }
 
 export function useUpcomingFightOdds(filter: Filter = 'upcoming') {
