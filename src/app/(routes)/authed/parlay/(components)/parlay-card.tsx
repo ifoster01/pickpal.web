@@ -38,7 +38,7 @@ export function ParlayCard({ parlay }: ParlayCardProps) {
                 {parlay.legs.slice(0, 2).map((leg) => (
                   <div 
                     key={leg.eventId} 
-                    className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-background"
+                    className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-background bg-white"
                   >
                     <Image
                       src={leg.picUrl || "/placeholder-fighter.png"}
@@ -96,7 +96,7 @@ export function ParlayCard({ parlay }: ParlayCardProps) {
               {parlay.legs.slice(0, 3).map((leg) => (
                 <div 
                   key={leg.eventId} 
-                  className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-background"
+                  className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-background bg-white"
                 >
                   <Image
                     src={leg.picUrl || "/placeholder-fighter.png"}
