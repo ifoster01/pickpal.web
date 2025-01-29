@@ -15,6 +15,7 @@ import { useAuth } from "@/providers/AuthProvider";
 
 type FightOdds = Database["public"]["Tables"]["upcoming_fight_odds"]["Row"];
 type NFLOdds = Database["public"]["Tables"]["upcoming_nfl_odds"]["Row"];
+type NBAGameOdds = Database["public"]["Tables"]["upcoming_nba_odds"]["Row"];
 
 type Fighter = {
   name: string | null;
@@ -26,12 +27,12 @@ type Fighter = {
 };
 
 interface PickCardProps {
-  event: FightOdds | NFLOdds;
-  type: 'UFC' | 'NFL';
+  event: FightOdds | NFLOdds | NBAGameOdds;
+  type: 'UFC' | 'NFL' | 'NBA';
   isLiked?: boolean;
   onLike?: () => void;
   onUnlike?: () => void;
-  league: 'UFC' | 'NFL';
+  league: 'UFC' | 'NFL' | 'NBA';
 }
 
 export function PickCard({ event, type, isLiked, onLike, onUnlike, league }: PickCardProps) {
@@ -45,13 +46,20 @@ export function PickCard({ event, type, isLiked, onLike, onUnlike, league }: Pic
     probability: calculateProbabilityFromOdds((event as FightOdds).odds1 || 0),
     bookProbability: calculateProbabilityFromOdds((event as FightOdds).f1_book_odds || 0),
     picUrl: (event as FightOdds).f1_pic_url
-  } : {
+  } : type === 'NFL' ? {
     name: (event as NFLOdds).team_name,
     odds: (event as NFLOdds).odds1,
     bookOdds: (event as NFLOdds).team_book_odds,
     probability: calculateProbabilityFromOdds((event as NFLOdds).odds1 || 0),
     bookProbability: calculateProbabilityFromOdds((event as NFLOdds).team_book_odds || 0),
     picUrl: (event as NFLOdds).team_pic_url
+  } : {
+    name: (event as NBAGameOdds).team_name,
+    odds: (event as NBAGameOdds).odds1,
+    bookOdds: (event as NBAGameOdds).team_book_odds,
+    probability: calculateProbabilityFromOdds((event as NBAGameOdds).odds1 || 0),
+    bookProbability: calculateProbabilityFromOdds((event as NBAGameOdds).team_book_odds || 0),
+    picUrl: (event as NBAGameOdds).team_pic_url
   };
 
   const fighter2: Fighter = type === 'UFC' ? {
@@ -61,13 +69,20 @@ export function PickCard({ event, type, isLiked, onLike, onUnlike, league }: Pic
     probability: calculateProbabilityFromOdds((event as FightOdds).odds2 || 0),
     bookProbability: calculateProbabilityFromOdds((event as FightOdds).f2_book_odds || 0),
     picUrl: (event as FightOdds).f2_pic_url
-  } : {
+  } : type === 'NFL' ? {
     name: (event as NFLOdds).opp_name,
     odds: (event as NFLOdds).odds2,
     bookOdds: (event as NFLOdds).opp_book_odds,
     probability: calculateProbabilityFromOdds((event as NFLOdds).odds2 || 0),
     bookProbability: calculateProbabilityFromOdds((event as NFLOdds).opp_book_odds || 0),
     picUrl: (event as NFLOdds).opp_pic_url
+  } : {
+    name: (event as NBAGameOdds).opp_name,
+    odds: (event as NBAGameOdds).odds2,
+    bookOdds: (event as NBAGameOdds).opp_book_odds,
+    probability: calculateProbabilityFromOdds((event as NBAGameOdds).odds2 || 0),
+    bookProbability: calculateProbabilityFromOdds((event as NBAGameOdds).opp_book_odds || 0),
+    picUrl: (event as NBAGameOdds).opp_pic_url
   };
 
   const discrepancy = Math.abs(fighter1.probability - fighter1.bookProbability);

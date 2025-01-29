@@ -15,6 +15,7 @@ import { Database } from "@/types/supabase";
 
 type FightOdds = Database["public"]["Tables"]["upcoming_fight_odds"]["Row"];
 type NFLOdds = Database["public"]["Tables"]["upcoming_nfl_odds"]["Row"];
+type NBAGameOdds = Database["public"]["Tables"]["upcoming_nba_odds"]["Row"];
 
 type Fighter = {
   name: string | null;
@@ -26,8 +27,8 @@ type Fighter = {
 };
 
 interface PickAnalyticsProps {
-  event: FightOdds | NFLOdds;
-  type: 'UFC' | 'NFL';
+  event: FightOdds | NFLOdds | NBAGameOdds;
+  type: 'UFC' | 'NFL' | 'NBA';
   fighter1: Fighter;
   fighter2: Fighter;
   discrepancy: "low" | "medium" | "high";

@@ -3,6 +3,7 @@ import { calculateProbabilityFromOdds } from "./odds";
 
 type FightOdds = Database["public"]["Tables"]["upcoming_fight_odds"]["Row"];
 type NFLOdds = Database["public"]["Tables"]["upcoming_nfl_odds"]["Row"];
+type NBAGameOdds = Database["public"]["Tables"]["upcoming_nba_odds"]["Row"];
 
 export type ParlayLeg = {
   eventId: string;
@@ -14,7 +15,7 @@ export type ParlayLeg = {
   modelProbability: number;
   bookProbability: number;
   valueEdge: number;
-  type: 'UFC' | 'NFL';
+  type: 'UFC' | 'NFL' | 'NBA';
   picUrl: string | null;
 };
 
@@ -52,7 +53,7 @@ export function calculateParlayProbability(probabilities: number[]): number {
   return probabilities.reduce((acc, curr) => acc * curr, 1);
 }
 
-export function getBetterSide(event: FightOdds | NFLOdds, type: 'UFC' | 'NFL'): ParlayLeg {
+export function getBetterSide(event: FightOdds | NFLOdds | NBAGameOdds, type: 'UFC' | 'NFL' | 'NBA'): ParlayLeg {
   if (type === 'UFC') {
     const fight = event as FightOdds;
     const f1Prob = calculateProbabilityFromOdds(fight.odds1 || 0);
@@ -90,7 +91,7 @@ export function getBetterSide(event: FightOdds | NFLOdds, type: 'UFC' | 'NFL'): 
         picUrl: fight.f2_pic_url,
       };
     }
-  } else {
+  } else if (type === 'NFL') {
     const game = event as NFLOdds;
     const teamProb = calculateProbabilityFromOdds(game.odds1 || 0);
     const oppProb = calculateProbabilityFromOdds(game.odds2 || 0);
@@ -123,6 +124,42 @@ export function getBetterSide(event: FightOdds | NFLOdds, type: 'UFC' | 'NFL'): 
         bookProbability: oppBookProb,
         valueEdge: oppProb - oppBookProb,
         type: 'NFL',
+        picUrl: game.opp_pic_url,
+      };
+    }
+  } else {
+    const game = event as NBAGameOdds;
+    const teamProb = calculateProbabilityFromOdds(game.odds1 || 0);
+    const oppProb = calculateProbabilityFromOdds(game.odds2 || 0);
+    const teamBookProb = calculateProbabilityFromOdds(game.team_book_odds || 0);
+    const oppBookProb = calculateProbabilityFromOdds(game.opp_book_odds || 0);
+
+    if (teamProb > oppProb) {
+      return {
+        eventId: game.game_id,
+        eventName: game.game_name,
+        eventDate: game.game_date,
+        selection: game.team_name,
+        modelOdds: game.odds1 || 0,
+        bookOdds: game.team_book_odds || 0,
+        modelProbability: teamProb,
+        bookProbability: teamBookProb,
+        valueEdge: teamProb - teamBookProb,
+        type: 'NBA',
+        picUrl: game.team_pic_url,
+      };
+    } else {
+      return {
+        eventId: game.game_id,
+        eventName: game.game_name,
+        eventDate: game.game_date,
+        selection: game.opp_name,
+        modelOdds: game.odds2 || 0,
+        bookOdds: game.opp_book_odds || 0,
+        modelProbability: oppProb,
+        bookProbability: oppBookProb,
+        valueEdge: oppProb - oppBookProb,
+        type: 'NBA',
         picUrl: game.opp_pic_url,
       };
     }

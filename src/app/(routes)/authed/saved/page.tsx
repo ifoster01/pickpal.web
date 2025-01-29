@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
-import { useLikedFights, useLikedNFLGames } from "@/hooks/api/use-likes";
+import { useLikedFights, useLikedNBAGames, useLikedNFLGames } from "@/hooks/api/use-likes";
 import { useAuth } from "@/providers/AuthProvider";
 import { calculateProbabilityFromOdds } from "@/utils/odds";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -31,6 +31,12 @@ export default function SavedPage() {
     unlikeGame,
     isLoading: isLoadingGames,
   } = useLikedNFLGames(filter);
+
+  const { 
+    data: likedNBAGames,
+    unlikeNBAGame,
+    isLoading: isLoadingNBAGames,
+  } = useLikedNBAGames(filter);
 
   const isLoading = isLoadingFights || isLoadingGames;
 
@@ -89,6 +95,7 @@ export default function SavedPage() {
         <TabsList className="mb-8">
           <TabsTrigger onClick={() => setLeague('UFC')} value="UFC">UFC Fights</TabsTrigger>
           <TabsTrigger onClick={() => setLeague('NFL')} value="NFL">NFL Games</TabsTrigger>
+          <TabsTrigger onClick={() => setLeague('NBA')} value="NBA">NBA Games</TabsTrigger>
         </TabsList>
 
         <TabsContent value="UFC">
@@ -141,6 +148,35 @@ export default function SavedPage() {
                       isLiked={true}
                       onUnlike={() => unlikeGame(game.game_id)}
                       league="NFL"
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="NBA">
+          {likedNBAGames?.length === 0 ? (
+            <Card className="w-full p-6">
+              <p className="text-muted-foreground">You haven&apos;t saved any NBA games yet.</p>
+            </Card>
+          ) : (
+            <div className="grid gap-6">
+              {likedNBAGames?.map((like) => {
+                const game = like.upcoming_nba_odds;
+                if (!game) return null;
+
+                const isCompleted = !isEventUpcoming(game.game_date);
+
+                return (
+                  <div key={game.game_id} className={cn(isCompleted && "opacity-75")}>
+                    <PickCard
+                      event={game}
+                      type="NBA"
+                      isLiked={true}
+                      onUnlike={() => unlikeNBAGame(game.game_id)}
+                      league="NBA"
                     />
                   </div>
                 );

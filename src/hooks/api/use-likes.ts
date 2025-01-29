@@ -436,13 +436,13 @@ export function useLikedNBAGames(filter: Filter = 'upcoming') {
     };
   }, [supabase, user, queryClient, filter]);
 
-  // Query for liked NFL games
+  // Query for liked NBA games
   const query = useQuery<EnrichedLikedNBAGame[]>({
     queryKey: ['liked_nba_games', user?.id, filter],
     queryFn: async () => {
       if (!user) return [];
 
-      // First, get the liked NFL games
+      // First, get the liked NBA games
       const { data: likedGames, error: likedError } = await supabase
         .from('liked_nba_games')
         .select('*')
@@ -451,7 +451,7 @@ export function useLikedNBAGames(filter: Filter = 'upcoming') {
 
       if (likedError) throw likedError;
 
-      // Then, get all the NFL odds
+      // Then, get all the NBA odds
       const { data: nbaOdds, error: oddsError } = await supabase
         .from('upcoming_nba_odds')
         .select('*');
@@ -573,8 +573,8 @@ export function useLikedNBAGames(filter: Filter = 'upcoming') {
 
   return {
     ...query,
-    likeGame: likeMutation.mutate,
-    unlikeGame: unlikeMutation.mutate,
+    likeNBAGame: likeMutation.mutate,
+    unlikeNBAGame: unlikeMutation.mutate,
     isLiking: likeMutation.isPending,
     isUnliking: unlikeMutation.isPending,
   };
