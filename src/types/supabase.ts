@@ -79,7 +79,7 @@ export type Database = {
         }
         Relationships: []
       }
-      liked_nfl_games: {
+      liked_nba_games: {
         Row: {
           game_id: string | null
           id: number
@@ -100,54 +100,24 @@ export type Database = {
         }
         Relationships: []
       }
-      liked_props: {
+      liked_nfl_games: {
         Row: {
-          americanOdds: number | null
-          category: string | null
-          created_at: string
-          eventDate: string | null
-          eventId: number | null
-          eventName: string | null
-          id: string
-          label: string | null
-          leagueId: number | null
-          leagueName: string | null
-          line: string | null
-          propLabel: string | null
-          providerOutcomeId: string | null
-          userId: string | null
+          game_id: string | null
+          id: number
+          saved_at: string
+          saving_user_id: string | null
         }
         Insert: {
-          americanOdds?: number | null
-          category?: string | null
-          created_at?: string
-          eventDate?: string | null
-          eventId?: number | null
-          eventName?: string | null
-          id?: string
-          label?: string | null
-          leagueId?: number | null
-          leagueName?: string | null
-          line?: string | null
-          propLabel?: string | null
-          providerOutcomeId?: string | null
-          userId?: string | null
+          game_id?: string | null
+          id?: number
+          saved_at?: string
+          saving_user_id?: string | null
         }
         Update: {
-          americanOdds?: number | null
-          category?: string | null
-          created_at?: string
-          eventDate?: string | null
-          eventId?: number | null
-          eventName?: string | null
-          id?: string
-          label?: string | null
-          leagueId?: number | null
-          leagueName?: string | null
-          line?: string | null
-          propLabel?: string | null
-          providerOutcomeId?: string | null
-          userId?: string | null
+          game_id?: string | null
+          id?: number
+          saved_at?: string
+          saving_user_id?: string | null
         }
         Relationships: []
       }
@@ -196,6 +166,42 @@ export type Database = {
           id?: number
           odds1?: number | null
           odds2?: number | null
+        }
+        Relationships: []
+      }
+      upcoming_nba_odds: {
+        Row: {
+          created_at: string
+          game_date: string | null
+          game_id: string
+          game_name: string | null
+          odds1: number | null
+          odds2: number | null
+          team: string | null
+          team_book_odds: number | null
+          team_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          game_date?: string | null
+          game_id: string
+          game_name?: string | null
+          odds1?: number | null
+          odds2?: number | null
+          team?: string | null
+          team_book_odds?: number | null
+          team_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          game_date?: string | null
+          game_id?: string
+          game_name?: string | null
+          odds1?: number | null
+          odds2?: number | null
+          team?: string | null
+          team_book_odds?: number | null
+          team_name?: string | null
         }
         Relationships: []
       }

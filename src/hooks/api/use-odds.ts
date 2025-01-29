@@ -4,6 +4,7 @@ import { Database } from "@/types/supabase";
 
 type FightOdds = Database["public"]["Tables"]["upcoming_fight_odds"]["Row"];
 type NFLOdds = Database["public"]["Tables"]["upcoming_nfl_odds"]["Row"];
+type NBAGameOdds = Database["public"]["Tables"]["upcoming_nba_odds"]["Row"];
 
 export type Filter = 'upcoming' | 'past' | 'all';
 
@@ -55,6 +56,34 @@ export function useUpcomingNFLOdds(filter: Filter = 'upcoming') {
       if (error) throw error;
 
       const games = data as NFLOdds[];
+      
+      // Filter based on status
+      if (filter === 'upcoming') {
+        return games.filter(game => isEventUpcoming(game.game_date));
+      } else if (filter === 'past') {
+        return games.filter(game => !isEventUpcoming(game.game_date));
+      }
+      
+      return games;
+    },
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+  });
+} 
+
+export function useUpcomingNBAGameOdds(filter: Filter = 'upcoming') {
+  const supabase = createClient();
+
+  return useQuery({
+    queryKey: ["upcoming_nba_odds", filter],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("upcoming_nba_odds")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const games = data as NBAGameOdds[];
       
       // Filter based on status
       if (filter === 'upcoming') {
