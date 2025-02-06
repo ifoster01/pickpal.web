@@ -54,7 +54,7 @@ export function FAQ() {
     },
     {
       question: "Is there a mobile app available?",
-      answer: "Yes! Our mobile app is available for both iOS and Android devices, offering the same powerful features as our web platform with the convenience of mobile access."
+      answer: "Yes! Our mobile app is currently available for iOS with an Android version coming soon. Offering the same powerful features as our web platform with the convenience of mobile access."
     },
     {
       question: "What makes your platform unique?",
