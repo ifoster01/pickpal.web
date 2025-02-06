@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import Image from "next/image";
+import aboutImage from "~/assets/media/about-img.png";
 
 export function About() {
   const [ref, inView] = useInView({
@@ -55,7 +56,7 @@ export function About() {
             className="relative h-[400px] rounded-lg overflow-hidden"
           >
             <Image
-              src="https://images.unsplash.com/photo-1522071820081-009f0129c71c"
+              src={aboutImage}
               alt="Team collaboration"
               fill
               className="object-cover"

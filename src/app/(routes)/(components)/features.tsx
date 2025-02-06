@@ -2,29 +2,38 @@
 
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { Smartphone, Shield, Zap, Trophy, BarChart, Clock, Heart, Rocket } from "lucide-react";
+import { Smartphone, Trophy, Heart, Rocket } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import Image from "next/image";
+import PicksImg from "~/assets/media/model-picks.png";
+import SavedImg from "~/assets/media/saved-picks.png";
+import ParlayImg from "~/assets/media/parlay-generation.png";
+import MobileImg from "~/assets/media/ios-saved.png";
 
 const features = [
   {
     icon: <Trophy className="h-6 w-6" />,
     title: "AI Picks",
-    description: "Get AI generated picks for your favorite sports"
+    description: "Get AI generated picks for your favorite sports",
+    image: PicksImg
   },
   {
     icon: <Heart className="h-6 w-6" />,
     title: "Save Favorites",
-    description: "Save your favorite picks for easy access"
+    description: "Save your favorite picks for easy access",
+    image: SavedImg
   },
   {
     icon: <Rocket className="h-6 w-6" />,
     title: "Parlay Generator",
-    description: "Generate parlay bets for your favorite sports"
+    description: "Generate parlay bets for your favorite sports",
+    image: ParlayImg
   },
   {
     icon: <Smartphone className="h-6 w-6" />,
     title: "Mobile First",
-    description: "Optimized experience across all devices"
+    description: "Optimized experience across all devices",
+    image: MobileImg
   }
 ];
 
@@ -55,7 +64,7 @@ export function Features() {
   );
 }
 
-function FeatureCard({ icon, title, description, index }: any) {
+function FeatureCard({ icon, title, description, image, index }: any) {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1
@@ -69,12 +78,21 @@ function FeatureCard({ icon, title, description, index }: any) {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="h-full"
     >
-      <Card className="p-6 h-full hover:shadow-lg transition-shadow">
+      <Card className="p-6 h-full hover:shadow-lg transition-shadow flex flex-col">
         <div className="rounded-full bg-primary/10 w-12 h-12 flex items-center justify-center mb-4">
           {icon}
         </div>
         <h3 className="text-xl font-semibold mb-2">{title}</h3>
-        <p className="text-muted-foreground">{description}</p>
+        <p className="text-muted-foreground mb-4">{description}</p>
+        <div className="relative aspect-square w-full mt-auto overflow-hidden">
+          <Image 
+            src={image} 
+            alt={title} 
+            className="object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+          />
+        </div>
       </Card>
     </motion.div>
   );
