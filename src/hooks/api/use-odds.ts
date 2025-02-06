@@ -10,7 +10,7 @@ export type Filter = 'upcoming' | 'past' | 'all';
 
 export function isEventUpcoming(eventDate: string | null): boolean {
   if (!eventDate) return true; // Consider events without dates as upcoming
-  // new date - 12 hours
+  // new date - 30 hours
   return new Date(eventDate) > new Date(new Date().getTime() - 30 * 60 * 60 * 1000);
 }
 

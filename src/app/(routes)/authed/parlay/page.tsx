@@ -43,21 +43,21 @@ export default function ParlayPage() {
     if (league === 'UFC') {
       return fights
         ?.filter(fight => 
-          likedFightIds.includes(fight.fight_id) && 
+          likedFightIds.includes(fight.fight_id) &&
           isEventUpcoming(fight.fight_date)
         )
         .map(fight => getBetterSide(fight, 'UFC')) || [];
     } else if (league === 'NFL') {
       return games
         ?.filter(game => 
-          likedGameIds.includes(game.game_id) && 
+          likedGameIds.includes(game.game_id) &&
           isEventUpcoming(game.game_date)
         )
         .map(game => getBetterSide(game, 'NFL')) || [];
     } else {
-      return games
+      return nbaGames
         ?.filter(game => 
-          likedNBAGameIds.includes(game.game_id) && 
+          likedNBAGameIds.includes(game.game_id) &&
           isEventUpcoming(game.game_date)
         )
         .map(game => getBetterSide(game, 'NBA')) || [];
