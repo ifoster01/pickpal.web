@@ -122,7 +122,7 @@ export default function ProfilePage() {
       await signOut();
       
       // After signing out, redirect to login page
-      router.push('/login');
+      router.push('/auth/login');
       toast.success("Account deleted successfully");
 
     } catch (error: any) {
