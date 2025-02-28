@@ -59,7 +59,7 @@ export function About() {
               src={aboutImage}
               alt="Team collaboration"
               fill
-              className="object-cover"
+              className="object-cover grayscale"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
           </motion.div>
