@@ -50,7 +50,7 @@ export function FAQ() {
     },
     {
       question: "What sports are covered?",
-      answer: "We currently cover the NFL, UFC, and NBA but are currently working on expanding to other sports."
+      answer: "We currently cover the NBA, UFC, ATP Tennis, and NFL but are currently working on expanding to other sports."
     },
     {
       question: "Is there a mobile app available?",

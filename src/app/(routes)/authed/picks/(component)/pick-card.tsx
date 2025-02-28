@@ -16,6 +16,7 @@ import { useAuth } from "@/providers/AuthProvider";
 type FightOdds = Database["public"]["Tables"]["upcoming_fight_odds"]["Row"];
 type NFLOdds = Database["public"]["Tables"]["upcoming_nfl_odds"]["Row"];
 type NBAGameOdds = Database["public"]["Tables"]["upcoming_nba_odds"]["Row"];
+type ATPMatchOdds = Database["public"]["Tables"]["upcoming_atp_odds"]["Row"];
 
 type Fighter = {
   name: string | null;
@@ -27,12 +28,12 @@ type Fighter = {
 };
 
 interface PickCardProps {
-  event: FightOdds | NFLOdds | NBAGameOdds;
-  type: 'UFC' | 'NFL' | 'NBA';
+  event: FightOdds | NFLOdds | NBAGameOdds | ATPMatchOdds;
+  type: 'UFC' | 'NFL' | 'NBA' | 'ATP';
   isLiked?: boolean;
   onLike?: () => void;
   onUnlike?: () => void;
-  league: 'UFC' | 'NFL' | 'NBA';
+  league: 'UFC' | 'NFL' | 'NBA' | 'ATP';
 }
 
 export function PickCard({ event, type, isLiked, onLike, onUnlike, league }: PickCardProps) {
@@ -53,13 +54,27 @@ export function PickCard({ event, type, isLiked, onLike, onUnlike, league }: Pic
     probability: calculateProbabilityFromOdds((event as NFLOdds).odds1 || 0),
     bookProbability: calculateProbabilityFromOdds((event as NFLOdds).team_book_odds || 0),
     picUrl: (event as NFLOdds).team_pic_url
-  } : {
+  } : type === 'NBA' ? {
     name: (event as NBAGameOdds).team_name,
     odds: (event as NBAGameOdds).odds1,
     bookOdds: (event as NBAGameOdds).team_book_odds,
     probability: calculateProbabilityFromOdds((event as NBAGameOdds).odds1 || 0),
     bookProbability: calculateProbabilityFromOdds((event as NBAGameOdds).team_book_odds || 0),
     picUrl: (event as NBAGameOdds).team_pic_url
+  } : type === 'ATP' ? {
+    name: (event as ATPMatchOdds).team_name,
+    odds: (event as ATPMatchOdds).odds1,
+    bookOdds: (event as ATPMatchOdds).team_book_odds,
+    probability: calculateProbabilityFromOdds((event as ATPMatchOdds).odds1 || 0),
+    bookProbability: calculateProbabilityFromOdds((event as ATPMatchOdds).team_book_odds || 0),
+    picUrl: (event as ATPMatchOdds).team_pic_url
+  } : {
+    name: "",
+    odds: 0,
+    bookOdds: 0,
+    probability: 0,
+    bookProbability: 0,
+    picUrl: ""
   };
 
   const fighter2: Fighter = type === 'UFC' ? {
@@ -76,13 +91,27 @@ export function PickCard({ event, type, isLiked, onLike, onUnlike, league }: Pic
     probability: calculateProbabilityFromOdds((event as NFLOdds).odds2 || 0),
     bookProbability: calculateProbabilityFromOdds((event as NFLOdds).opp_book_odds || 0),
     picUrl: (event as NFLOdds).opp_pic_url
-  } : {
+  } : type === 'NBA' ? {
     name: (event as NBAGameOdds).opp_name,
     odds: (event as NBAGameOdds).odds2,
     bookOdds: (event as NBAGameOdds).opp_book_odds,
     probability: calculateProbabilityFromOdds((event as NBAGameOdds).odds2 || 0),
     bookProbability: calculateProbabilityFromOdds((event as NBAGameOdds).opp_book_odds || 0),
     picUrl: (event as NBAGameOdds).opp_pic_url
+  } : type === 'ATP' ? {
+    name: (event as ATPMatchOdds).opp_name,
+    odds: (event as ATPMatchOdds).odds2,
+    bookOdds: (event as ATPMatchOdds).opp_book_odds,
+    probability: calculateProbabilityFromOdds((event as ATPMatchOdds).odds2 || 0),
+    bookProbability: calculateProbabilityFromOdds((event as ATPMatchOdds).opp_book_odds || 0),
+    picUrl: (event as ATPMatchOdds).opp_pic_url
+  } : {
+    name: "",
+    odds: 0,
+    bookOdds: 0,
+    probability: 0,
+    bookProbability: 0,
+    picUrl: ""
   };
 
   const discrepancy = Math.abs(fighter1.probability - fighter1.bookProbability);
@@ -146,7 +175,7 @@ export function PickCard({ event, type, isLiked, onLike, onUnlike, league }: Pic
                 />
               </div>
               <div>
-                <h3 className={cn("font-semibold", league === 'UFC' ? "text-lg" : "text-2xl")}>{league === 'UFC' ? fighter1.name : fighter1.name?.split(" ").at(-1)}</h3>
+                <h3 className={cn("font-semibold", league === 'UFC' ? "text-lg" : "text-2xl")}>{league === 'UFC' || league === 'ATP' ? fighter1.name : fighter1.name?.split(" ").at(-1)}</h3>
                 <div className="text-2xl font-bold text-primary flex items-center">
                   {fighter1.odds && fighter1.odds > 0 ? "+" : ""}{fighter1.odds}
                   <span className="text-sm text-muted-foreground ml-2">
@@ -188,7 +217,7 @@ export function PickCard({ event, type, isLiked, onLike, onUnlike, league }: Pic
             {/* Fighter/Team 2 */}
             <div className="flex items-center justify-end space-x-4">
               <div className="text-right">
-                <h3 className={cn("font-semibold", league === 'UFC' ? "text-lg" : "text-2xl")}>{league === 'UFC' ? fighter2.name : fighter2.name?.split(" ").at(-1)}</h3>
+                <h3 className={cn("font-semibold", league === 'UFC' ? "text-lg" : "text-2xl")}>{league === 'UFC' || league === 'ATP' ? fighter2.name : fighter2.name?.split(" ").at(-1)}</h3>
                 <div className="text-2xl font-bold text-primary flex items-center">
                   <span className="text-sm text-muted-foreground mr-2">
                     ({fighter2.bookOdds && fighter2.bookOdds > 0 ? "+" : ""}{fighter2.bookOdds ? fighter2.bookOdds : "N/A"} book)

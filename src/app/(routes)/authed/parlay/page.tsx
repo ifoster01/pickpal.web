@@ -4,15 +4,15 @@ import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLeague } from "@/providers/LeagueProvider";
-import { useUpcomingFightOdds, useUpcomingNBAGameOdds, useUpcomingNFLOdds } from "@/hooks/api/use-odds";
-import { useLikedFights, useLikedNBAGames, useLikedNFLGames } from "@/hooks/api/use-likes";
+import { useUpcomingATPMatchOdds, useUpcomingFightOdds, useUpcomingNBAGameOdds, useUpcomingNFLOdds } from "@/hooks/api/use-odds";
+import { useLikedATPMatches, useLikedFights, useLikedNBAGames, useLikedNFLGames } from "@/hooks/api/use-likes";
 import { ParlayCard } from "./(components)/parlay-card";
 import { ParlayFilters } from "./(components)/parlay-filters";
 import { generateParlayCombinations, getBetterSide } from "@/utils/parlay";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/cn";
 import { isEventUpcoming } from "@/hooks/api/use-odds";
-type League = 'UFC' | 'NFL' | 'NBA';
+type League = 'UFC' | 'NFL' | 'NBA' | 'ATP';
 type SortOption = 'payout' | 'value' | 'probability';
 
 export default function ParlayPage() {
@@ -32,11 +32,14 @@ export default function ParlayPage() {
   const { data: likedGames } = useLikedNFLGames();
   const { data: nbaGames } = useUpcomingNBAGameOdds('upcoming');
   const { data: likedNBAGames } = useLikedNBAGames();
+  const { data: atpMatches } = useUpcomingATPMatchOdds('upcoming');
+  const { data: likedATPMatches } = useLikedATPMatches();
 
   // Get liked event IDs
   const likedFightIds = likedFights?.map(like => like.fight_id) || [];
   const likedGameIds = likedGames?.map(like => like.game_id) || [];
   const likedNBAGameIds = likedNBAGames?.map(like => like.game_id) || [];
+  const likedATPMatchIds = likedATPMatches?.map(like => like.game_id) || [];
 
   // Filter liked events and get better sides
   const parlayLegs = useMemo(() => {
@@ -54,15 +57,22 @@ export default function ParlayPage() {
           isEventUpcoming(game.game_date)
         )
         .map(game => getBetterSide(game, 'NFL')) || [];
-    } else {
+    } else if (league === 'NBA') {
       return nbaGames
         ?.filter(game => 
           likedNBAGameIds.includes(game.game_id) &&
           isEventUpcoming(game.game_date)
         )
         .map(game => getBetterSide(game, 'NBA')) || [];
+    } else {
+      return atpMatches
+        ?.filter(match => 
+          likedATPMatchIds.includes(match.game_id) &&
+          isEventUpcoming(match.game_date)
+        )
+        .map(match => getBetterSide(match, 'ATP')) || [];
     }
-  }, [fights, games, nbaGames, league, likedFightIds, likedGameIds, likedNBAGameIds]);
+  }, [fights, games, nbaGames, atpMatches, league, likedFightIds, likedGameIds, likedNBAGameIds, likedATPMatchIds]);
 
   // Generate and filter parlays
   const parlays = useMemo(() => {
@@ -105,6 +115,7 @@ export default function ParlayPage() {
                     <SelectItem value="UFC">UFC</SelectItem>
                     <SelectItem value="NFL">NFL</SelectItem>
                     <SelectItem value="NBA">NBA</SelectItem>
+                    <SelectItem value="ATP">ATP</SelectItem>
                 </SelectContent>
             </Select>
             <ParlayFilters

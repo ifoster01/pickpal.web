@@ -12,8 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { isEventUpcoming, useUpcomingFightOdds, useUpcomingNBAGameOdds, useUpcomingNFLOdds } from "@/hooks/api/use-odds";
-import { useLikedFights, useLikedNBAGames, useLikedNFLGames } from "@/hooks/api/use-likes";
+import { isEventUpcoming, useUpcomingATPMatchOdds, useUpcomingFightOdds, useUpcomingNBAGameOdds, useUpcomingNFLOdds } from "@/hooks/api/use-odds";
+import { useLikedATPMatches, useLikedFights, useLikedNBAGames, useLikedNFLGames } from "@/hooks/api/use-likes";
 import { cn } from "@/utils/cn";
 import { useAuth } from "@/providers/AuthProvider";
 import { PickCard } from "@/app/(routes)/authed/picks/(component)/pick-card";
@@ -21,7 +21,7 @@ import { useLeague } from "@/providers/LeagueProvider";
 import { useFilter } from "@/providers/FilterProvider";
 import { EventFilter } from "@/components/general/event-filter";
 
-type League = 'UFC' | 'NFL' | 'NBA';
+type League = 'UFC' | 'NFL' | 'NBA' | 'ATP';
 type Filter = 'upcoming' | 'past' | 'all';
 
 export default function PicksPage() {
@@ -44,7 +44,12 @@ export default function PicksPage() {
   const { data: likedNBAGames, likeNBAGame, unlikeNBAGame } = useLikedNBAGames(filter);
   const likedNBAGameIds = likedNBAGames?.map(like => like.game_id) || [];
 
-  const isLoading = league === 'UFC' ? isLoadingFights : league === 'NFL' ? isLoadingGames : league === 'NBA' ? isLoadingNBAGames : false;
+  // ATP Data
+  const { data: atpMatches, isLoading: isLoadingATPMatches } = useUpcomingATPMatchOdds(filter);
+  const { data: likedATPMatches, likeATPMatch, unlikeATPMatch } = useLikedATPMatches(filter);
+  const likedATPMatchIds = likedATPMatches?.map(like => like.game_id) || [];
+
+  const isLoading = league === 'UFC' ? isLoadingFights : league === 'NFL' ? isLoadingGames : league === 'NBA' ? isLoadingNBAGames : league === 'ATP' ? isLoadingATPMatches : false;
 
   if (isLoading) {
     return (
@@ -94,6 +99,7 @@ export default function PicksPage() {
               <SelectItem value="UFC">UFC</SelectItem>
               <SelectItem value="NFL">NFL</SelectItem>
               <SelectItem value="NBA">NBA</SelectItem>
+              <SelectItem value="ATP">ATP</SelectItem>
             </SelectContent>
           </Select>
           <EventFilter className="hidden sm:block" />
@@ -147,7 +153,7 @@ export default function PicksPage() {
               <p className="text-center text-muted-foreground">No NFL games available</p>
             </Card>
           )
-        ) : (
+        ) : league === 'NBA' ? (
           // NBA Games
           nbaGames && nbaGames.length > 0 ? nbaGames.map((game) => {
             const isLiked = likedNBAGameIds.includes(game.game_id);
@@ -168,6 +174,29 @@ export default function PicksPage() {
           }) : (
             <Card className="p-6">
               <p className="text-center text-muted-foreground">No NBA games available</p>
+            </Card>
+          )
+        ) : (
+          // ATP Matches
+          atpMatches && atpMatches.length > 0 ? atpMatches.map((match) => {
+            const isLiked = likedATPMatchIds.includes(match.game_id);
+            const isCompleted = !isEventUpcoming(match.game_date);
+            
+            return (
+              <div key={match.game_id} className={cn(isCompleted && "opacity-75")}>
+                <PickCard
+                  event={match as any}
+                  type="ATP"
+                  isLiked={isLiked}
+                  onLike={() => likeATPMatch(match.game_id)}
+                  onUnlike={() => unlikeATPMatch(match.game_id)}
+                  league="ATP"
+                />
+              </div>
+            );
+          }) : (
+            <Card className="p-6">
+              <p className="text-center text-muted-foreground">No ATP matches available</p>
             </Card>
           )
         )}

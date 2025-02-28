@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
-import { useLikedFights, useLikedNBAGames, useLikedNFLGames } from "@/hooks/api/use-likes";
+import { useLikedATPMatches, useLikedFights, useLikedNBAGames, useLikedNFLGames } from "@/hooks/api/use-likes";
 import { useAuth } from "@/providers/AuthProvider";
 import { calculateProbabilityFromOdds } from "@/utils/odds";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -38,7 +38,13 @@ export default function SavedPage() {
     isLoading: isLoadingNBAGames,
   } = useLikedNBAGames(filter);
 
-  const isLoading = isLoadingFights || isLoadingGames;
+  const {
+    data: likedATPMatches,
+    unlikeATPMatch,
+    isLoading: isLoadingATPMatches,
+  } = useLikedATPMatches(filter);
+
+  const isLoading = isLoadingFights || isLoadingGames || isLoadingNBAGames || isLoadingATPMatches;
 
   if (!user) {
     return (
@@ -96,6 +102,7 @@ export default function SavedPage() {
           <TabsTrigger onClick={() => setLeague('UFC')} value="UFC">UFC Fights</TabsTrigger>
           <TabsTrigger onClick={() => setLeague('NFL')} value="NFL">NFL Games</TabsTrigger>
           <TabsTrigger onClick={() => setLeague('NBA')} value="NBA">NBA Games</TabsTrigger>
+          <TabsTrigger onClick={() => setLeague('ATP')} value="ATP">ATP Matches</TabsTrigger>
         </TabsList>
 
         <TabsContent value="UFC">
@@ -177,6 +184,35 @@ export default function SavedPage() {
                       isLiked={true}
                       onUnlike={() => unlikeNBAGame(game.game_id)}
                       league="NBA"
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="ATP">
+          {likedATPMatches?.length === 0 ? (
+            <Card className="w-full p-6">
+              <p className="text-muted-foreground">You haven&apos;t saved any ATP matches yet.</p>
+            </Card>
+          ) : (
+            <div className="grid gap-6">
+              {likedATPMatches?.map((like) => {
+                const game = like.upcoming_atp_odds;
+                if (!game) return null;
+
+                const isCompleted = !isEventUpcoming(game.game_date);
+
+                return (
+                  <div key={game.game_id} className={cn(isCompleted && "opacity-75")}>
+                    <PickCard
+                      event={game}
+                      type="ATP"
+                      isLiked={true}
+                      onUnlike={() => unlikeATPMatch(game.game_id)}
+                      league="ATP"
                     />
                   </div>
                 );

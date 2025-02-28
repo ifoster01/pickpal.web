@@ -58,6 +58,35 @@ export type Database = {
         }
         Relationships: []
       }
+      liked_atp_games: {
+        Row: {
+          game_id: string | null
+          id: number
+          saved_at: string
+          saving_user_id: string | null
+        }
+        Insert: {
+          game_id?: string | null
+          id?: number
+          saved_at?: string
+          saving_user_id?: string | null
+        }
+        Update: {
+          game_id?: string | null
+          id?: number
+          saved_at?: string
+          saving_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "liked_atp_games_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_atp_odds"
+            referencedColumns: ["game_id"]
+          },
+        ]
+      }
       liked_fights: {
         Row: {
           fight_id: string | null
@@ -121,6 +150,57 @@ export type Database = {
         }
         Relationships: []
       }
+      upcoming_atp_odds: {
+        Row: {
+          created_at: string
+          game_date: string | null
+          game_id: string
+          game_name: string | null
+          odds1: number | null
+          odds2: number | null
+          opp: string | null
+          opp_book_odds: number | null
+          opp_name: string | null
+          opp_pic_url: string | null
+          team: string | null
+          team_book_odds: number | null
+          team_name: string | null
+          team_pic_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          game_date?: string | null
+          game_id: string
+          game_name?: string | null
+          odds1?: number | null
+          odds2?: number | null
+          opp?: string | null
+          opp_book_odds?: number | null
+          opp_name?: string | null
+          opp_pic_url?: string | null
+          team?: string | null
+          team_book_odds?: number | null
+          team_name?: string | null
+          team_pic_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          game_date?: string | null
+          game_id?: string
+          game_name?: string | null
+          odds1?: number | null
+          odds2?: number | null
+          opp?: string | null
+          opp_book_odds?: number | null
+          opp_name?: string | null
+          opp_pic_url?: string | null
+          team?: string | null
+          team_book_odds?: number | null
+          team_name?: string | null
+          team_pic_url?: string | null
+        }
+        Relationships: []
+      }
       upcoming_fight_odds: {
         Row: {
           created_at: string
@@ -180,10 +260,12 @@ export type Database = {
           opp: string | null
           opp_book_odds: number | null
           opp_name: string | null
+          opp_pic_png: string | null
           opp_pic_url: string | null
           team: string | null
           team_book_odds: number | null
           team_name: string | null
+          team_pic_png: string | null
           team_pic_url: string | null
         }
         Insert: {
@@ -196,10 +278,12 @@ export type Database = {
           opp?: string | null
           opp_book_odds?: number | null
           opp_name?: string | null
+          opp_pic_png?: string | null
           opp_pic_url?: string | null
           team?: string | null
           team_book_odds?: number | null
           team_name?: string | null
+          team_pic_png?: string | null
           team_pic_url?: string | null
         }
         Update: {
@@ -212,10 +296,12 @@ export type Database = {
           opp?: string | null
           opp_book_odds?: number | null
           opp_name?: string | null
+          opp_pic_png?: string | null
           opp_pic_url?: string | null
           team?: string | null
           team_book_odds?: number | null
           team_name?: string | null
+          team_pic_png?: string | null
           team_pic_url?: string | null
         }
         Relationships: []
