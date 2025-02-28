@@ -88,7 +88,7 @@ function FeatureCard({ icon, title, description, image, index }: any) {
           <Image 
             src={image} 
             alt={title} 
-            className="object-cover"
+            className={title === 'Mobile First' ? "object-cover object-top" : "object-cover"}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           />
