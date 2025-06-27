@@ -1,38 +1,40 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Heart } from "lucide-react";
-import { useLikedATPMatches, useLikedFights, useLikedNBAGames, useLikedNFLGames } from "@/hooks/api/use-likes";
-import { useAuth } from "@/providers/AuthProvider";
-import { calculateProbabilityFromOdds } from "@/utils/odds";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EventFilter } from "@/components/general/event-filter";
-import { useLeague } from "@/providers/LeagueProvider";
-import { PickCard } from "../picks/(component)/pick-card";
-import { cn } from "@/utils/cn";
-import { isEventUpcoming } from "@/hooks/api/use-odds";
-import { useFilter } from "@/providers/FilterProvider";
+import { motion } from 'framer-motion';
+import { Card } from '@/components/ui/card';
+import {
+  useLikedATPMatches,
+  useLikedFights,
+  useLikedNBAGames,
+  useLikedNFLGames,
+} from '@/hooks/api/use-likes';
+import { useAuth } from '@/providers/AuthProvider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { EventFilter } from '@/components/general/event-filter';
+import { useLeague } from '@/providers/LeagueProvider';
+import { PickCard } from '../picks/(component)/pick-card';
+import { cn } from '@/utils/cn';
+import { isEventUpcoming } from '@/hooks/api/use-odds';
+import { useFilter } from '@/providers/FilterProvider';
 
 export default function SavedPage() {
   const { user } = useAuth();
   const { league, setLeague } = useLeague();
   const { filter } = useFilter();
 
-  const { 
+  const {
     data: likedFights,
     unlikeFight,
     isLoading: isLoadingFights,
   } = useLikedFights(filter);
 
-  const { 
+  const {
     data: likedGames,
     unlikeGame,
     isLoading: isLoadingGames,
   } = useLikedNFLGames(filter);
 
-  const { 
+  const {
     data: likedNBAGames,
     unlikeNBAGame,
     isLoading: isLoadingNBAGames,
@@ -44,7 +46,11 @@ export default function SavedPage() {
     isLoading: isLoadingATPMatches,
   } = useLikedATPMatches(filter);
 
-  const isLoading = isLoadingFights || isLoadingGames || isLoadingNBAGames || isLoadingATPMatches;
+  const isLoading =
+    isLoadingFights ||
+    isLoadingGames ||
+    isLoadingNBAGames ||
+    isLoadingATPMatches;
 
   if (!user) {
     return (
@@ -52,11 +58,13 @@ export default function SavedPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className="w-full"
+        className='w-full'
       >
-        <h1 className="text-3xl font-bold mb-8">Saved Picks</h1>
-        <Card className="w-full p-6">
-          <p className="text-muted-foreground">Please sign in to see your saved picks.</p>
+        <h1 className='text-3xl font-bold mb-8'>Saved Picks</h1>
+        <Card className='w-full p-6'>
+          <p className='text-muted-foreground'>
+            Please sign in to see your saved picks.
+          </p>
         </Card>
       </motion.div>
     );
@@ -68,16 +76,16 @@ export default function SavedPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className="w-full"
+        className='w-full'
       >
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold mb-8">Saved Picks</h1>
-          <EventFilter className="block sm:block" />
+        <div className='flex items-center justify-between'>
+          <h1 className='text-3xl font-bold mb-8'>Saved Picks</h1>
+          <EventFilter className='block sm:block' />
         </div>
-        <Card className="w-full p-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-muted rounded w-1/3" />
-            <div className="h-32 bg-muted rounded" />
+        <Card className='w-full p-6'>
+          <div className='animate-pulse space-y-4'>
+            <div className='h-8 bg-muted rounded w-1/3' />
+            <div className='h-32 bg-muted rounded' />
           </div>
         </Card>
       </motion.div>
@@ -89,29 +97,39 @@ export default function SavedPage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="w-full"
+      className='w-full'
       key={`${league}-${filter}`}
     >
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold mb-8">Saved Picks</h1>
-        <EventFilter className="block sm:block" />
+      <div className='flex items-center justify-between'>
+        <h1 className='text-3xl font-bold mb-8'>Saved Picks</h1>
+        <EventFilter className='block sm:block' />
       </div>
-      
-      <Tabs defaultValue="UFC" className="w-full" value={league}>
-        <TabsList className="mb-8">
-          <TabsTrigger onClick={() => setLeague('UFC')} value="UFC">UFC Fights</TabsTrigger>
-          <TabsTrigger onClick={() => setLeague('NFL')} value="NFL">NFL Games</TabsTrigger>
-          <TabsTrigger onClick={() => setLeague('NBA')} value="NBA">NBA Games</TabsTrigger>
-          <TabsTrigger onClick={() => setLeague('ATP')} value="ATP">ATP Matches</TabsTrigger>
+
+      <Tabs defaultValue='UFC' className='w-full' value={league}>
+        <TabsList className='mb-8'>
+          <TabsTrigger onClick={() => setLeague('UFC')} value='UFC'>
+            UFC Fights
+          </TabsTrigger>
+          <TabsTrigger onClick={() => setLeague('NFL')} value='NFL'>
+            NFL Games
+          </TabsTrigger>
+          <TabsTrigger onClick={() => setLeague('NBA')} value='NBA'>
+            NBA Games
+          </TabsTrigger>
+          <TabsTrigger onClick={() => setLeague('ATP')} value='ATP'>
+            ATP Matches
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="UFC">
+        <TabsContent value='UFC'>
           {likedFights?.length === 0 ? (
-            <Card className="w-full p-6">
-              <p className="text-muted-foreground">You haven&apos;t saved any fights yet.</p>
+            <Card className='w-full p-6'>
+              <p className='text-muted-foreground'>
+                You haven&apos;t saved any fights yet.
+              </p>
             </Card>
           ) : (
-            <div className="grid gap-6">
+            <div className='grid gap-6'>
               {likedFights?.map((like) => {
                 const fight = like.upcoming_fight_odds;
                 if (!fight) return null;
@@ -119,13 +137,16 @@ export default function SavedPage() {
                 const isCompleted = !isEventUpcoming(fight.fight_date);
 
                 return (
-                  <div key={fight.fight_id} className={cn(isCompleted && "opacity-75")}>
+                  <div
+                    key={fight.fight_id}
+                    className={cn(isCompleted && 'opacity-75')}
+                  >
                     <PickCard
                       event={fight}
-                      type="UFC"
+                      type='UFC'
                       isLiked={true}
                       onUnlike={() => unlikeFight(fight.fight_id)}
-                      league="UFC"
+                      league='UFC'
                     />
                   </div>
                 );
@@ -134,13 +155,15 @@ export default function SavedPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="NFL">
+        <TabsContent value='NFL'>
           {likedGames?.length === 0 ? (
-            <Card className="w-full p-6">
-              <p className="text-muted-foreground">You haven&apos;t saved any NFL games yet.</p>
+            <Card className='w-full p-6'>
+              <p className='text-muted-foreground'>
+                You haven&apos;t saved any NFL games yet.
+              </p>
             </Card>
           ) : (
-            <div className="grid gap-6">
+            <div className='grid gap-6'>
               {likedGames?.map((like) => {
                 const game = like.upcoming_nfl_odds;
                 if (!game) return null;
@@ -148,13 +171,16 @@ export default function SavedPage() {
                 const isCompleted = !isEventUpcoming(game.game_date);
 
                 return (
-                  <div key={game.game_id} className={cn(isCompleted && "opacity-75")}>
+                  <div
+                    key={game.game_id}
+                    className={cn(isCompleted && 'opacity-75')}
+                  >
                     <PickCard
                       event={game}
-                      type="NFL"
+                      type='NFL'
                       isLiked={true}
                       onUnlike={() => unlikeGame(game.game_id)}
-                      league="NFL"
+                      league='NFL'
                     />
                   </div>
                 );
@@ -163,13 +189,15 @@ export default function SavedPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="NBA">
+        <TabsContent value='NBA'>
           {likedNBAGames?.length === 0 ? (
-            <Card className="w-full p-6">
-              <p className="text-muted-foreground">You haven&apos;t saved any NBA games yet.</p>
+            <Card className='w-full p-6'>
+              <p className='text-muted-foreground'>
+                You haven&apos;t saved any NBA games yet.
+              </p>
             </Card>
           ) : (
-            <div className="grid gap-6">
+            <div className='grid gap-6'>
               {likedNBAGames?.map((like) => {
                 const game = like.upcoming_nba_odds;
                 if (!game) return null;
@@ -177,13 +205,16 @@ export default function SavedPage() {
                 const isCompleted = !isEventUpcoming(game.game_date);
 
                 return (
-                  <div key={game.game_id} className={cn(isCompleted && "opacity-75")}>
+                  <div
+                    key={game.game_id}
+                    className={cn(isCompleted && 'opacity-75')}
+                  >
                     <PickCard
                       event={game}
-                      type="NBA"
+                      type='NBA'
                       isLiked={true}
                       onUnlike={() => unlikeNBAGame(game.game_id)}
-                      league="NBA"
+                      league='NBA'
                     />
                   </div>
                 );
@@ -192,13 +223,15 @@ export default function SavedPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="ATP">
+        <TabsContent value='ATP'>
           {likedATPMatches?.length === 0 ? (
-            <Card className="w-full p-6">
-              <p className="text-muted-foreground">You haven&apos;t saved any ATP matches yet.</p>
+            <Card className='w-full p-6'>
+              <p className='text-muted-foreground'>
+                You haven&apos;t saved any ATP matches yet.
+              </p>
             </Card>
           ) : (
-            <div className="grid gap-6">
+            <div className='grid gap-6'>
               {likedATPMatches?.map((like) => {
                 const game = like.upcoming_atp_odds;
                 if (!game) return null;
@@ -206,13 +239,16 @@ export default function SavedPage() {
                 const isCompleted = !isEventUpcoming(game.game_date);
 
                 return (
-                  <div key={game.game_id} className={cn(isCompleted && "opacity-75")}>
+                  <div
+                    key={game.game_id}
+                    className={cn(isCompleted && 'opacity-75')}
+                  >
                     <PickCard
                       event={game}
-                      type="ATP"
+                      type='ATP'
                       isLiked={true}
                       onUnlike={() => unlikeATPMatch(game.game_id)}
-                      league="ATP"
+                      league='ATP'
                     />
                   </div>
                 );

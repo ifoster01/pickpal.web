@@ -1,10 +1,10 @@
-import { Database } from "@/types/supabase";
-import { calculateProbabilityFromOdds } from "./odds";
+import { Database } from '@/types/supabase';
+import { calculateProbabilityFromOdds } from './odds';
 
-type FightOdds = Database["public"]["Tables"]["upcoming_fight_odds"]["Row"];
-type NFLOdds = Database["public"]["Tables"]["upcoming_nfl_odds"]["Row"];
-type NBAGameOdds = Database["public"]["Tables"]["upcoming_nba_odds"]["Row"];
-type ATPMatchOdds = Database["public"]["Tables"]["upcoming_atp_odds"]["Row"];
+type FightOdds = Database['public']['Tables']['upcoming_fight_odds']['Row'];
+type NFLOdds = Database['public']['Tables']['upcoming_nfl_odds']['Row'];
+type NBAGameOdds = Database['public']['Tables']['upcoming_nba_odds']['Row'];
+type ATPMatchOdds = Database['public']['Tables']['upcoming_atp_odds']['Row'];
 
 export type ParlayLeg = {
   eventId: string;
@@ -31,11 +31,11 @@ export type Parlay = {
 
 export function calculateParlayOdds(americanOdds: number[]): number {
   // Convert American odds to decimal
-  const decimalOdds = americanOdds.map(odds => {
+  const decimalOdds = americanOdds.map((odds) => {
     if (odds > 0) {
-      return 1 + (odds / 100);
+      return 1 + odds / 100;
     } else {
-      return 1 + (100 / Math.abs(odds));
+      return 1 + 100 / Math.abs(odds);
     }
   });
 
@@ -54,7 +54,10 @@ export function calculateParlayProbability(probabilities: number[]): number {
   return probabilities.reduce((acc, curr) => acc * curr, 1);
 }
 
-export function getBetterSide(event: FightOdds | NFLOdds | NBAGameOdds | ATPMatchOdds, type: 'UFC' | 'NFL' | 'NBA' | 'ATP'): ParlayLeg {
+export function getBetterSide(
+  event: FightOdds | NFLOdds | NBAGameOdds | ATPMatchOdds,
+  type: 'UFC' | 'NFL' | 'NBA' | 'ATP'
+): ParlayLeg {
   if (type === 'UFC') {
     const fight = event as FightOdds;
     const f1Prob = calculateProbabilityFromOdds(fight.odds1 || 0);
@@ -168,7 +171,9 @@ export function getBetterSide(event: FightOdds | NFLOdds | NBAGameOdds | ATPMatc
     const match = event as ATPMatchOdds;
     const teamProb = calculateProbabilityFromOdds(match.odds1 || 0);
     const oppProb = calculateProbabilityFromOdds(match.odds2 || 0);
-    const teamBookProb = calculateProbabilityFromOdds(match.team_book_odds || 0);
+    const teamBookProb = calculateProbabilityFromOdds(
+      match.team_book_odds || 0
+    );
     const oppBookProb = calculateProbabilityFromOdds(match.opp_book_odds || 0);
 
     if (teamProb > oppProb) {
@@ -213,12 +218,12 @@ export function generateParlayCombinations(
   // Generate combinations for each possible number of legs
   for (let size = minLegs; size <= Math.min(maxLegs, legs.length); size++) {
     const combinations = getCombinations(legs, size);
-    
-    combinations.forEach(combo => {
-      const bookOdds = combo.map(leg => leg.bookOdds);
-      const modelOdds = combo.map(leg => leg.modelOdds);
-      const bookProbs = combo.map(leg => leg.bookProbability);
-      const modelProbs = combo.map(leg => leg.modelProbability);
+
+    combinations.forEach((combo) => {
+      const bookOdds = combo.map((leg) => leg.bookOdds);
+      const modelOdds = combo.map((leg) => leg.modelOdds);
+      const bookProbs = combo.map((leg) => leg.bookProbability);
+      const modelProbs = combo.map((leg) => leg.modelProbability);
 
       parlays.push({
         legs: combo,
@@ -226,7 +231,9 @@ export function generateParlayCombinations(
         totalModelOdds: calculateParlayOdds(modelOdds),
         totalBookProbability: calculateParlayProbability(bookProbs),
         totalModelProbability: calculateParlayProbability(modelProbs),
-        valueEdge: calculateParlayProbability(modelProbs) - calculateParlayProbability(bookProbs),
+        valueEdge:
+          calculateParlayProbability(modelProbs) -
+          calculateParlayProbability(bookProbs),
       });
     });
   }
@@ -253,4 +260,4 @@ function getCombinations<T>(array: T[], size: number): T[][] {
 
   combine(0, []);
   return result;
-} 
+}

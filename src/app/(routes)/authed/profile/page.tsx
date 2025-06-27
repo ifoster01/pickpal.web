@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
-import { useAuth } from "@/providers/AuthProvider";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
+import { useCallback, useEffect, useState } from 'react';
+import { useAuth } from '@/providers/AuthProvider';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 import {
   Card,
   CardContent,
@@ -13,8 +13,16 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Loader2, User, KeyRound, Trash2, AlertCircle, Eye, EyeOff } from "lucide-react";
+} from '@/components/ui/card';
+import {
+  Loader2,
+  User,
+  KeyRound,
+  Trash2,
+  AlertCircle,
+  Eye,
+  EyeOff,
+} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -23,18 +31,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { createClient } from "@/utils/supabase/client";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useRouter } from "next/navigation";
+} from '@/components/ui/dialog';
+import { createClient } from '@/utils/supabase/client';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
   const { user, signOut } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [fullName, setFullName] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [fullName, setFullName] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const supabase = createClient();
   const router = useRouter();
@@ -57,9 +65,9 @@ export default function ProfilePage() {
       });
 
       if (error) throw error;
-      toast.success("Name updated successfully!");
-    } catch (error: any) {
-      toast.error(error.message);
+      toast.success('Name updated successfully!');
+    } catch (error: unknown) {
+      toast.error((error as Error).message);
     } finally {
       setLoading(false);
     }
@@ -67,18 +75,18 @@ export default function ProfilePage() {
 
   const handleUpdatePassword = useCallback(async () => {
     if (newPassword !== confirmPassword) {
-      toast.error("New passwords do not match!");
+      toast.error('New passwords do not match!');
       return;
     }
 
     if (newPassword.length < 8) {
-      toast.error("New password must be at least 8 characters long");
+      toast.error('New password must be at least 8 characters long');
       return;
     }
 
     try {
       setLoading(true);
-      
+
       // First verify the current password
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: user?.email as string,
@@ -86,7 +94,7 @@ export default function ProfilePage() {
       });
 
       if (signInError) {
-        toast.error("Current password is incorrect");
+        toast.error('Current password is incorrect');
         return;
       }
 
@@ -96,37 +104,42 @@ export default function ProfilePage() {
       });
 
       if (error) throw error;
-      
-      toast.success("Password updated successfully!");
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (error: any) {
-      toast.error(error.message);
+
+      toast.success('Password updated successfully!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error: unknown) {
+      toast.error((error as Error).message);
     } finally {
       setLoading(false);
     }
-  }, [currentPassword, newPassword, confirmPassword, supabase.auth, user?.email]);
+  }, [
+    currentPassword,
+    newPassword,
+    confirmPassword,
+    supabase.auth,
+    user?.email,
+  ]);
 
   const handleDeleteAccount = useCallback(async () => {
     if (!user?.id) return;
-    
+
     try {
       setLoading(true);
-      
+
       // Delete user's auth account
-      const { error } = await supabase.rpc('delete_user')
-      if (error) throw error
+      const { error } = await supabase.rpc('delete_user');
+      if (error) throw error;
 
       // sign out the user
       await signOut();
-      
+
       // After signing out, redirect to login page
       router.push('/auth/login');
-      toast.success("Account deleted successfully");
-
-    } catch (error: any) {
-      toast.error("Failed to delete account. Please try again later.");
+      toast.success('Account deleted successfully');
+    } catch (error: unknown) {
+      toast.error('Failed to delete account. Please try again later.');
       console.error('Delete account error:', error);
     } finally {
       setLoading(false);
@@ -135,57 +148,60 @@ export default function ProfilePage() {
   }, [user?.id, supabase, signOut, router]);
 
   return (
-    <div className="container max-w-4xl mx-auto px-4">
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className='container max-w-4xl mx-auto px-4'>
+      <div className='space-y-6'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Profile Settings</h1>
-            <p className="text-muted-foreground">
+            <h1 className='text-2xl font-bold tracking-tight'>
+              Profile Settings
+            </h1>
+            <p className='text-muted-foreground'>
               Manage your account settings and preferences
             </p>
           </div>
         </div>
 
-        <div className="grid gap-6">
+        <div className='grid gap-6'>
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
+              <CardTitle className='flex items-center gap-2'>
+                <User className='h-5 w-5' />
                 Personal Information
               </CardTitle>
               <CardDescription>
-                Update your personal information and how it appears on your profile
+                Update your personal information and how it appears on your
+                profile
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+            <CardContent className='space-y-4'>
+              <div className='space-y-2'>
+                <Label htmlFor='email'>Email</Label>
                 <Input
-                  id="email"
-                  type="email"
+                  id='email'
+                  type='email'
                   value={user?.email}
                   disabled
-                  className="max-w-md"
+                  className='max-w-md'
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+              <div className='space-y-2'>
+                <Label htmlFor='name'>Full Name</Label>
+                <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center'>
                   <Input
-                    id="name"
+                    id='name'
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="max-w-md"
+                    className='max-w-md'
                   />
                   <Button
                     onClick={handleUpdateName}
                     disabled={loading}
-                    className="w-full sm:w-auto"
+                    className='w-full sm:w-auto'
                   >
                     {loading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className='h-4 w-4 animate-spin' />
                     ) : (
-                      "Update Name"
+                      'Update Name'
                     )}
                   </Button>
                 </div>
@@ -196,99 +212,108 @@ export default function ProfilePage() {
           {!isGoogleUser && (
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <KeyRound className="h-5 w-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <KeyRound className='h-5 w-5' />
                   Security
                 </CardTitle>
                 <CardDescription>
                   Manage your password and account security
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="current-password">Current Password</Label>
-                  <div className="relative w-full sm:max-w-md">
+              <CardContent className='space-y-4'>
+                <div className='space-y-2'>
+                  <Label htmlFor='current-password'>Current Password</Label>
+                  <div className='relative w-full sm:max-w-md'>
                     <Input
-                      id="current-password"
-                      type={showCurrentPassword ? "text" : "password"}
+                      id='current-password'
+                      type={showCurrentPassword ? 'text' : 'password'}
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="max-w-md pr-10"
+                      className='max-w-md pr-10'
                     />
                     <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      type='button'
+                      variant='ghost'
+                      size='sm'
+                      className='absolute right-0 top-0 h-full px-3 hover:bg-transparent'
+                      onClick={() =>
+                        setShowCurrentPassword(!showCurrentPassword)
+                      }
                     >
                       {showCurrentPassword ? (
-                        <EyeOff className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                        <EyeOff className='h-4 w-4 text-muted-foreground hover:text-foreground' />
                       ) : (
-                        <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                        <Eye className='h-4 w-4 text-muted-foreground hover:text-foreground' />
                       )}
                     </Button>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="new-password">New Password</Label>
-                  <div className="relative w-full sm:max-w-md">
+                <div className='space-y-2'>
+                  <Label htmlFor='new-password'>New Password</Label>
+                  <div className='relative w-full sm:max-w-md'>
                     <Input
-                      id="new-password"
-                      type={showNewPassword ? "text" : "password"}
+                      id='new-password'
+                      type={showNewPassword ? 'text' : 'password'}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="pr-10"
+                      className='pr-10'
                     />
                     <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                      type='button'
+                      variant='ghost'
+                      size='sm'
+                      className='absolute right-0 top-0 h-full px-3 hover:bg-transparent'
                       onClick={() => setShowNewPassword(!showNewPassword)}
                     >
                       {showNewPassword ? (
-                        <EyeOff className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                        <EyeOff className='h-4 w-4 text-muted-foreground hover:text-foreground' />
                       ) : (
-                        <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                        <Eye className='h-4 w-4 text-muted-foreground hover:text-foreground' />
                       )}
                     </Button>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirm New Password</Label>
-                  <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                    <div className="relative w-full sm:max-w-md">
-                        <Input
-                            id="confirm-password"
-                            type={showConfirmPassword ? "text" : "password"}
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="pr-10"
-                        />
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        >
-                            {showConfirmPassword ? (
-                            <EyeOff className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                            ) : (
-                            <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                            )}
-                        </Button>
+                <div className='space-y-2'>
+                  <Label htmlFor='confirm-password'>Confirm New Password</Label>
+                  <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center'>
+                    <div className='relative w-full sm:max-w-md'>
+                      <Input
+                        id='confirm-password'
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className='pr-10'
+                      />
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        size='sm'
+                        className='absolute right-0 top-0 h-full px-3 hover:bg-transparent'
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className='h-4 w-4 text-muted-foreground hover:text-foreground' />
+                        ) : (
+                          <Eye className='h-4 w-4 text-muted-foreground hover:text-foreground' />
+                        )}
+                      </Button>
                     </div>
                     <Button
                       onClick={handleUpdatePassword}
-                      disabled={loading || !currentPassword || !newPassword || !confirmPassword}
-                      className="w-full sm:w-auto"
+                      disabled={
+                        loading ||
+                        !currentPassword ||
+                        !newPassword ||
+                        !confirmPassword
+                      }
+                      className='w-full sm:w-auto'
                     >
                       {loading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Loader2 className='h-4 w-4 animate-spin' />
                       ) : (
-                        "Update Password"
+                        'Update Password'
                       )}
                     </Button>
                   </div>
@@ -299,18 +324,19 @@ export default function ProfilePage() {
 
           {isGoogleUser && (
             <Alert>
-              <AlertCircle className="h-4 w-4" />
+              <AlertCircle className='h-4 w-4' />
               <AlertDescription>
-                Password management is not available for Google-authenticated accounts.
-                To change your password, please visit your Google Account settings.
+                Password management is not available for Google-authenticated
+                accounts. To change your password, please visit your Google
+                Account settings.
               </AlertDescription>
             </Alert>
           )}
 
-          <Card className="border-destructive">
+          <Card className='border-destructive'>
             <CardHeader>
-              <CardTitle className="text-destructive flex items-center gap-2">
-                <Trash2 className="h-5 w-5" />
+              <CardTitle className='text-destructive flex items-center gap-2'>
+                <Trash2 className='h-5 w-5' />
                 Delete Account
               </CardTitle>
               <CardDescription>
@@ -318,9 +344,12 @@ export default function ProfilePage() {
               </CardDescription>
             </CardHeader>
             <CardFooter>
-              <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+              <Dialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+              >
                 <DialogTrigger asChild>
-                  <Button variant="destructive">Delete Account</Button>
+                  <Button variant='destructive'>Delete Account</Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
@@ -332,14 +361,14 @@ export default function ProfilePage() {
                   </DialogHeader>
                   <DialogFooter>
                     <Button
-                      variant="destructive"
+                      variant='destructive'
                       onClick={handleDeleteAccount}
                       disabled={loading}
                     >
                       {loading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Loader2 className='h-4 w-4 animate-spin' />
                       ) : (
-                        "Delete Account"
+                        'Delete Account'
                       )}
                     </Button>
                   </DialogFooter>
@@ -351,4 +380,4 @@ export default function ProfilePage() {
       </div>
     </div>
   );
-} 
+}

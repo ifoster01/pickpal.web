@@ -1,25 +1,24 @@
-import type { Metadata } from 'next'
-import type { PropsWithChildren } from 'react'
-import './globals.css'
-import Script from 'next/script'
-import { ThemeProvider } from '@/providers/ThemeProvider';
+import type { Metadata } from 'next';
+import type { PropsWithChildren } from 'react';
+import './globals.css';
+import Script from 'next/script';
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+  : 'http://localhost:3000';
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: 'Pickpockt',
   description: 'Enrich your sports betting.',
-}
+};
 
 const RootLayout = (props: PropsWithChildren) => {
-  const { children } = props
+  const { children } = props;
   return (
-    <html lang="en">
+    <html lang='en'>
       <head>
-        <Script id="microsoft-clarity" strategy="afterInteractive">
+        <Script id='microsoft-clarity' strategy='afterInteractive'>
           {`
             (function(c,l,a,r,i,t,y){
               c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -31,7 +30,7 @@ const RootLayout = (props: PropsWithChildren) => {
       </head>
       <body>{children}</body>
     </html>
-  )
-}
+  );
+};
 
-export default RootLayout
+export default RootLayout;

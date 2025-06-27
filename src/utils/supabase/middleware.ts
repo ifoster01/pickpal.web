@@ -1,5 +1,6 @@
-import { createServerClient } from "@supabase/ssr";
-import { type NextRequest, NextResponse } from "next/server";
+import { Database } from '@/types/supabase';
+import { createServerClient } from '@supabase/ssr';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const updateSession = async (request: NextRequest) => {
   // This `try/catch` block is only here for the interactive tutorial.
@@ -12,7 +13,7 @@ export const updateSession = async (request: NextRequest) => {
       },
     });
 
-    const supabase = createServerClient(
+    const supabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
@@ -22,17 +23,17 @@ export const updateSession = async (request: NextRequest) => {
           },
           setAll(cookiesToSet) {
             cookiesToSet.forEach(({ name, value }) =>
-              request.cookies.set(name, value),
+              request.cookies.set(name, value)
             );
             response = NextResponse.next({
               request,
             });
             cookiesToSet.forEach(({ name, value, options }) =>
-              response.cookies.set(name, value, options),
+              response.cookies.set(name, value, options)
             );
           },
         },
-      },
+      }
     );
 
     // This will refresh session if expired - required for Server Components
@@ -41,20 +42,24 @@ export const updateSession = async (request: NextRequest) => {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user && request.nextUrl.pathname.startsWith("/authed")) {
+    if (!user && request.nextUrl.pathname.startsWith('/authed')) {
       const url = request.nextUrl.clone();
-      url.pathname = "/auth/login";
+      url.pathname = '/auth/login';
       return NextResponse.redirect(url);
     }
 
-    if (user && (request.nextUrl.pathname === "/auth/signup" || request.nextUrl.pathname === "/auth/login")) {
+    if (
+      user &&
+      (request.nextUrl.pathname === '/auth/signup' ||
+        request.nextUrl.pathname === '/auth/login')
+    ) {
       const url = request.nextUrl.clone();
-      url.pathname = "/authed/picks";
+      url.pathname = '/authed/picks';
       return NextResponse.redirect(url);
     }
 
     return response;
-  } catch (e) {
+  } catch {
     // If you are here, a Supabase client could not be created!
     // This is likely because you have not set up environment variables.
     // Check out http://localhost:3000 for Next Steps.

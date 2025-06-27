@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from 'react';
 
 type Filter = 'upcoming' | 'past' | 'all';
 
@@ -17,7 +17,11 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
   // Persist filter selection to localStorage
   useEffect(() => {
     const savedFilter = localStorage.getItem('selectedFilter');
-    if (savedFilter === 'upcoming' || savedFilter === 'past' || savedFilter === 'all') {
+    if (
+      savedFilter === 'upcoming' ||
+      savedFilter === 'past' ||
+      savedFilter === 'all'
+    ) {
       setFilter(savedFilter);
     }
   }, []);
@@ -39,4 +43,4 @@ export function useFilter() {
     throw new Error('useFilter must be used within a FilterProvider');
   }
   return context;
-} 
+}

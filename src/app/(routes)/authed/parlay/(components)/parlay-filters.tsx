@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 import {
   Sheet,
   SheetContent,
@@ -10,10 +10,10 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Filter } from "lucide-react";
-import { useState } from "react";
+} from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Filter } from 'lucide-react';
+import { useState } from 'react';
 
 interface ParlayFiltersProps {
   minLegs: number;
@@ -49,11 +49,15 @@ export function ParlayFilters({
   const [maxOddsInput, setMaxOddsInput] = useState(maxOdds.toString());
 
   // Handle odds input changes with validation
-  const handleOddsInput = (value: string, setter: (value: string) => void, callback: (value: number) => void) => {
+  const handleOddsInput = (
+    value: string,
+    setter: (value: string) => void,
+    callback: (value: number) => void
+  ) => {
     // Allow empty string, minus sign, or numbers with optional minus sign
     if (value === '' || value === '-' || /^-?\d*$/.test(value)) {
       setter(value);
-      
+
       // Only call the callback if we have a valid number
       const numValue = parseInt(value);
       if (!isNaN(numValue)) {
@@ -65,8 +69,8 @@ export function ParlayFilters({
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Filter className="h-4 w-4" />
+        <Button variant='outline' size='icon'>
+          <Filter className='h-4 w-4' />
         </Button>
       </SheetTrigger>
       <SheetContent>
@@ -77,25 +81,29 @@ export function ParlayFilters({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-8 py-6">
+        <div className='space-y-8 py-6'>
           {/* Leg Count */}
-          <div className="space-y-4">
+          <div className='space-y-4'>
             <Label>Number of Legs</Label>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">Min Legs</Label>
+            <div className='grid grid-cols-2 gap-4'>
+              <div className='space-y-2'>
+                <Label className='text-sm text-muted-foreground'>
+                  Min Legs
+                </Label>
                 <Input
-                  type="number"
+                  type='number'
                   min={2}
                   max={10}
                   value={minLegs}
                   onChange={(e) => onMinLegsChange(parseInt(e.target.value))}
                 />
               </div>
-              <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">Max Legs</Label>
+              <div className='space-y-2'>
+                <Label className='text-sm text-muted-foreground'>
+                  Max Legs
+                </Label>
                 <Input
-                  type="number"
+                  type='number'
                   min={2}
                   max={10}
                   value={maxLegs}
@@ -106,25 +114,35 @@ export function ParlayFilters({
           </div>
 
           {/* Odds Range */}
-          <div className="space-y-4">
+          <div className='space-y-4'>
             <Label>Payout Odds Range</Label>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">Min Odds</Label>
+            <div className='grid grid-cols-2 gap-4'>
+              <div className='space-y-2'>
+                <Label className='text-sm text-muted-foreground'>
+                  Min Odds
+                </Label>
                 <Input
-                  type="text"
-                  inputMode="numeric"
+                  type='text'
+                  inputMode='numeric'
                   value={minOddsInput}
-                  onChange={(e) => handleOddsInput(
-                    e.target.value,
-                    setMinOddsInput,
-                    onMinOddsChange
-                  )}
+                  onChange={(e) =>
+                    handleOddsInput(
+                      e.target.value,
+                      setMinOddsInput,
+                      onMinOddsChange
+                    )
+                  }
                   onKeyDown={(e) => {
                     // Only allow numbers, backspace, delete, minus sign, and arrow keys
                     if (
-                      !/[\d\-]/.test(e.key) && 
-                      !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)
+                      !/[\d\-]/.test(e.key) &&
+                      ![
+                        'Backspace',
+                        'Delete',
+                        'ArrowLeft',
+                        'ArrowRight',
+                        'Tab',
+                      ].includes(e.key)
                     ) {
                       e.preventDefault();
                     }
@@ -136,25 +154,35 @@ export function ParlayFilters({
                       e.preventDefault();
                     }
                   }}
-                  placeholder="-200"
+                  placeholder='-200'
                 />
               </div>
-              <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">Max Odds</Label>
+              <div className='space-y-2'>
+                <Label className='text-sm text-muted-foreground'>
+                  Max Odds
+                </Label>
                 <Input
-                  type="text"
-                  inputMode="numeric"
+                  type='text'
+                  inputMode='numeric'
                   value={maxOddsInput}
-                  onChange={(e) => handleOddsInput(
-                    e.target.value,
-                    setMaxOddsInput,
-                    onMaxOddsChange
-                  )}
+                  onChange={(e) =>
+                    handleOddsInput(
+                      e.target.value,
+                      setMaxOddsInput,
+                      onMaxOddsChange
+                    )
+                  }
                   onKeyDown={(e) => {
                     // Only allow numbers, backspace, delete, minus sign, and arrow keys
                     if (
-                      !/[\d\-]/.test(e.key) && 
-                      !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)
+                      !/[\d\-]/.test(e.key) &&
+                      ![
+                        'Backspace',
+                        'Delete',
+                        'ArrowLeft',
+                        'ArrowRight',
+                        'Tab',
+                      ].includes(e.key)
                     ) {
                       e.preventDefault();
                     }
@@ -166,24 +194,24 @@ export function ParlayFilters({
                       e.preventDefault();
                     }
                   }}
-                  placeholder="+1000"
+                  placeholder='+1000'
                 />
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className='text-xs text-muted-foreground'>
               Enter American odds (e.g., -150 or +120)
             </p>
           </div>
 
           {/* Probability Range */}
-          <div className="space-y-4">
-            <div className="flex justify-between">
+          <div className='space-y-4'>
+            <div className='flex justify-between'>
               <Label>Probability Range</Label>
-              <span className="text-sm text-muted-foreground">
+              <span className='text-sm text-muted-foreground'>
                 {minProbability}% - {maxProbability}%
               </span>
             </div>
-            <div className="pt-2">
+            <div className='pt-2'>
               <Slider
                 min={0}
                 max={100}
@@ -200,4 +228,4 @@ export function ParlayFilters({
       </SheetContent>
     </Sheet>
   );
-} 
+}
