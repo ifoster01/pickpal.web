@@ -109,9 +109,9 @@ export function useUpcomingATPMatchOdds(filter: Filter = 'upcoming') {
 
       // Filter based on status
       if (filter === 'upcoming') {
-        return games.filter((game) => isEventUpcoming(game.event_datetime));
+        return games.filter((game) => isEventUpcoming(game.event_date));
       } else if (filter === 'past') {
-        return games.filter((game) => !isEventUpcoming(game.event_datetime));
+        return games.filter((game) => !isEventUpcoming(game.event_date));
       }
 
       return games;
@@ -141,9 +141,9 @@ export function useUpcomingEventOdds(
 
       // Filter based on status
       if (filter === 'upcoming') {
-        return games.filter((game) => isEventUpcoming(game.event_datetime));
+        return games.filter((game) => isEventUpcoming(game.event_date));
       } else if (filter === 'past') {
-        return games.filter((game) => !isEventUpcoming(game.event_datetime));
+        return games.filter((game) => !isEventUpcoming(game.event_date));
       }
 
       return games;

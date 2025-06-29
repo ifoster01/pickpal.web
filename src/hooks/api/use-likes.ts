@@ -5,49 +5,22 @@ import { useEffect } from 'react';
 import { useAuth } from '@/providers/AuthProvider';
 import { isEventUpcoming } from './use-odds';
 
-type LikedFight = Database['public']['Tables']['liked_fights']['Row'];
-type LikedNFLGame = Database['public']['Tables']['liked_nfl_games']['Row'];
-type LikedNBAGame = Database['public']['Tables']['liked_nba_games']['Row'];
-type LikedATPMatch = Database['public']['Tables']['liked_atp_games']['Row'];
+type LikedEvent = Database['public']['Tables']['liked_events']['Row'];
 type EventOdds = Database['public']['Tables']['event_moneyline_odds']['Row'];
 
-type EnrichedLikedFight = LikedFight & {
-  upcoming_fight_odds: EventOdds | null;
-};
-
-type EnrichedLikedNFLGame = LikedNFLGame & {
-  upcoming_nfl_odds: EventOdds | null;
-};
-
-type EnrichedLikedNBAGame = LikedNBAGame & {
-  upcoming_nba_odds: EventOdds | null;
-};
-
-type EnrichedLikedATPMatch = LikedATPMatch & {
-  upcoming_atp_odds: EventOdds | null;
+type EnrichedLikedEvent = LikedEvent & {
+  upcoming_event_odds: EventOdds | null;
 };
 
 type Filter = 'upcoming' | 'past' | 'all';
 
 // Helper function to filter events based on filter type
-function filterEvents<
-  T extends
-    | EnrichedLikedFight
-    | EnrichedLikedNFLGame
-    | EnrichedLikedNBAGame
-    | EnrichedLikedATPMatch,
->(events: T[], filter: Filter): T[] {
+function filterEvents<T extends EnrichedLikedEvent>(
+  events: T[],
+  filter: Filter
+): T[] {
   return events.filter((event) => {
-    const date =
-      'upcoming_fight_odds' in event
-        ? event.upcoming_fight_odds?.event_date
-        : 'upcoming_nfl_odds' in event
-          ? event.upcoming_nfl_odds?.event_date
-          : 'upcoming_nba_odds' in event
-            ? event.upcoming_nba_odds?.event_date
-            : 'upcoming_atp_odds' in event
-              ? event.upcoming_atp_odds?.event_date
-              : null;
+    const date = event?.upcoming_event_odds?.event_date;
 
     if (!date) return true;
     const isUpcoming = isEventUpcoming(date);
@@ -64,7 +37,10 @@ function filterEvents<
   });
 }
 
-export function useLikedFights(filter: Filter = 'upcoming') {
+export function useLikedEvents(
+  filter: Filter = 'upcoming',
+  league: 'UFC' | 'NFL' | 'NBA' | 'ATP'
+) {
   const { user } = useAuth();
   const supabase = createClient();
   const queryClient = useQueryClient();
@@ -74,19 +50,22 @@ export function useLikedFights(filter: Filter = 'upcoming') {
     if (!user) return;
 
     const channel = supabase
-      .channel('liked_fights_changes')
+      .channel('liked_events_changes')
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'liked_fights',
+          table: 'liked_events',
           filter: `saving_user_id=eq.${user.id}`,
         },
         () => {
-          // Refetch the liked fights when changes occur
+          // Refetch the liked events when changes occur
           queryClient.invalidateQueries({
-            queryKey: ['liked_fights', user.id, filter],
+            queryKey: ['liked_events', user.id, filter, league],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ['likes-count', league],
           });
         }
       )
@@ -95,36 +74,37 @@ export function useLikedFights(filter: Filter = 'upcoming') {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, user, queryClient, filter]);
+  }, [supabase, user, queryClient, filter, league]);
 
-  // Query for liked fights
-  const query = useQuery<EnrichedLikedFight[]>({
-    queryKey: ['liked_fights', user?.id, filter],
+  // Query for liked events
+  const query = useQuery<EnrichedLikedEvent[]>({
+    queryKey: ['liked_events', user?.id, filter, league],
     queryFn: async () => {
       if (!user) return [];
 
-      // First, get the liked fights
-      const { data: likedFights, error: likedError } = await supabase
-        .from('liked_fights')
+      // First, get the liked events
+      const { data: likedEvents, error: likedError } = await supabase
+        .from('liked_events')
         .select('*')
         .eq('saving_user_id', user.id)
-        .order('saved_at', { ascending: false });
+        .eq('event_type', league)
+        .order('created_at', { ascending: false });
 
       if (likedError) throw likedError;
 
-      // Then, get all the fight odds
-      const { data: fightOdds, error: oddsError } = await supabase
+      // Then, get all the event odds
+      const { data: eventOdds, error: oddsError } = await supabase
         .from('event_moneyline_odds')
         .select('*')
-        .eq('event_type', 'ufc');
+        .eq('event_type', league.toLowerCase());
 
       if (oddsError) throw oddsError;
 
       // Manually join the data
-      const enrichedLikes: EnrichedLikedFight[] = likedFights.map((like) => ({
+      const enrichedLikes: EnrichedLikedEvent[] = likedEvents.map((like) => ({
         ...like,
-        upcoming_fight_odds:
-          fightOdds.find((odds) => odds.id === like.fight_id) || null,
+        upcoming_event_odds:
+          eventOdds.find((odds) => odds.id === like.event_id) || null,
       }));
 
       // Apply filtering
@@ -133,51 +113,54 @@ export function useLikedFights(filter: Filter = 'upcoming') {
     enabled: !!user,
   });
 
-  // Mutation to like a fight
+  // Mutation to like a event
   const likeMutation = useMutation({
-    mutationFn: async (fightId: string) => {
+    mutationFn: async (eventId: string) => {
       if (!user) throw new Error('User not authenticated');
 
       const newLike = {
-        fight_id: fightId,
+        event_id: eventId,
         saving_user_id: user.id,
-        saved_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        event_type: league,
       };
 
-      const { error } = await supabase.from('liked_fights').insert(newLike);
+      const { error } = await supabase.from('liked_events').insert(newLike);
 
       if (error) throw error;
       return newLike;
     },
-    onMutate: async (fightId) => {
+    onMutate: async (eventId) => {
       if (!user) return;
 
       // Cancel outgoing refetches
       await queryClient.cancelQueries({
-        queryKey: ['liked_fights', user.id, filter],
+        queryKey: ['liked_events', user.id, filter, league],
       });
 
       // Snapshot the previous value
-      const previousLikes = queryClient.getQueryData<EnrichedLikedFight[]>([
-        'liked_fights',
+      const previousLikes = queryClient.getQueryData<EnrichedLikedEvent[]>([
+        'liked_events',
         user.id,
         filter,
+        league,
       ]);
 
       // Optimistically update to the new value
-      const newLike: EnrichedLikedFight = {
-        fight_id: fightId,
+      const newLike: EnrichedLikedEvent = {
+        event_id: eventId,
         saving_user_id: user.id,
-        saved_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
         id: Math.random(), // temporary ID
-        upcoming_fight_odds:
+        upcoming_event_odds:
           queryClient
             .getQueryData<EventOdds[]>(['event_moneyline_odds'])
-            ?.find((fight) => fight.id === fightId) || null,
+            ?.find((event) => event.id === eventId) || null,
+        event_type: league,
       };
 
-      queryClient.setQueryData<EnrichedLikedFight[]>(
-        ['liked_fights', user.id, filter],
+      queryClient.setQueryData<EnrichedLikedEvent[]>(
+        ['liked_events', user.id, filter, league],
         (old = []) => {
           const newData = [newLike, ...old];
           return filterEvents(newData, filter);
@@ -187,59 +170,60 @@ export function useLikedFights(filter: Filter = 'upcoming') {
       // Return a context object with the snapshotted value
       return { previousLikes };
     },
-    onError: (err, newFight, context) => {
+    onError: (err, newEvent, context) => {
       if (context?.previousLikes && user) {
-        queryClient.setQueryData<EnrichedLikedFight[]>(
-          ['liked_fights', user.id, filter],
+        queryClient.setQueryData<EnrichedLikedEvent[]>(
+          ['liked_events', user.id, filter, league],
           context.previousLikes
         );
       }
     },
-    onSettled: (_data, _error, fightId) => {
+    onSettled: (_data, _error, eventId) => {
       if (user) {
         queryClient.invalidateQueries({
-          queryKey: ['liked_fights', user.id, filter],
+          queryKey: ['liked_events', user.id, filter, league],
         });
         queryClient.invalidateQueries({
-          queryKey: ['likes-count', fightId],
+          queryKey: ['likes-count', eventId],
         });
       }
     },
   });
 
-  // Mutation to unlike a fight
+  // Mutation to unlike a event
   const unlikeMutation = useMutation({
-    mutationFn: async (fightId: string) => {
+    mutationFn: async (eventId: string) => {
       if (!user) throw new Error('User not authenticated');
 
       const { error } = await supabase
-        .from('liked_fights')
+        .from('liked_events')
         .delete()
-        .eq('fight_id', fightId)
+        .eq('event_id', eventId)
         .eq('saving_user_id', user.id);
 
       if (error) throw error;
     },
-    onMutate: async (fightId) => {
+    onMutate: async (eventId) => {
       if (!user) return;
 
       // Cancel outgoing refetches
       await queryClient.cancelQueries({
-        queryKey: ['liked_fights', user.id, filter],
+        queryKey: ['liked_events', user.id, filter, league],
       });
 
       // Snapshot the previous value
-      const previousLikes = queryClient.getQueryData<EnrichedLikedFight[]>([
-        'liked_fights',
+      const previousLikes = queryClient.getQueryData<EnrichedLikedEvent[]>([
+        'liked_events',
         user.id,
         filter,
+        league,
       ]);
 
       // Optimistically update to the new value
-      queryClient.setQueryData<EnrichedLikedFight[]>(
-        ['liked_fights', user.id, filter],
+      queryClient.setQueryData<EnrichedLikedEvent[]>(
+        ['liked_events', user.id, filter, league],
         (old = []) => {
-          const newData = old.filter((like) => like.fight_id !== fightId);
+          const newData = old.filter((like) => like.event_id !== eventId);
           return filterEvents(newData, filter);
         }
       );
@@ -247,21 +231,21 @@ export function useLikedFights(filter: Filter = 'upcoming') {
       // Return a context object with the snapshotted value
       return { previousLikes };
     },
-    onError: (err, fightId, context) => {
+    onError: (err, eventId, context) => {
       if (context?.previousLikes && user) {
-        queryClient.setQueryData<EnrichedLikedFight[]>(
-          ['liked_fights', user.id, filter],
+        queryClient.setQueryData<EnrichedLikedEvent[]>(
+          ['liked_events', user.id, filter, league],
           context.previousLikes
         );
       }
     },
-    onSettled: (_data, _error, fightId) => {
+    onSettled: (_data, _error, eventId) => {
       if (user) {
         queryClient.invalidateQueries({
-          queryKey: ['liked_fights', user.id, filter],
+          queryKey: ['liked_events', user.id, filter, league],
         });
         queryClient.invalidateQueries({
-          queryKey: ['likes-count', fightId],
+          queryKey: ['likes-count', eventId],
         });
       }
     },
@@ -269,638 +253,8 @@ export function useLikedFights(filter: Filter = 'upcoming') {
 
   return {
     ...query,
-    likeFight: likeMutation.mutate,
-    unlikeFight: unlikeMutation.mutate,
-    isLiking: likeMutation.isPending,
-    isUnliking: unlikeMutation.isPending,
-  };
-}
-
-export function useLikedNFLGames(filter: Filter = 'upcoming') {
-  const { user } = useAuth();
-  const supabase = createClient();
-  const queryClient = useQueryClient();
-
-  // Set up real-time subscription
-  useEffect(() => {
-    if (!user) return;
-
-    const channel = supabase
-      .channel('liked_nfl_games_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'liked_nfl_games',
-          filter: `saving_user_id=eq.${user.id}`,
-        },
-        () => {
-          // Refetch the liked games when changes occur
-          queryClient.invalidateQueries({
-            queryKey: ['liked_nfl_games', user.id, filter],
-          });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, user, queryClient, filter]);
-
-  // Query for liked NFL games
-  const query = useQuery<EnrichedLikedNFLGame[]>({
-    queryKey: ['liked_nfl_games', user?.id, filter],
-    queryFn: async () => {
-      if (!user) return [];
-
-      // First, get the liked NFL games
-      const { data: likedGames, error: likedError } = await supabase
-        .from('liked_nfl_games')
-        .select('*')
-        .eq('saving_user_id', user.id)
-        .order('saved_at', { ascending: false });
-
-      if (likedError) throw likedError;
-
-      // Then, get all the NFL odds
-      const { data: nflOdds, error: oddsError } = await supabase
-        .from('event_moneyline_odds')
-        .select('*')
-        .eq('event_type', 'nfl');
-
-      if (oddsError) throw oddsError;
-
-      // Manually join the data
-      const enrichedLikes: EnrichedLikedNFLGame[] = likedGames.map((like) => ({
-        ...like,
-        upcoming_nfl_odds:
-          nflOdds.find((odds) => odds.id === like.game_id) || null,
-      }));
-
-      // Apply filtering
-      return filterEvents(enrichedLikes, filter);
-    },
-    enabled: !!user,
-  });
-
-  // Mutation to like an NFL game
-  const likeMutation = useMutation({
-    mutationFn: async (gameId: string) => {
-      if (!user) throw new Error('User not authenticated');
-
-      const newLike = {
-        game_id: gameId,
-        saving_user_id: user.id,
-        saved_at: new Date().toISOString(),
-      };
-
-      const { error } = await supabase.from('liked_nfl_games').insert(newLike);
-
-      if (error) throw error;
-      return newLike;
-    },
-    onMutate: async (gameId) => {
-      if (!user) return;
-
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({
-        queryKey: ['liked_nfl_games', user.id, filter],
-      });
-
-      // Snapshot the previous value
-      const previousLikes = queryClient.getQueryData<EnrichedLikedNFLGame[]>([
-        'liked_nfl_games',
-        user.id,
-        filter,
-      ]);
-
-      // Optimistically update to the new value
-      const newLike: EnrichedLikedNFLGame = {
-        game_id: gameId,
-        saving_user_id: user.id,
-        saved_at: new Date().toISOString(),
-        id: Math.random(), // temporary ID
-        upcoming_nfl_odds:
-          queryClient
-            .getQueryData<EventOdds[]>(['event_moneyline_odds'])
-            ?.find((game) => game.id === gameId) || null,
-      };
-
-      queryClient.setQueryData<EnrichedLikedNFLGame[]>(
-        ['liked_nfl_games', user.id, filter],
-        (old = []) => {
-          const newData = [newLike, ...old];
-          return filterEvents(newData, filter);
-        }
-      );
-
-      // Return a context object with the snapshotted value
-      return { previousLikes };
-    },
-    onError: (err, newGame, context) => {
-      if (context?.previousLikes && user) {
-        queryClient.setQueryData<EnrichedLikedNFLGame[]>(
-          ['liked_nfl_games', user.id, filter],
-          context.previousLikes
-        );
-      }
-    },
-    onSettled: (_data, _error, gameId) => {
-      if (user) {
-        queryClient.invalidateQueries({
-          queryKey: ['liked_nfl_games', user.id, filter],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['likes-count', gameId],
-        });
-      }
-    },
-  });
-
-  // Mutation to unlike an NFL game
-  const unlikeMutation = useMutation({
-    mutationFn: async (gameId: string) => {
-      if (!user) throw new Error('User not authenticated');
-
-      const { error } = await supabase
-        .from('liked_nfl_games')
-        .delete()
-        .eq('game_id', gameId)
-        .eq('saving_user_id', user.id);
-
-      if (error) throw error;
-    },
-    onMutate: async (gameId) => {
-      if (!user) return;
-
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({
-        queryKey: ['liked_nfl_games', user.id, filter],
-      });
-
-      // Snapshot the previous value
-      const previousLikes = queryClient.getQueryData<EnrichedLikedNFLGame[]>([
-        'liked_nfl_games',
-        user.id,
-        filter,
-      ]);
-
-      // Optimistically update to the new value
-      queryClient.setQueryData<EnrichedLikedNFLGame[]>(
-        ['liked_nfl_games', user.id, filter],
-        (old = []) => {
-          const newData = old.filter((like) => like.game_id !== gameId);
-          return filterEvents(newData, filter);
-        }
-      );
-
-      // Return a context object with the snapshotted value
-      return { previousLikes };
-    },
-    onError: (err, gameId, context) => {
-      if (context?.previousLikes && user) {
-        queryClient.setQueryData<EnrichedLikedNFLGame[]>(
-          ['liked_nfl_games', user.id, filter],
-          context.previousLikes
-        );
-      }
-    },
-    onSettled: (_data, _error, gameId) => {
-      if (user) {
-        queryClient.invalidateQueries({
-          queryKey: ['liked_nfl_games', user.id, filter],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['likes-count', gameId],
-        });
-      }
-    },
-  });
-
-  return {
-    ...query,
-    likeGame: likeMutation.mutate,
-    unlikeGame: unlikeMutation.mutate,
-    isLiking: likeMutation.isPending,
-    isUnliking: unlikeMutation.isPending,
-  };
-}
-
-export function useLikedNBAGames(filter: Filter = 'upcoming') {
-  const { user } = useAuth();
-  const supabase = createClient();
-  const queryClient = useQueryClient();
-
-  // Set up real-time subscription
-  useEffect(() => {
-    if (!user) return;
-
-    const channel = supabase
-      .channel('liked_nba_games_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'liked_nba_games',
-          filter: `saving_user_id=eq.${user.id}`,
-        },
-        () => {
-          // Refetch the liked games when changes occur
-          queryClient.invalidateQueries({
-            queryKey: ['liked_nba_games', user.id, filter],
-          });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, user, queryClient, filter]);
-
-  // Query for liked NBA games
-  const query = useQuery<EnrichedLikedNBAGame[]>({
-    queryKey: ['liked_nba_games', user?.id, filter],
-    queryFn: async () => {
-      if (!user) return [];
-
-      // First, get the liked NBA games
-      const { data: likedGames, error: likedError } = await supabase
-        .from('liked_nba_games')
-        .select('*')
-        .eq('saving_user_id', user.id)
-        .order('saved_at', { ascending: false });
-
-      if (likedError) throw likedError;
-
-      // Then, get all the NBA odds
-      const { data: nbaOdds, error: oddsError } = await supabase
-        .from('event_moneyline_odds')
-        .select('*')
-        .eq('event_type', 'nba');
-
-      if (oddsError) throw oddsError;
-
-      // Manually join the data
-      const enrichedLikes: EnrichedLikedNBAGame[] = likedGames.map((like) => ({
-        ...like,
-        upcoming_nba_odds:
-          nbaOdds.find((odds) => odds.id === like.game_id) || null,
-      }));
-
-      // Apply filtering
-      return filterEvents(enrichedLikes, filter);
-    },
-    enabled: !!user,
-  });
-
-  // Mutation to like an NBA game
-  const likeMutation = useMutation({
-    mutationFn: async (gameId: string) => {
-      if (!user) throw new Error('User not authenticated');
-
-      const newLike = {
-        game_id: gameId,
-        saving_user_id: user.id,
-        saved_at: new Date().toISOString(),
-      };
-
-      const { error } = await supabase.from('liked_nba_games').insert(newLike);
-
-      if (error) throw error;
-      return newLike;
-    },
-    onMutate: async (gameId) => {
-      if (!user) return;
-
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({
-        queryKey: ['liked_nba_games', user.id, filter],
-      });
-
-      // Snapshot the previous value
-      const previousLikes = queryClient.getQueryData<EnrichedLikedNBAGame[]>([
-        'liked_nba_games',
-        user.id,
-        filter,
-      ]);
-
-      // Optimistically update to the new value
-      const newLike: EnrichedLikedNBAGame = {
-        game_id: gameId,
-        saving_user_id: user.id,
-        saved_at: new Date().toISOString(),
-        id: Math.random(), // temporary ID
-        upcoming_nba_odds:
-          queryClient
-            .getQueryData<EventOdds[]>(['event_moneyline_odds'])
-            ?.find((game) => game.id === gameId) || null,
-      };
-
-      queryClient.setQueryData<EnrichedLikedNBAGame[]>(
-        ['liked_nba_games', user.id, filter],
-        (old = []) => {
-          const newData = [newLike, ...old];
-          return filterEvents(newData, filter);
-        }
-      );
-
-      // Return a context object with the snapshotted value
-      return { previousLikes };
-    },
-    onError: (err, newGame, context) => {
-      if (context?.previousLikes && user) {
-        queryClient.setQueryData<EnrichedLikedNBAGame[]>(
-          ['liked_nba_games', user.id, filter],
-          context.previousLikes
-        );
-      }
-    },
-    onSettled: (_data, _error, gameId) => {
-      if (user) {
-        queryClient.invalidateQueries({
-          queryKey: ['liked_nba_games', user.id, filter],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['likes-count', gameId],
-        });
-      }
-    },
-  });
-
-  // Mutation to unlike an NBA game
-  const unlikeMutation = useMutation({
-    mutationFn: async (gameId: string) => {
-      if (!user) throw new Error('User not authenticated');
-
-      const { error } = await supabase
-        .from('liked_nba_games')
-        .delete()
-        .eq('game_id', gameId)
-        .eq('saving_user_id', user.id);
-
-      if (error) throw error;
-    },
-    onMutate: async (gameId) => {
-      if (!user) return;
-
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({
-        queryKey: ['liked_nba_games', user.id, filter],
-      });
-
-      // Snapshot the previous value
-      const previousLikes = queryClient.getQueryData<EnrichedLikedNBAGame[]>([
-        'liked_nba_games',
-        user.id,
-        filter,
-      ]);
-
-      // Optimistically update to the new value
-      queryClient.setQueryData<EnrichedLikedNBAGame[]>(
-        ['liked_nba_games', user.id, filter],
-        (old = []) => {
-          const newData = old.filter((like) => like.game_id !== gameId);
-          return filterEvents(newData, filter);
-        }
-      );
-
-      // Return a context object with the snapshotted value
-      return { previousLikes };
-    },
-    onError: (err, gameId, context) => {
-      if (context?.previousLikes && user) {
-        queryClient.setQueryData<EnrichedLikedNBAGame[]>(
-          ['liked_nba_games', user.id, filter],
-          context.previousLikes
-        );
-      }
-    },
-    onSettled: (_data, _error, gameId) => {
-      if (user) {
-        queryClient.invalidateQueries({
-          queryKey: ['liked_nba_games', user.id, filter],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['likes-count', gameId],
-        });
-      }
-    },
-  });
-
-  return {
-    ...query,
-    likeNBAGame: likeMutation.mutate,
-    unlikeNBAGame: unlikeMutation.mutate,
-    isLiking: likeMutation.isPending,
-    isUnliking: unlikeMutation.isPending,
-  };
-}
-
-export function useLikedATPMatches(filter: Filter = 'upcoming') {
-  const { user } = useAuth();
-  const supabase = createClient();
-  const queryClient = useQueryClient();
-
-  // Set up real-time subscription
-  useEffect(() => {
-    if (!user) return;
-
-    const channel = supabase
-      .channel('liked_atp_games_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'liked_atp_games',
-          filter: `saving_user_id=eq.${user.id}`,
-        },
-        () => {
-          // Refetch the liked games when changes occur
-          queryClient.invalidateQueries({
-            queryKey: ['liked_atp_games', user.id, filter],
-          });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, user, queryClient, filter]);
-
-  // Query for liked ATP games
-  const query = useQuery<EnrichedLikedATPMatch[]>({
-    queryKey: ['liked_atp_games', user?.id, filter],
-    queryFn: async () => {
-      if (!user) return [];
-
-      // First, get the liked ATP games
-      const { data: likedGames, error: likedError } = await supabase
-        .from('liked_atp_games')
-        .select('*')
-        .eq('saving_user_id', user.id)
-        .order('saved_at', { ascending: false });
-
-      if (likedError) throw likedError;
-
-      // Then, get all the ATP odds
-      const { data: atpOdds, error: oddsError } = await supabase
-        .from('event_moneyline_odds')
-        .select('*')
-        .eq('event_type', 'atp');
-
-      if (oddsError) throw oddsError;
-
-      // Manually join the data
-      const enrichedLikes: EnrichedLikedATPMatch[] = likedGames.map((like) => ({
-        ...like,
-        upcoming_atp_odds:
-          atpOdds.find((odds) => odds.id === like.game_id) || null,
-      }));
-
-      // Apply filtering
-      return filterEvents(enrichedLikes, filter);
-    },
-    enabled: !!user,
-  });
-
-  // Mutation to like an ATP match
-  const likeMutation = useMutation({
-    mutationFn: async (gameId: string) => {
-      if (!user) throw new Error('User not authenticated');
-
-      const newLike = {
-        game_id: gameId,
-        saving_user_id: user.id,
-        saved_at: new Date().toISOString(),
-      };
-
-      const { error } = await supabase.from('liked_atp_games').insert(newLike);
-
-      if (error) throw error;
-      return newLike;
-    },
-    onMutate: async (gameId) => {
-      if (!user) return;
-
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({
-        queryKey: ['liked_atp_games', user.id, filter],
-      });
-
-      // Snapshot the previous value
-      const previousLikes = queryClient.getQueryData<EnrichedLikedATPMatch[]>([
-        'liked_atp_games',
-        user.id,
-        filter,
-      ]);
-
-      // Optimistically update to the new value
-      const newLike: EnrichedLikedATPMatch = {
-        game_id: gameId,
-        saving_user_id: user.id,
-        saved_at: new Date().toISOString(),
-        id: Math.random(), // temporary ID
-        upcoming_atp_odds:
-          queryClient
-            .getQueryData<EventOdds[]>(['event_moneyline_odds'])
-            ?.find((game) => game.id === gameId) || null,
-      };
-
-      queryClient.setQueryData<EnrichedLikedATPMatch[]>(
-        ['liked_atp_games', user.id, filter],
-        (old = []) => {
-          const newData = [newLike, ...old];
-          return filterEvents(newData, filter);
-        }
-      );
-
-      // Return a context object with the snapshotted value
-      return { previousLikes };
-    },
-    onError: (err, newGame, context) => {
-      if (context?.previousLikes && user) {
-        queryClient.setQueryData<EnrichedLikedATPMatch[]>(
-          ['liked_atp_games', user.id, filter],
-          context.previousLikes
-        );
-      }
-    },
-    onSettled: () => {
-      if (user) {
-        queryClient.invalidateQueries({
-          queryKey: ['liked_atp_games', user.id, filter],
-        });
-      }
-    },
-  });
-
-  // Mutation to unlike an ATP match
-  const unlikeMutation = useMutation({
-    mutationFn: async (gameId: string) => {
-      if (!user) throw new Error('User not authenticated');
-
-      const { error } = await supabase
-        .from('liked_atp_games')
-        .delete()
-        .eq('game_id', gameId)
-        .eq('saving_user_id', user.id);
-
-      if (error) throw error;
-    },
-    onMutate: async (gameId) => {
-      if (!user) return;
-
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({
-        queryKey: ['liked_atp_games', user.id, filter],
-      });
-
-      // Snapshot the previous value
-      const previousLikes = queryClient.getQueryData<EnrichedLikedATPMatch[]>([
-        'liked_atp_games',
-        user.id,
-        filter,
-      ]);
-
-      // Optimistically update to the new value
-      queryClient.setQueryData<EnrichedLikedATPMatch[]>(
-        ['liked_atp_games', user.id, filter],
-        (old = []) => {
-          const newData = old.filter((like) => like.game_id !== gameId);
-          return filterEvents(newData, filter);
-        }
-      );
-
-      // Return a context object with the snapshotted value
-      return { previousLikes };
-    },
-    onError: (err, gameId, context) => {
-      if (context?.previousLikes && user) {
-        queryClient.setQueryData<EnrichedLikedATPMatch[]>(
-          ['liked_atp_games', user.id, filter],
-          context.previousLikes
-        );
-      }
-    },
-    onSettled: () => {
-      if (user) {
-        queryClient.invalidateQueries({
-          queryKey: ['liked_atp_games', user.id, filter],
-        });
-      }
-    },
-  });
-
-  return {
-    ...query,
-    likeATPMatch: likeMutation.mutate,
-    unlikeATPMatch: unlikeMutation.mutate,
+    likeEvent: likeMutation.mutate,
+    unlikeEvent: unlikeMutation.mutate,
     isLiking: likeMutation.isPending,
     isUnliking: unlikeMutation.isPending,
   };

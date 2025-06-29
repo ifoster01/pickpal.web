@@ -84,7 +84,9 @@ export function PickCard({
     >
       <Card className='overflow-hidden group relative'>
         <div className='absolute top-4 right-4 z-10 flex items-center gap-2'>
-          <span className='text-sm text-muted-foreground'>{likesCount}</span>
+          {likesCount !== undefined && likesCount > 0 && (
+            <span className='text-sm text-muted-foreground'>{likesCount}</span>
+          )}
           {/* Save Button - Floating in top right */}
           <motion.button
             className={cn(

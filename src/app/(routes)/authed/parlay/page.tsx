@@ -10,19 +10,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useLeague } from '@/providers/LeagueProvider';
-import { useUpcomingEventOdds } from '@/hooks/api/use-odds';
-import {
-  useLikedATPMatches,
-  useLikedFights,
-  useLikedNBAGames,
-  useLikedNFLGames,
-} from '@/hooks/api/use-likes';
+import { useLikedEvents } from '@/hooks/api/use-likes';
 import { ParlayCard } from './(components)/parlay-card';
 import { ParlayFilters } from './(components)/parlay-filters';
 import { generateParlayCombinations, getBetterSide } from '@/utils/parlay';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/cn';
-import { isEventUpcoming } from '@/hooks/api/use-odds';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type League = 'UFC' | 'NFL' | 'NBA' | 'ATP';
 type SortOption = 'payout' | 'value' | 'probability';
@@ -37,77 +31,18 @@ export default function ParlayPage() {
   const [maxProbability, setMaxProbability] = useState(100);
   const [sortBy, setSortBy] = useState<SortOption>('value');
 
-  // Fetch data
-  const { data: fights } = useUpcomingEventOdds('upcoming', 'ufc');
-  const { data: likedFights } = useLikedFights();
-  const { data: games } = useUpcomingEventOdds('upcoming', 'nfl');
-  const { data: likedGames } = useLikedNFLGames();
-  const { data: nbaGames } = useUpcomingEventOdds('upcoming', 'nba');
-  const { data: likedNBAGames } = useLikedNBAGames();
-  const { data: atpMatches } = useUpcomingEventOdds('upcoming', 'atp');
-  const { data: likedATPMatches } = useLikedATPMatches();
+  const { data: likedEvents, isLoading } = useLikedEvents('upcoming', league);
 
-  // Filter liked events and get better sides
   const parlayLegs = useMemo(() => {
-    // Get liked event IDs
-    const likedFightIds = likedFights?.map((like) => like.fight_id) || [];
-    const likedGameIds = likedGames?.map((like) => like.game_id) || [];
-    const likedNBAGameIds = likedNBAGames?.map((like) => like.game_id) || [];
-    const likedATPMatchIds = likedATPMatches?.map((like) => like.game_id) || [];
+    if (!likedEvents) return [];
+    return likedEvents
+      .map((event) => {
+        if (!event.upcoming_event_odds) return null;
+        return getBetterSide(event.upcoming_event_odds, league);
+      })
+      .filter((leg): leg is NonNullable<typeof leg> => leg !== null);
+  }, [likedEvents, league]);
 
-    if (league === 'UFC') {
-      return (
-        fights
-          ?.filter(
-            (fight) =>
-              likedFightIds.includes(fight.id) &&
-              isEventUpcoming(fight.event_date)
-          )
-          .map((fight) => getBetterSide(fight, 'UFC')) || []
-      );
-    } else if (league === 'NFL') {
-      return (
-        games
-          ?.filter(
-            (game) =>
-              likedGameIds.includes(game.id) && isEventUpcoming(game.event_date)
-          )
-          .map((game) => getBetterSide(game, 'NFL')) || []
-      );
-    } else if (league === 'NBA') {
-      return (
-        nbaGames
-          ?.filter(
-            (game) =>
-              likedNBAGameIds.includes(game.id) &&
-              isEventUpcoming(game.event_date)
-          )
-          .map((game) => getBetterSide(game, 'NBA')) || []
-      );
-    } else {
-      return (
-        atpMatches
-          ?.filter(
-            (match) =>
-              likedATPMatchIds.includes(match.id) &&
-              isEventUpcoming(match.event_date)
-          )
-          .map((match) => getBetterSide(match, 'ATP')) || []
-      );
-    }
-  }, [
-    fights,
-    games,
-    nbaGames,
-    atpMatches,
-    league,
-    likedFights,
-    likedGames,
-    likedNBAGames,
-    likedATPMatches,
-  ]);
-
-  // Generate and filter parlays
   const parlays = useMemo(() => {
     const allParlays = generateParlayCombinations(parlayLegs, minLegs, maxLegs);
 
@@ -128,7 +63,6 @@ export default function ParlayPage() {
     maxProbability,
   ]);
 
-  // Sort parlays
   const sortedParlays = useMemo(() => {
     return [...parlays].sort((a, b) => {
       switch (sortBy) {
@@ -143,6 +77,30 @@ export default function ParlayPage() {
       }
     });
   }, [parlays, sortBy]);
+
+  if (isLoading) {
+    return (
+      <div className='space-y-8'>
+        <div className='flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between'>
+          <Skeleton className='h-9 w-48' />
+          <div className='flex justify-between sm:justify-start items-center gap-4'>
+            <Skeleton className='h-10 w-full sm:w-[120px]' />
+            <Skeleton className='h-10 w-10' />
+          </div>
+        </div>
+        <div className='flex gap-2 overflow-x-auto pb-2'>
+          <Skeleton className='h-9 w-24' />
+          <Skeleton className='h-9 w-28' />
+          <Skeleton className='h-9 w-28' />
+        </div>
+        <div className='grid gap-4'>
+          {[1, 2].map((i) => (
+            <Skeleton key={i} className='h-36 w-full' />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-8'>

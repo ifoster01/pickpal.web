@@ -153,6 +153,30 @@ export type Database = {
           },
         ];
       };
+      liked_events: {
+        Row: {
+          created_at: string;
+          event_id: string | null;
+          event_type: string | null;
+          id: number;
+          saving_user_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          event_id?: string | null;
+          event_type?: string | null;
+          id?: number;
+          saving_user_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          event_id?: string | null;
+          event_type?: string | null;
+          id?: number;
+          saving_user_id?: string | null;
+        };
+        Relationships: [];
+      };
       liked_fights: {
         Row: {
           fight_id: string | null;
