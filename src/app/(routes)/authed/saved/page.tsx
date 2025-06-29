@@ -13,6 +13,8 @@ import { isEventUpcoming } from '@/hooks/api/use-odds';
 import { useFilter } from '@/providers/FilterProvider';
 import { Skeleton } from '@/components/ui/skeleton';
 
+type League = 'UFC' | 'NFL' | 'NBA' | 'ATP';
+
 export default function SavedPage() {
   const { user } = useAuth();
   const { league, setLeague } = useLeague();
@@ -129,7 +131,7 @@ export default function SavedPage() {
         defaultValue='UFC'
         className='w-full'
         value={league}
-        onValueChange={(val) => setLeague(val as any)}
+        onValueChange={(val) => setLeague(val as League)}
       >
         <TabsList className='mb-8'>
           <TabsTrigger value='UFC'>UFC Fights</TabsTrigger>

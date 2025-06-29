@@ -6,11 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, Heart } from 'lucide-react';
+import { ChevronDown, Heart, User } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { PickAnalytics } from './pick-analytics';
 import { calculateProbabilityFromOdds } from '@/utils/odds';
-import Image from 'next/image';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/providers/AuthProvider';
 import { useLikesCount } from '@/hooks/api/use-likes-count';
 
@@ -115,22 +115,22 @@ export function PickCard({
 
         <div className='p-6 pt-10'>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-            {/* Fighter/Team 1 */}
+            {/* Team 1 */}
             <div className='flex items-center space-x-4'>
-              <div
+              <Avatar
                 className={cn(
-                  'relative rounded-full overflow-hidden',
                   league === 'UFC' ? 'w-[100px] h-[100px]' : 'w-[50px] h-[50px]'
                 )}
               >
-                <Image
-                  src={team1.picUrl || '/placeholder-fighter.png'}
-                  alt={team1.name || 'Fighter 1'}
-                  fill
+                <AvatarImage
+                  src={team1.picUrl}
+                  alt={team1.name || 'Team 1'}
                   className='object-cover object-top'
-                  sizes='100px'
                 />
-              </div>
+                <AvatarFallback>
+                  <User className='h-1/2 w-1/2 text-muted-foreground' />
+                </AvatarFallback>
+              </Avatar>
               <div>
                 <h3
                   className={cn(
@@ -182,7 +182,7 @@ export function PickCard({
               </div>
             </div>
 
-            {/* Fighter/Team 2 */}
+            {/* Team 2 */}
             <div className='flex items-center justify-end space-x-4'>
               <div className='text-right'>
                 <h3
@@ -204,20 +204,20 @@ export function PickCard({
                   {team2.odds}
                 </div>
               </div>
-              <div
+              <Avatar
                 className={cn(
-                  'relative rounded-full overflow-hidden',
                   league === 'UFC' ? 'w-[100px] h-[100px]' : 'w-[50px] h-[50px]'
                 )}
               >
-                <Image
-                  src={team2.picUrl || '/placeholder-fighter.png'}
-                  alt={team2.name || 'Fighter 2'}
-                  fill
+                <AvatarImage
+                  src={team2.picUrl}
+                  alt={team2.name || 'Team 2'}
                   className='object-cover object-top'
-                  sizes='100px'
                 />
-              </div>
+                <AvatarFallback>
+                  <User className='h-1/2 w-1/2 text-muted-foreground' />
+                </AvatarFallback>
+              </Avatar>
             </div>
           </div>
 
