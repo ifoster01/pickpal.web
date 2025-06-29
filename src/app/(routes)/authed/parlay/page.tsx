@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useLeague } from '@/providers/LeagueProvider';
+import { League, useLeague } from '@/providers/LeagueProvider';
 import { useLikedEvents } from '@/hooks/api/use-likes';
 import { ParlayCard } from './(components)/parlay-card';
 import { ParlayFilters } from './(components)/parlay-filters';
@@ -18,7 +18,6 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/cn';
 import { Skeleton } from '@/components/ui/skeleton';
 
-type League = 'UFC' | 'NFL' | 'NBA' | 'ATP';
 type SortOption = 'payout' | 'value' | 'probability';
 
 export default function ParlayPage() {
@@ -115,10 +114,10 @@ export default function ParlayPage() {
               <SelectValue placeholder='Select League' />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value='UFC'>UFC</SelectItem>
-              <SelectItem value='NFL'>NFL</SelectItem>
-              <SelectItem value='NBA'>NBA</SelectItem>
-              <SelectItem value='ATP'>ATP</SelectItem>
+              <SelectItem value='ufc'>UFC</SelectItem>
+              <SelectItem value='nfl'>NFL</SelectItem>
+              <SelectItem value='nba'>NBA</SelectItem>
+              <SelectItem value='atp'>ATP</SelectItem>
             </SelectContent>
           </Select>
           <ParlayFilters

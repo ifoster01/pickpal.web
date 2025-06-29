@@ -4,6 +4,7 @@ import { Database } from '@/types/supabase';
 import { useEffect } from 'react';
 import { useAuth } from '@/providers/AuthProvider';
 import { isEventUpcoming } from './use-odds';
+import { League } from '@/providers/LeagueProvider';
 
 type LikedEvent = Database['public']['Tables']['liked_events']['Row'];
 type EventOdds = Database['public']['Tables']['event_moneyline_odds']['Row'];
@@ -37,10 +38,7 @@ function filterEvents<T extends EnrichedLikedEvent>(
   });
 }
 
-export function useLikedEvents(
-  filter: Filter = 'upcoming',
-  league: 'UFC' | 'NFL' | 'NBA' | 'ATP'
-) {
+export function useLikedEvents(filter: Filter = 'upcoming', league: League) {
   const { user } = useAuth();
   const supabase = createClient();
   const queryClient = useQueryClient();

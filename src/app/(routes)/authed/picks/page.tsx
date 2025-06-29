@@ -14,20 +14,15 @@ import { isEventUpcoming, useUpcomingEventOdds } from '@/hooks/api/use-odds';
 import { useLikedEvents } from '@/hooks/api/use-likes';
 import { cn } from '@/utils/cn';
 import { PickCard } from '@/app/(routes)/authed/picks/(component)/pick-card';
-import { useLeague } from '@/providers/LeagueProvider';
+import { League, useLeague } from '@/providers/LeagueProvider';
 import { useFilter } from '@/providers/FilterProvider';
 import { EventFilter } from '@/components/general/event-filter';
-
-type League = 'UFC' | 'NFL' | 'NBA' | 'ATP';
 
 export default function PicksPage() {
   const { league, setLeague } = useLeague();
   const { filter } = useFilter();
 
-  const { data: events, isLoading } = useUpcomingEventOdds(
-    filter,
-    league.toLowerCase() as 'ufc' | 'nfl' | 'nba' | 'atp'
-  );
+  const { data: events, isLoading } = useUpcomingEventOdds(filter, league);
 
   const {
     data: likedEvents,
@@ -85,10 +80,10 @@ export default function PicksPage() {
               <SelectValue placeholder='Select League' />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value='UFC'>UFC</SelectItem>
-              <SelectItem value='NFL'>NFL</SelectItem>
-              <SelectItem value='NBA'>NBA</SelectItem>
-              <SelectItem value='ATP'>ATP</SelectItem>
+              <SelectItem value='ufc'>UFC</SelectItem>
+              <SelectItem value='nfl'>NFL</SelectItem>
+              <SelectItem value='nba'>NBA</SelectItem>
+              <SelectItem value='atp'>ATP</SelectItem>
             </SelectContent>
           </Select>
           <EventFilter className='hidden sm:block' />

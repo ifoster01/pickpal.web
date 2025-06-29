@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/utils/supabase/client';
+import { League } from '@/providers/LeagueProvider';
 
 export type Filter = 'upcoming' | 'past' | 'all';
 
@@ -13,7 +14,7 @@ export function isEventUpcoming(eventDate: string | null): boolean {
 
 export function useUpcomingEventOdds(
   filter: Filter = 'upcoming',
-  eventType: 'atp' | 'nfl' | 'nba' | 'ufc'
+  eventType: League
 ) {
   const supabase = createClient();
 

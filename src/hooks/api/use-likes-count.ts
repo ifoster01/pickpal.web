@@ -1,10 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/utils/supabase/client';
+import { League } from '@/providers/LeagueProvider';
 
-export function useLikesCount(
-  eventId: string,
-  league: 'UFC' | 'NFL' | 'NBA' | 'ATP'
-) {
+export function useLikesCount(eventId: string, league: League) {
   const { data, isLoading, error } = useQuery({
     queryKey: ['likes-count', eventId, league],
     queryFn: async () => {

@@ -1,5 +1,6 @@
 import { Database } from '@/types/supabase';
 import { calculateProbabilityFromOdds } from './odds';
+import { League } from '@/providers/LeagueProvider';
 
 type EventOdds = Database['public']['Tables']['event_moneyline_odds']['Row'];
 
@@ -13,7 +14,7 @@ export type ParlayLeg = {
   modelProbability: number;
   bookProbability: number;
   valueEdge: number;
-  type: 'UFC' | 'NFL' | 'NBA' | 'ATP';
+  type: League;
   picUrl: string | null;
 };
 
@@ -51,10 +52,7 @@ export function calculateParlayProbability(probabilities: number[]): number {
   return probabilities.reduce((acc, curr) => acc * curr, 1);
 }
 
-export function getBetterSide(
-  event: EventOdds,
-  type: 'UFC' | 'NFL' | 'NBA' | 'ATP'
-): ParlayLeg {
+export function getBetterSide(event: EventOdds, type: League): ParlayLeg {
   const f1Prob = calculateProbabilityFromOdds(event.odds1 || 0);
   const f2Prob = calculateProbabilityFromOdds(event.odds2 || 0);
   const f1BookProb = calculateProbabilityFromOdds(event.book_odds1 || 0);

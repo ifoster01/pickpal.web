@@ -13,6 +13,7 @@ import { calculateProbabilityFromOdds } from '@/utils/odds';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/providers/AuthProvider';
 import { useLikesCount } from '@/hooks/api/use-likes-count';
+import { League } from '@/providers/LeagueProvider';
 
 type EventOdds = Database['public']['Tables']['event_moneyline_odds']['Row'];
 
@@ -30,7 +31,7 @@ interface PickCardProps {
   isLiked?: boolean;
   onLike?: () => void;
   onUnlike?: () => void;
-  league: 'UFC' | 'NFL' | 'NBA' | 'ATP';
+  league: League;
 }
 
 export function PickCard({
@@ -119,7 +120,7 @@ export function PickCard({
             <div className='flex items-center space-x-4'>
               <Avatar
                 className={cn(
-                  league === 'UFC' ? 'w-[100px] h-[100px]' : 'w-[50px] h-[50px]'
+                  league === 'ufc' ? 'w-[100px] h-[100px]' : 'w-[50px] h-[50px]'
                 )}
               >
                 <AvatarImage
@@ -135,10 +136,10 @@ export function PickCard({
                 <h3
                   className={cn(
                     'font-semibold',
-                    league === 'UFC' ? 'text-lg' : 'text-2xl'
+                    league === 'ufc' ? 'text-lg' : 'text-2xl'
                   )}
                 >
-                  {league === 'UFC' || league === 'ATP'
+                  {league === 'ufc' || league === 'atp'
                     ? team1.name
                     : team1.name?.split(' ').at(-1)}
                 </h3>
@@ -188,10 +189,10 @@ export function PickCard({
                 <h3
                   className={cn(
                     'font-semibold',
-                    league === 'UFC' ? 'text-lg' : 'text-2xl'
+                    league === 'ufc' ? 'text-lg' : 'text-2xl'
                   )}
                 >
-                  {league === 'UFC' || league === 'ATP'
+                  {league === 'ufc' || league === 'atp'
                     ? team2.name
                     : team2.name?.split(' ').at(-1)}
                 </h3>
@@ -206,7 +207,7 @@ export function PickCard({
               </div>
               <Avatar
                 className={cn(
-                  league === 'UFC' ? 'w-[100px] h-[100px]' : 'w-[50px] h-[50px]'
+                  league === 'ufc' ? 'w-[100px] h-[100px]' : 'w-[50px] h-[50px]'
                 )}
               >
                 <AvatarImage

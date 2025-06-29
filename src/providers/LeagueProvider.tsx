@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 
-type League = 'UFC' | 'NFL' | 'NBA' | 'ATP';
+export type League = 'ufc' | 'nfl' | 'nba' | 'atp';
 
 interface LeagueContextType {
   league: League;
@@ -12,16 +12,16 @@ interface LeagueContextType {
 const LeagueContext = createContext<LeagueContextType | undefined>(undefined);
 
 export function LeagueProvider({ children }: { children: React.ReactNode }) {
-  const [league, setLeague] = useState<League>('UFC');
+  const [league, setLeague] = useState<League>('ufc');
 
   // Persist league selection to localStorage
   useEffect(() => {
     const savedLeague = localStorage.getItem('selectedLeague');
     if (
-      savedLeague === 'UFC' ||
-      savedLeague === 'NFL' ||
-      savedLeague === 'NBA' ||
-      savedLeague === 'ATP'
+      savedLeague === 'ufc' ||
+      savedLeague === 'nfl' ||
+      savedLeague === 'nba' ||
+      savedLeague === 'atp'
     ) {
       setLeague(savedLeague);
     }

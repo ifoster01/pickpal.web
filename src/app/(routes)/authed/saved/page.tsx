@@ -6,14 +6,12 @@ import { useLikedEvents } from '@/hooks/api/use-likes';
 import { useAuth } from '@/providers/AuthProvider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EventFilter } from '@/components/general/event-filter';
-import { useLeague } from '@/providers/LeagueProvider';
+import { League, useLeague } from '@/providers/LeagueProvider';
 import { PickCard } from '../picks/(component)/pick-card';
 import { cn } from '@/utils/cn';
 import { isEventUpcoming } from '@/hooks/api/use-odds';
 import { useFilter } from '@/providers/FilterProvider';
 import { Skeleton } from '@/components/ui/skeleton';
-
-type League = 'UFC' | 'NFL' | 'NBA' | 'ATP';
 
 export default function SavedPage() {
   const { user } = useAuth();
@@ -89,18 +87,18 @@ export default function SavedPage() {
           <h1 className='text-3xl font-bold'>Saved Picks</h1>
           <EventFilter className='block sm:block' />
         </div>
-        <Tabs defaultValue='UFC' className='w-full' value={league}>
+        <Tabs defaultValue='ufc' className='w-full' value={league}>
           <TabsList className='mb-8'>
-            <TabsTrigger onClick={() => setLeague('UFC')} value='UFC'>
+            <TabsTrigger onClick={() => setLeague('ufc')} value='ufc'>
               UFC Fights
             </TabsTrigger>
-            <TabsTrigger onClick={() => setLeague('NFL')} value='NFL'>
+            <TabsTrigger onClick={() => setLeague('nfl')} value='nfl'>
               NFL Games
             </TabsTrigger>
-            <TabsTrigger onClick={() => setLeague('NBA')} value='NBA'>
+            <TabsTrigger onClick={() => setLeague('nba')} value='nba'>
               NBA Games
             </TabsTrigger>
-            <TabsTrigger onClick={() => setLeague('ATP')} value='ATP'>
+            <TabsTrigger onClick={() => setLeague('atp')} value='atp'>
               ATP Matches
             </TabsTrigger>
           </TabsList>
@@ -128,22 +126,22 @@ export default function SavedPage() {
       </div>
 
       <Tabs
-        defaultValue='UFC'
+        defaultValue='ufc'
         className='w-full'
         value={league}
         onValueChange={(val) => setLeague(val as League)}
       >
         <TabsList className='mb-8'>
-          <TabsTrigger value='UFC'>UFC Fights</TabsTrigger>
-          <TabsTrigger value='NFL'>NFL Games</TabsTrigger>
-          <TabsTrigger value='NBA'>NBA Games</TabsTrigger>
-          <TabsTrigger value='ATP'>ATP Matches</TabsTrigger>
+          <TabsTrigger value='ufc'>UFC Fights</TabsTrigger>
+          <TabsTrigger value='nfl'>NFL Games</TabsTrigger>
+          <TabsTrigger value='nba'>NBA Games</TabsTrigger>
+          <TabsTrigger value='atp'>ATP Matches</TabsTrigger>
         </TabsList>
 
-        <TabsContent value='UFC'>{renderSavedEvents()}</TabsContent>
-        <TabsContent value='NFL'>{renderSavedEvents()}</TabsContent>
-        <TabsContent value='NBA'>{renderSavedEvents()}</TabsContent>
-        <TabsContent value='ATP'>{renderSavedEvents()}</TabsContent>
+        <TabsContent value='ufc'>{renderSavedEvents()}</TabsContent>
+        <TabsContent value='nfl'>{renderSavedEvents()}</TabsContent>
+        <TabsContent value='nba'>{renderSavedEvents()}</TabsContent>
+        <TabsContent value='atp'>{renderSavedEvents()}</TabsContent>
       </Tabs>
     </motion.div>
   );
