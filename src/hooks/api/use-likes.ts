@@ -195,10 +195,13 @@ export function useLikedFights(filter: Filter = 'upcoming') {
         );
       }
     },
-    onSettled: () => {
+    onSettled: (_data, _error, fightId) => {
       if (user) {
         queryClient.invalidateQueries({
           queryKey: ['liked_fights', user.id, filter],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['likes-count', fightId],
         });
       }
     },
@@ -252,10 +255,13 @@ export function useLikedFights(filter: Filter = 'upcoming') {
         );
       }
     },
-    onSettled: () => {
+    onSettled: (_data, _error, fightId) => {
       if (user) {
         queryClient.invalidateQueries({
           queryKey: ['liked_fights', user.id, filter],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['likes-count', fightId],
         });
       }
     },
@@ -401,10 +407,13 @@ export function useLikedNFLGames(filter: Filter = 'upcoming') {
         );
       }
     },
-    onSettled: () => {
+    onSettled: (_data, _error, gameId) => {
       if (user) {
         queryClient.invalidateQueries({
           queryKey: ['liked_nfl_games', user.id, filter],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['likes-count', gameId],
         });
       }
     },
@@ -458,10 +467,13 @@ export function useLikedNFLGames(filter: Filter = 'upcoming') {
         );
       }
     },
-    onSettled: () => {
+    onSettled: (_data, _error, gameId) => {
       if (user) {
         queryClient.invalidateQueries({
           queryKey: ['liked_nfl_games', user.id, filter],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['likes-count', gameId],
         });
       }
     },
@@ -607,10 +619,13 @@ export function useLikedNBAGames(filter: Filter = 'upcoming') {
         );
       }
     },
-    onSettled: () => {
+    onSettled: (_data, _error, gameId) => {
       if (user) {
         queryClient.invalidateQueries({
           queryKey: ['liked_nba_games', user.id, filter],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['likes-count', gameId],
         });
       }
     },
@@ -664,10 +679,13 @@ export function useLikedNBAGames(filter: Filter = 'upcoming') {
         );
       }
     },
-    onSettled: () => {
+    onSettled: (_data, _error, gameId) => {
       if (user) {
         queryClient.invalidateQueries({
           queryKey: ['liked_nba_games', user.id, filter],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['likes-count', gameId],
         });
       }
     },

@@ -12,7 +12,7 @@ import { PickAnalytics } from './pick-analytics';
 import { calculateProbabilityFromOdds } from '@/utils/odds';
 import Image from 'next/image';
 import { useAuth } from '@/providers/AuthProvider';
-// import { useLikesCount } from '@/hooks/api/use-likes-count';
+import { useLikesCount } from '@/hooks/api/use-likes-count';
 
 type EventOdds = Database['public']['Tables']['event_moneyline_odds']['Row'];
 
@@ -42,7 +42,7 @@ export function PickCard({
 }: PickCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { user } = useAuth();
-  // const { data: likesCount } = useLikesCount(event., 'fight');
+  const { data: likesCount } = useLikesCount(event.id, league);
 
   const team1: Team = {
     name: event.team1 || '',
@@ -83,33 +83,35 @@ export function PickCard({
       transition={{ duration: 0.4 }}
     >
       <Card className='overflow-hidden group relative'>
-        {/* Save Button - Floating in top right */}
-        <motion.button
-          className={cn(
-            'absolute top-4 right-4 z-10',
-            'w-8 h-8 rounded-full flex items-center justify-center',
-            'transition-all duration-200 ease-in-out',
-            'hover:scale-110 active:scale-95',
-            isLiked ? 'bg-primary/10' : 'bg-background/80 backdrop-blur-sm',
-            !user && 'opacity-50 cursor-not-allowed'
-          )}
-          onClick={handleSaveClick}
-          disabled={!user}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Heart
+        <div className='absolute top-4 right-4 z-10 flex items-center gap-2'>
+          <span className='text-sm text-muted-foreground'>{likesCount}</span>
+          {/* Save Button - Floating in top right */}
+          <motion.button
             className={cn(
-              'w-4 h-4 transition-all duration-200',
-              isLiked
-                ? 'fill-primary stroke-primary'
-                : 'stroke-muted-foreground',
-              'group-hover:stroke-primary'
+              'w-8 h-8 rounded-full flex items-center justify-center',
+              'transition-all duration-200 ease-in-out',
+              'hover:scale-110 active:scale-95',
+              isLiked ? 'bg-primary/10' : 'bg-background/80 backdrop-blur-sm',
+              !user && 'opacity-50 cursor-not-allowed'
             )}
-          />
-        </motion.button>
+            onClick={handleSaveClick}
+            disabled={!user}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Heart
+              className={cn(
+                'w-4 h-4 transition-all duration-200',
+                isLiked
+                  ? 'fill-primary stroke-primary'
+                  : 'stroke-muted-foreground',
+                'group-hover:stroke-primary'
+              )}
+            />
+          </motion.button>
+        </div>
 
-        <div className='p-6'>
+        <div className='p-6 pt-10'>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
             {/* Fighter/Team 1 */}
             <div className='flex items-center space-x-4'>
