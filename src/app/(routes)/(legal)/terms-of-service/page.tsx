@@ -142,9 +142,9 @@ export default function TermsOfService() {
               The App and all content provided therein are offered &quot;as
               is&quot; and &quot;as available&quot; without any warranties of
               any kind, either express or implied. We make no representations or
-              warranties regarding the accuracy, reliability, or availability
-              of the App or its content.
-              You agree that your use of the App is at your sole risk.
+              warranties regarding the accuracy, reliability, or availability of
+              the App or its content. You agree that your use of the App is at
+              your sole risk.
             </p>
           </section>
 

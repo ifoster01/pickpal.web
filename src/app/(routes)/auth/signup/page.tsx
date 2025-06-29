@@ -88,7 +88,8 @@ export default function SignUp() {
     } catch (error: unknown) {
       console.error('Error signing up:', error);
       toast.error(
-        (error as Error).message || 'Failed to create account. Please try again.'
+        (error as Error).message ||
+          'Failed to create account. Please try again.'
       );
     } finally {
       setIsLoading(false);

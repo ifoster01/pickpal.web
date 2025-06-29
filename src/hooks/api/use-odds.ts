@@ -96,19 +96,54 @@ export function useUpcomingATPMatchOdds(filter: Filter = 'upcoming') {
     queryKey: ['upcoming_atp_odds', filter],
     queryFn: async () => {
       const { data: games, error } = await supabase
-        .from('upcoming_atp_odds')
+        .from('event_moneyline_odds')
         .select('*')
-        .not('team_book_odds', 'eq', 0)
-        .not('opp_book_odds', 'eq', 0)
+        .eq('event_type', 'atp')
+        .not('book_odds1', 'eq', 0)
+        .not('book_odds2', 'eq', 0)
+        .order('created_at', { ascending: false });
+      console.log(games);
+
+      console.log(error);
+      if (error) throw error;
+
+      // Filter based on status
+      if (filter === 'upcoming') {
+        return games.filter((game) => isEventUpcoming(game.event_datetime));
+      } else if (filter === 'past') {
+        return games.filter((game) => !isEventUpcoming(game.event_datetime));
+      }
+
+      return games;
+    },
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+  });
+}
+
+export function useUpcomingEventOdds(
+  filter: Filter = 'upcoming',
+  eventType: 'atp' | 'nfl' | 'nba' | 'ufc'
+) {
+  const supabase = createClient();
+
+  return useQuery({
+    queryKey: ['upcoming_event_odds', filter, eventType],
+    queryFn: async () => {
+      const { data: games, error } = await supabase
+        .from('event_moneyline_odds')
+        .select('*')
+        .eq('event_type', eventType)
+        .not('book_odds1', 'eq', 0)
+        .not('book_odds2', 'eq', 0)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
       // Filter based on status
       if (filter === 'upcoming') {
-        return games.filter((game) => isEventUpcoming(game.game_date));
+        return games.filter((game) => isEventUpcoming(game.event_datetime));
       } else if (filter === 'past') {
-        return games.filter((game) => !isEventUpcoming(game.game_date));
+        return games.filter((game) => !isEventUpcoming(game.event_datetime));
       }
 
       return games;

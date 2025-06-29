@@ -10,12 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useLeague } from '@/providers/LeagueProvider';
-import {
-  useUpcomingATPMatchOdds,
-  useUpcomingFightOdds,
-  useUpcomingNBAGameOdds,
-  useUpcomingNFLOdds,
-} from '@/hooks/api/use-odds';
+import { useUpcomingEventOdds } from '@/hooks/api/use-odds';
 import {
   useLikedATPMatches,
   useLikedFights,
@@ -28,6 +23,7 @@ import { generateParlayCombinations, getBetterSide } from '@/utils/parlay';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/cn';
 import { isEventUpcoming } from '@/hooks/api/use-odds';
+
 type League = 'UFC' | 'NFL' | 'NBA' | 'ATP';
 type SortOption = 'payout' | 'value' | 'probability';
 
@@ -42,13 +38,13 @@ export default function ParlayPage() {
   const [sortBy, setSortBy] = useState<SortOption>('value');
 
   // Fetch data
-  const { data: fights } = useUpcomingFightOdds('upcoming');
+  const { data: fights } = useUpcomingEventOdds('upcoming', 'ufc');
   const { data: likedFights } = useLikedFights();
-  const { data: games } = useUpcomingNFLOdds('upcoming');
+  const { data: games } = useUpcomingEventOdds('upcoming', 'nfl');
   const { data: likedGames } = useLikedNFLGames();
-  const { data: nbaGames } = useUpcomingNBAGameOdds('upcoming');
+  const { data: nbaGames } = useUpcomingEventOdds('upcoming', 'nba');
   const { data: likedNBAGames } = useLikedNBAGames();
-  const { data: atpMatches } = useUpcomingATPMatchOdds('upcoming');
+  const { data: atpMatches } = useUpcomingEventOdds('upcoming', 'atp');
   const { data: likedATPMatches } = useLikedATPMatches();
 
   // Filter liked events and get better sides
@@ -64,8 +60,8 @@ export default function ParlayPage() {
         fights
           ?.filter(
             (fight) =>
-              likedFightIds.includes(fight.fight_id) &&
-              isEventUpcoming(fight.fight_date)
+              likedFightIds.includes(fight.id) &&
+              isEventUpcoming(fight.event_date)
           )
           .map((fight) => getBetterSide(fight, 'UFC')) || []
       );
@@ -74,8 +70,7 @@ export default function ParlayPage() {
         games
           ?.filter(
             (game) =>
-              likedGameIds.includes(game.game_id) &&
-              isEventUpcoming(game.game_date)
+              likedGameIds.includes(game.id) && isEventUpcoming(game.event_date)
           )
           .map((game) => getBetterSide(game, 'NFL')) || []
       );
@@ -84,8 +79,8 @@ export default function ParlayPage() {
         nbaGames
           ?.filter(
             (game) =>
-              likedNBAGameIds.includes(game.game_id) &&
-              isEventUpcoming(game.game_date)
+              likedNBAGameIds.includes(game.id) &&
+              isEventUpcoming(game.event_date)
           )
           .map((game) => getBetterSide(game, 'NBA')) || []
       );
@@ -94,8 +89,8 @@ export default function ParlayPage() {
         atpMatches
           ?.filter(
             (match) =>
-              likedATPMatchIds.includes(match.game_id) &&
-              isEventUpcoming(match.game_date)
+              likedATPMatchIds.includes(match.id) &&
+              isEventUpcoming(match.event_date)
           )
           .map((match) => getBetterSide(match, 'ATP')) || []
       );

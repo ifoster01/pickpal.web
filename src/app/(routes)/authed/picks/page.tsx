@@ -10,13 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  isEventUpcoming,
-  useUpcomingATPMatchOdds,
-  useUpcomingFightOdds,
-  useUpcomingNBAGameOdds,
-  useUpcomingNFLOdds,
-} from '@/hooks/api/use-odds';
+import { isEventUpcoming, useUpcomingEventOdds } from '@/hooks/api/use-odds';
 import {
   useLikedATPMatches,
   useLikedFights,
@@ -37,19 +31,26 @@ export default function PicksPage() {
   const { filter } = useFilter();
 
   // UFC Data
-  const { data: fights, isLoading: isLoadingFights } =
-    useUpcomingFightOdds(filter);
+  const { data: fights, isLoading: isLoadingFights } = useUpcomingEventOdds(
+    filter,
+    'ufc'
+  );
   const { data: likedFights, likeFight, unlikeFight } = useLikedFights(filter);
   const likedFightIds = likedFights?.map((like) => like.fight_id) || [];
 
   // NFL Data
-  const { data: games, isLoading: isLoadingGames } = useUpcomingNFLOdds(filter);
+  const { data: games, isLoading: isLoadingGames } = useUpcomingEventOdds(
+    filter,
+    'nfl'
+  );
   const { data: likedGames, likeGame, unlikeGame } = useLikedNFLGames(filter);
   const likedGameIds = likedGames?.map((like) => like.game_id) || [];
 
   // NBA Data
-  const { data: nbaGames, isLoading: isLoadingNBAGames } =
-    useUpcomingNBAGameOdds(filter);
+  const { data: nbaGames, isLoading: isLoadingNBAGames } = useUpcomingEventOdds(
+    filter,
+    'nba'
+  );
   const {
     data: likedNBAGames,
     likeNBAGame,
@@ -59,7 +60,7 @@ export default function PicksPage() {
 
   // ATP Data
   const { data: atpMatches, isLoading: isLoadingATPMatches } =
-    useUpcomingATPMatchOdds(filter);
+    useUpcomingEventOdds(filter, 'atp');
   const {
     data: likedATPMatches,
     likeATPMatch,
@@ -141,20 +142,16 @@ export default function PicksPage() {
           // UFC Fights
           fights && fights.length > 0 ? (
             fights.map((fight) => {
-              const isLiked = likedFightIds.includes(fight.fight_id);
-              const isCompleted = !isEventUpcoming(fight.fight_date);
+              const isLiked = likedFightIds.includes(fight.id);
+              const isCompleted = !isEventUpcoming(fight.event_date);
 
               return (
-                <div
-                  key={fight.fight_id}
-                  className={cn(isCompleted && 'opacity-75')}
-                >
+                <div key={fight.id} className={cn(isCompleted && 'opacity-75')}>
                   <PickCard
                     event={fight}
-                    type='UFC'
                     isLiked={isLiked}
-                    onLike={() => likeFight(fight.fight_id)}
-                    onUnlike={() => unlikeFight(fight.fight_id)}
+                    onLike={() => likeFight(fight.id)}
+                    onUnlike={() => unlikeFight(fight.id)}
                     league='UFC'
                   />
                 </div>
@@ -171,20 +168,16 @@ export default function PicksPage() {
           // NFL Games
           games && games.length > 0 ? (
             games.map((game) => {
-              const isLiked = likedGameIds.includes(game.game_id);
-              const isCompleted = !isEventUpcoming(game.game_date);
+              const isLiked = likedGameIds.includes(game.id);
+              const isCompleted = !isEventUpcoming(game.event_date);
 
               return (
-                <div
-                  key={game.game_id}
-                  className={cn(isCompleted && 'opacity-75')}
-                >
+                <div key={game.id} className={cn(isCompleted && 'opacity-75')}>
                   <PickCard
                     event={game}
-                    type='NFL'
                     isLiked={isLiked}
-                    onLike={() => likeGame(game.game_id)}
-                    onUnlike={() => unlikeGame(game.game_id)}
+                    onLike={() => likeGame(game.id)}
+                    onUnlike={() => unlikeGame(game.id)}
                     league='NFL'
                   />
                 </div>
@@ -201,20 +194,16 @@ export default function PicksPage() {
           // NBA Games
           nbaGames && nbaGames.length > 0 ? (
             nbaGames.map((game) => {
-              const isLiked = likedNBAGameIds.includes(game.game_id);
-              const isCompleted = !isEventUpcoming(game.game_date);
+              const isLiked = likedNBAGameIds.includes(game.id);
+              const isCompleted = !isEventUpcoming(game.event_date);
 
               return (
-                <div
-                  key={game.game_id}
-                  className={cn(isCompleted && 'opacity-75')}
-                >
+                <div key={game.id} className={cn(isCompleted && 'opacity-75')}>
                   <PickCard
                     event={game}
-                    type='NFL'
                     isLiked={isLiked}
-                    onLike={() => likeNBAGame(game.game_id)}
-                    onUnlike={() => unlikeNBAGame(game.game_id)}
+                    onLike={() => likeNBAGame(game.id)}
+                    onUnlike={() => unlikeNBAGame(game.id)}
                     league='NBA'
                   />
                 </div>
@@ -230,20 +219,16 @@ export default function PicksPage() {
         ) : // ATP Matches
         atpMatches && atpMatches.length > 0 ? (
           atpMatches.map((match) => {
-            const isLiked = likedATPMatchIds.includes(match.game_id);
-            const isCompleted = !isEventUpcoming(match.game_date);
+            const isLiked = likedATPMatchIds.includes(match.id);
+            const isCompleted = !isEventUpcoming(match.event_date);
 
             return (
-              <div
-                key={match.game_id}
-                className={cn(isCompleted && 'opacity-75')}
-              >
+              <div key={match.id} className={cn(isCompleted && 'opacity-75')}>
                 <PickCard
                   event={match}
-                  type='ATP'
                   isLiked={isLiked}
-                  onLike={() => likeATPMatch(match.game_id)}
-                  onUnlike={() => unlikeATPMatch(match.game_id)}
+                  onLike={() => likeATPMatch(match.id)}
+                  onUnlike={() => unlikeATPMatch(match.id)}
                   league='ATP'
                 />
               </div>

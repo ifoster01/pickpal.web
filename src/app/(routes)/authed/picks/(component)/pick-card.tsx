@@ -12,24 +12,21 @@ import { PickAnalytics } from './pick-analytics';
 import { calculateProbabilityFromOdds } from '@/utils/odds';
 import Image from 'next/image';
 import { useAuth } from '@/providers/AuthProvider';
+// import { useLikesCount } from '@/hooks/api/use-likes-count';
 
-type FightOdds = Database['public']['Tables']['upcoming_fight_odds']['Row'];
-type NFLOdds = Database['public']['Tables']['upcoming_nfl_odds']['Row'];
-type NBAGameOdds = Database['public']['Tables']['upcoming_nba_odds']['Row'];
-type ATPMatchOdds = Database['public']['Tables']['upcoming_atp_odds']['Row'];
+type EventOdds = Database['public']['Tables']['event_moneyline_odds']['Row'];
 
-type Fighter = {
-  name: string | null;
-  odds: number | null;
-  bookOdds: number | null;
+type Team = {
+  name: string;
+  odds: number;
+  bookOdds: number;
   probability: number;
   bookProbability: number;
-  picUrl: string | null;
+  picUrl: string;
 };
 
 interface PickCardProps {
-  event: FightOdds | NFLOdds | NBAGameOdds | ATPMatchOdds;
-  type: 'UFC' | 'NFL' | 'NBA' | 'ATP';
+  event: EventOdds;
   isLiked?: boolean;
   onLike?: () => void;
   onUnlike?: () => void;
@@ -38,7 +35,6 @@ interface PickCardProps {
 
 export function PickCard({
   event,
-  type,
   isLiked,
   onLike,
   onUnlike,
@@ -46,132 +42,27 @@ export function PickCard({
 }: PickCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { user } = useAuth();
+  // const { data: likesCount } = useLikesCount(event., 'fight');
 
-  const fighter1: Fighter =
-    type === 'UFC'
-      ? {
-          name: (event as FightOdds).fighter1,
-          odds: (event as FightOdds).odds1,
-          bookOdds: (event as FightOdds).f1_book_odds,
-          probability: calculateProbabilityFromOdds(
-            (event as FightOdds).odds1 || 0
-          ),
-          bookProbability: calculateProbabilityFromOdds(
-            (event as FightOdds).f1_book_odds || 0
-          ),
-          picUrl: (event as FightOdds).f1_pic_url,
-        }
-      : type === 'NFL'
-        ? {
-            name: (event as NFLOdds).team_name,
-            odds: (event as NFLOdds).odds1,
-            bookOdds: (event as NFLOdds).team_book_odds,
-            probability: calculateProbabilityFromOdds(
-              (event as NFLOdds).odds1 || 0
-            ),
-            bookProbability: calculateProbabilityFromOdds(
-              (event as NFLOdds).team_book_odds || 0
-            ),
-            picUrl: (event as NFLOdds).team_pic_url,
-          }
-        : type === 'NBA'
-          ? {
-              name: (event as NBAGameOdds).team_name,
-              odds: (event as NBAGameOdds).odds1,
-              bookOdds: (event as NBAGameOdds).team_book_odds,
-              probability: calculateProbabilityFromOdds(
-                (event as NBAGameOdds).odds1 || 0
-              ),
-              bookProbability: calculateProbabilityFromOdds(
-                (event as NBAGameOdds).team_book_odds || 0
-              ),
-              picUrl: (event as NBAGameOdds).team_pic_url,
-            }
-          : type === 'ATP'
-            ? {
-                name: (event as ATPMatchOdds).team_name,
-                odds: (event as ATPMatchOdds).odds1,
-                bookOdds: (event as ATPMatchOdds).team_book_odds,
-                probability: calculateProbabilityFromOdds(
-                  (event as ATPMatchOdds).odds1 || 0
-                ),
-                bookProbability: calculateProbabilityFromOdds(
-                  (event as ATPMatchOdds).team_book_odds || 0
-                ),
-                picUrl: (event as ATPMatchOdds).team_pic_url,
-              }
-            : {
-                name: '',
-                odds: 0,
-                bookOdds: 0,
-                probability: 0,
-                bookProbability: 0,
-                picUrl: '',
-              };
+  const team1: Team = {
+    name: event.team1 || '',
+    odds: event.odds1 || 0,
+    bookOdds: event.book_odds1 || 0,
+    probability: calculateProbabilityFromOdds(event.odds1 || 0),
+    bookProbability: calculateProbabilityFromOdds(event.book_odds1 || 0),
+    picUrl: event.team1_pic_url || '',
+  };
 
-  const fighter2: Fighter =
-    type === 'UFC'
-      ? {
-          name: (event as FightOdds).fighter2,
-          odds: (event as FightOdds).odds2,
-          bookOdds: (event as FightOdds).f2_book_odds,
-          probability: calculateProbabilityFromOdds(
-            (event as FightOdds).odds2 || 0
-          ),
-          bookProbability: calculateProbabilityFromOdds(
-            (event as FightOdds).f2_book_odds || 0
-          ),
-          picUrl: (event as FightOdds).f2_pic_url,
-        }
-      : type === 'NFL'
-        ? {
-            name: (event as NFLOdds).opp_name,
-            odds: (event as NFLOdds).odds2,
-            bookOdds: (event as NFLOdds).opp_book_odds,
-            probability: calculateProbabilityFromOdds(
-              (event as NFLOdds).odds2 || 0
-            ),
-            bookProbability: calculateProbabilityFromOdds(
-              (event as NFLOdds).opp_book_odds || 0
-            ),
-            picUrl: (event as NFLOdds).opp_pic_url,
-          }
-        : type === 'NBA'
-          ? {
-              name: (event as NBAGameOdds).opp_name,
-              odds: (event as NBAGameOdds).odds2,
-              bookOdds: (event as NBAGameOdds).opp_book_odds,
-              probability: calculateProbabilityFromOdds(
-                (event as NBAGameOdds).odds2 || 0
-              ),
-              bookProbability: calculateProbabilityFromOdds(
-                (event as NBAGameOdds).opp_book_odds || 0
-              ),
-              picUrl: (event as NBAGameOdds).opp_pic_url,
-            }
-          : type === 'ATP'
-            ? {
-                name: (event as ATPMatchOdds).opp_name,
-                odds: (event as ATPMatchOdds).odds2,
-                bookOdds: (event as ATPMatchOdds).opp_book_odds,
-                probability: calculateProbabilityFromOdds(
-                  (event as ATPMatchOdds).odds2 || 0
-                ),
-                bookProbability: calculateProbabilityFromOdds(
-                  (event as ATPMatchOdds).opp_book_odds || 0
-                ),
-                picUrl: (event as ATPMatchOdds).opp_pic_url,
-              }
-            : {
-                name: '',
-                odds: 0,
-                bookOdds: 0,
-                probability: 0,
-                bookProbability: 0,
-                picUrl: '',
-              };
+  const team2: Team = {
+    name: event.team2 || '',
+    odds: event.odds2 || 0,
+    bookOdds: event.book_odds2 || 0,
+    probability: calculateProbabilityFromOdds(event.odds2 || 0),
+    bookProbability: calculateProbabilityFromOdds(event.book_odds2 || 0),
+    picUrl: event.team2_pic_url || '',
+  };
 
-  const discrepancy = Math.abs(fighter1.probability - fighter1.bookProbability);
+  const discrepancy = Math.abs(team1.probability - team1.bookProbability);
   const discrepancyLevel =
     discrepancy < 0.1 ? 'low' : discrepancy < 0.2 ? 'medium' : 'high';
 
@@ -229,8 +120,8 @@ export function PickCard({
                 )}
               >
                 <Image
-                  src={fighter1.picUrl || '/placeholder-fighter.png'}
-                  alt={fighter1.name || 'Fighter 1'}
+                  src={team1.picUrl || '/placeholder-fighter.png'}
+                  alt={team1.name || 'Fighter 1'}
                   fill
                   className='object-cover object-top'
                   sizes='100px'
@@ -244,15 +135,15 @@ export function PickCard({
                   )}
                 >
                   {league === 'UFC' || league === 'ATP'
-                    ? fighter1.name
-                    : fighter1.name?.split(' ').at(-1)}
+                    ? team1.name
+                    : team1.name?.split(' ').at(-1)}
                 </h3>
                 <div className='text-2xl font-bold text-primary flex items-center'>
-                  {fighter1.odds && fighter1.odds > 0 ? '+' : ''}
-                  {fighter1.odds}
+                  {team1.odds && team1.odds > 0 ? '+' : ''}
+                  {team1.odds}
                   <span className='text-sm text-muted-foreground ml-2'>
-                    ({fighter1.bookOdds && fighter1.bookOdds > 0 ? '+' : ''}
-                    {fighter1.bookOdds ? fighter1.bookOdds : 'N/A'} book)
+                    ({team1.bookOdds && team1.bookOdds > 0 ? '+' : ''}
+                    {team1.bookOdds ? team1.bookOdds : 'N/A'} book)
                   </span>
                 </div>
               </div>
@@ -268,21 +159,21 @@ export function PickCard({
                   <div className='flex justify-between text-sm mb-1'>
                     <span>Model Prediction</span>
                     <span>
-                      {Math.round(fighter1.probability * 100)}% -{' '}
-                      {Math.round(fighter2.probability * 100)}%
+                      {Math.round(team1.probability * 100)}% -{' '}
+                      {Math.round(team2.probability * 100)}%
                     </span>
                   </div>
-                  <Progress value={fighter1.probability * 100} />
+                  <Progress value={team1.probability * 100} />
                 </div>
                 <div>
                   <div className='flex justify-between text-sm mb-1'>
                     <span>Sports Book</span>
                     <span>
-                      {Math.round(fighter1.bookProbability * 100)}% -{' '}
-                      {Math.round(fighter2.bookProbability * 100)}%
+                      {Math.round(team1.bookProbability * 100)}% -{' '}
+                      {Math.round(team2.bookProbability * 100)}%
                     </span>
                   </div>
-                  <Progress value={fighter1.bookProbability * 100} />
+                  <Progress value={team1.bookProbability * 100} />
                 </div>
               </div>
             </div>
@@ -297,16 +188,16 @@ export function PickCard({
                   )}
                 >
                   {league === 'UFC' || league === 'ATP'
-                    ? fighter2.name
-                    : fighter2.name?.split(' ').at(-1)}
+                    ? team2.name
+                    : team2.name?.split(' ').at(-1)}
                 </h3>
                 <div className='text-2xl font-bold text-primary flex items-center'>
                   <span className='text-sm text-muted-foreground mr-2'>
-                    ({fighter2.bookOdds && fighter2.bookOdds > 0 ? '+' : ''}
-                    {fighter2.bookOdds ? fighter2.bookOdds : 'N/A'} book)
+                    ({team2.bookOdds && team2.bookOdds > 0 ? '+' : ''}
+                    {team2.bookOdds ? team2.bookOdds : 'N/A'} book)
                   </span>
-                  {fighter2.odds && fighter2.odds > 0 ? '+' : ''}
-                  {fighter2.odds}
+                  {team2.odds && team2.odds > 0 ? '+' : ''}
+                  {team2.odds}
                 </div>
               </div>
               <div
@@ -316,8 +207,8 @@ export function PickCard({
                 )}
               >
                 <Image
-                  src={fighter2.picUrl || '/placeholder-fighter.png'}
-                  alt={fighter2.name || 'Fighter 2'}
+                  src={team2.picUrl || '/placeholder-fighter.png'}
+                  alt={team2.name || 'Fighter 2'}
                   fill
                   className='object-cover object-top'
                   sizes='100px'
@@ -358,10 +249,8 @@ export function PickCard({
             >
               <div className='px-6 pb-6'>
                 <PickAnalytics
-                  event={event}
-                  type={type}
-                  fighter1={fighter1}
-                  fighter2={fighter2}
+                  team1={team1}
+                  team2={team2}
                   discrepancy={discrepancyLevel}
                 />
               </div>

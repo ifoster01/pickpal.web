@@ -9,25 +9,22 @@ type LikedFight = Database['public']['Tables']['liked_fights']['Row'];
 type LikedNFLGame = Database['public']['Tables']['liked_nfl_games']['Row'];
 type LikedNBAGame = Database['public']['Tables']['liked_nba_games']['Row'];
 type LikedATPMatch = Database['public']['Tables']['liked_atp_games']['Row'];
-type FightOdds = Database['public']['Tables']['upcoming_fight_odds']['Row'];
-type NFLOdds = Database['public']['Tables']['upcoming_nfl_odds']['Row'];
-type NBAGameOdds = Database['public']['Tables']['upcoming_nba_odds']['Row'];
-type ATPMatchOdds = Database['public']['Tables']['upcoming_atp_odds']['Row'];
+type EventOdds = Database['public']['Tables']['event_moneyline_odds']['Row'];
 
 type EnrichedLikedFight = LikedFight & {
-  upcoming_fight_odds: FightOdds | null;
+  upcoming_fight_odds: EventOdds | null;
 };
 
 type EnrichedLikedNFLGame = LikedNFLGame & {
-  upcoming_nfl_odds: NFLOdds | null;
+  upcoming_nfl_odds: EventOdds | null;
 };
 
 type EnrichedLikedNBAGame = LikedNBAGame & {
-  upcoming_nba_odds: NBAGameOdds | null;
+  upcoming_nba_odds: EventOdds | null;
 };
 
 type EnrichedLikedATPMatch = LikedATPMatch & {
-  upcoming_atp_odds: ATPMatchOdds | null;
+  upcoming_atp_odds: EventOdds | null;
 };
 
 type Filter = 'upcoming' | 'past' | 'all';
@@ -43,13 +40,13 @@ function filterEvents<
   return events.filter((event) => {
     const date =
       'upcoming_fight_odds' in event
-        ? event.upcoming_fight_odds?.fight_date
+        ? event.upcoming_fight_odds?.event_date
         : 'upcoming_nfl_odds' in event
-          ? event.upcoming_nfl_odds?.game_date
+          ? event.upcoming_nfl_odds?.event_date
           : 'upcoming_nba_odds' in event
-            ? event.upcoming_nba_odds?.game_date
+            ? event.upcoming_nba_odds?.event_date
             : 'upcoming_atp_odds' in event
-              ? event.upcoming_atp_odds?.game_date
+              ? event.upcoming_atp_odds?.event_date
               : null;
 
     if (!date) return true;
@@ -117,8 +114,9 @@ export function useLikedFights(filter: Filter = 'upcoming') {
 
       // Then, get all the fight odds
       const { data: fightOdds, error: oddsError } = await supabase
-        .from('upcoming_fight_odds')
-        .select('*');
+        .from('event_moneyline_odds')
+        .select('*')
+        .eq('event_type', 'ufc');
 
       if (oddsError) throw oddsError;
 
@@ -126,7 +124,7 @@ export function useLikedFights(filter: Filter = 'upcoming') {
       const enrichedLikes: EnrichedLikedFight[] = likedFights.map((like) => ({
         ...like,
         upcoming_fight_odds:
-          fightOdds.find((odds) => odds.fight_id === like.fight_id) || null,
+          fightOdds.find((odds) => odds.id === like.fight_id) || null,
       }));
 
       // Apply filtering
@@ -174,8 +172,8 @@ export function useLikedFights(filter: Filter = 'upcoming') {
         id: Math.random(), // temporary ID
         upcoming_fight_odds:
           queryClient
-            .getQueryData<FightOdds[]>(['upcoming_fight_odds'])
-            ?.find((fight) => fight.fight_id === fightId) || null,
+            .getQueryData<EventOdds[]>(['event_moneyline_odds'])
+            ?.find((fight) => fight.id === fightId) || null,
       };
 
       queryClient.setQueryData<EnrichedLikedFight[]>(
@@ -322,8 +320,9 @@ export function useLikedNFLGames(filter: Filter = 'upcoming') {
 
       // Then, get all the NFL odds
       const { data: nflOdds, error: oddsError } = await supabase
-        .from('upcoming_nfl_odds')
-        .select('*');
+        .from('event_moneyline_odds')
+        .select('*')
+        .eq('event_type', 'nfl');
 
       if (oddsError) throw oddsError;
 
@@ -331,7 +330,7 @@ export function useLikedNFLGames(filter: Filter = 'upcoming') {
       const enrichedLikes: EnrichedLikedNFLGame[] = likedGames.map((like) => ({
         ...like,
         upcoming_nfl_odds:
-          nflOdds.find((odds) => odds.game_id === like.game_id) || null,
+          nflOdds.find((odds) => odds.id === like.game_id) || null,
       }));
 
       // Apply filtering
@@ -379,8 +378,8 @@ export function useLikedNFLGames(filter: Filter = 'upcoming') {
         id: Math.random(), // temporary ID
         upcoming_nfl_odds:
           queryClient
-            .getQueryData<NFLOdds[]>(['upcoming_nfl_odds'])
-            ?.find((game) => game.game_id === gameId) || null,
+            .getQueryData<EventOdds[]>(['event_moneyline_odds'])
+            ?.find((game) => game.id === gameId) || null,
       };
 
       queryClient.setQueryData<EnrichedLikedNFLGame[]>(
@@ -527,8 +526,9 @@ export function useLikedNBAGames(filter: Filter = 'upcoming') {
 
       // Then, get all the NBA odds
       const { data: nbaOdds, error: oddsError } = await supabase
-        .from('upcoming_nba_odds')
-        .select('*');
+        .from('event_moneyline_odds')
+        .select('*')
+        .eq('event_type', 'nba');
 
       if (oddsError) throw oddsError;
 
@@ -536,7 +536,7 @@ export function useLikedNBAGames(filter: Filter = 'upcoming') {
       const enrichedLikes: EnrichedLikedNBAGame[] = likedGames.map((like) => ({
         ...like,
         upcoming_nba_odds:
-          nbaOdds.find((odds) => odds.game_id === like.game_id) || null,
+          nbaOdds.find((odds) => odds.id === like.game_id) || null,
       }));
 
       // Apply filtering
@@ -584,8 +584,8 @@ export function useLikedNBAGames(filter: Filter = 'upcoming') {
         id: Math.random(), // temporary ID
         upcoming_nba_odds:
           queryClient
-            .getQueryData<NBAGameOdds[]>(['upcoming_nba_odds'])
-            ?.find((game) => game.game_id === gameId) || null,
+            .getQueryData<EventOdds[]>(['event_moneyline_odds'])
+            ?.find((game) => game.id === gameId) || null,
       };
 
       queryClient.setQueryData<EnrichedLikedNBAGame[]>(
@@ -732,8 +732,9 @@ export function useLikedATPMatches(filter: Filter = 'upcoming') {
 
       // Then, get all the ATP odds
       const { data: atpOdds, error: oddsError } = await supabase
-        .from('upcoming_atp_odds')
-        .select('*');
+        .from('event_moneyline_odds')
+        .select('*')
+        .eq('event_type', 'atp');
 
       if (oddsError) throw oddsError;
 
@@ -741,7 +742,7 @@ export function useLikedATPMatches(filter: Filter = 'upcoming') {
       const enrichedLikes: EnrichedLikedATPMatch[] = likedGames.map((like) => ({
         ...like,
         upcoming_atp_odds:
-          atpOdds.find((odds) => odds.game_id === like.game_id) || null,
+          atpOdds.find((odds) => odds.id === like.game_id) || null,
       }));
 
       // Apply filtering
@@ -789,8 +790,8 @@ export function useLikedATPMatches(filter: Filter = 'upcoming') {
         id: Math.random(), // temporary ID
         upcoming_atp_odds:
           queryClient
-            .getQueryData<ATPMatchOdds[]>(['upcoming_atp_odds'])
-            ?.find((game) => game.game_id === gameId) || null,
+            .getQueryData<EventOdds[]>(['event_moneyline_odds'])
+            ?.find((game) => game.id === gameId) || null,
       };
 
       queryClient.setQueryData<EnrichedLikedATPMatch[]>(

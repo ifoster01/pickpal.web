@@ -11,14 +11,8 @@ import { Card } from '@/components/ui/card';
 //   Tooltip,
 //   ResponsiveContainer,
 // } from 'recharts';
-import { Database } from '@/types/supabase';
 
-type FightOdds = Database['public']['Tables']['upcoming_fight_odds']['Row'];
-type NFLOdds = Database['public']['Tables']['upcoming_nfl_odds']['Row'];
-type NBAGameOdds = Database['public']['Tables']['upcoming_nba_odds']['Row'];
-type ATPMatchOdds = Database['public']['Tables']['upcoming_atp_odds']['Row'];
-
-type Fighter = {
+type Team = {
   name: string | null;
   odds: number | null;
   bookOdds: number | null;
@@ -28,16 +22,14 @@ type Fighter = {
 };
 
 interface PickAnalyticsProps {
-  event: FightOdds | NFLOdds | NBAGameOdds | ATPMatchOdds;
-  type: 'UFC' | 'NFL' | 'NBA' | 'ATP';
-  fighter1: Fighter;
-  fighter2: Fighter;
+  team1: Team;
+  team2: Team;
   discrepancy: 'low' | 'medium' | 'high';
 }
 
 export function PickAnalytics({
-  fighter1,
-  fighter2,
+  team1,
+  team2,
   discrepancy,
 }: PickAnalyticsProps) {
   // Sample historical data - in a real app, this would come from your API
@@ -60,10 +52,9 @@ export function PickAnalytics({
   //   },
   // ];
 
-  const modelConfidence =
-    Math.max(fighter1.probability, fighter2.probability) * 100;
+  const modelConfidence = Math.max(team1.probability, team2.probability) * 100;
   const edgeVsMarket = Math.abs(
-    (fighter1.probability - fighter1.bookProbability) * 100
+    (team1.probability - team1.bookProbability) * 100
   ).toFixed(1);
 
   return (

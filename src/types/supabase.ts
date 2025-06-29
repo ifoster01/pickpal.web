@@ -58,6 +58,72 @@ export type Database = {
         };
         Relationships: [];
       };
+      event_moneyline_odds: {
+        Row: {
+          book_odds1: number | null;
+          book_odds2: number | null;
+          created_at: string;
+          event_date: string | null;
+          event_datetime: string | null;
+          event_name: string | null;
+          event_type: string | null;
+          id: string;
+          odds1: number | null;
+          odds2: number | null;
+          team1: string | null;
+          team1_name: string | null;
+          team1_pic_png: string | null;
+          team1_pic_url: string | null;
+          team2: string | null;
+          team2_name: string | null;
+          team2_pic_png: string | null;
+          team2_pic_url: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          book_odds1?: number | null;
+          book_odds2?: number | null;
+          created_at?: string;
+          event_date?: string | null;
+          event_datetime?: string | null;
+          event_name?: string | null;
+          event_type?: string | null;
+          id?: string;
+          odds1?: number | null;
+          odds2?: number | null;
+          team1?: string | null;
+          team1_name?: string | null;
+          team1_pic_png?: string | null;
+          team1_pic_url?: string | null;
+          team2?: string | null;
+          team2_name?: string | null;
+          team2_pic_png?: string | null;
+          team2_pic_url?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          book_odds1?: number | null;
+          book_odds2?: number | null;
+          created_at?: string;
+          event_date?: string | null;
+          event_datetime?: string | null;
+          event_name?: string | null;
+          event_type?: string | null;
+          id?: string;
+          odds1?: number | null;
+          odds2?: number | null;
+          team1?: string | null;
+          team1_name?: string | null;
+          team1_pic_png?: string | null;
+          team1_pic_url?: string | null;
+          team2?: string | null;
+          team2_name?: string | null;
+          team2_pic_png?: string | null;
+          team2_pic_url?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
       liked_atp_games: {
         Row: {
           game_id: string | null;
@@ -150,10 +216,43 @@ export type Database = {
         };
         Relationships: [];
       };
+      moneyline_book_odds_data: {
+        Row: {
+          created_at: string;
+          event_id: string | null;
+          id: string;
+          odds1: number | null;
+          odds2: number | null;
+        };
+        Insert: {
+          created_at?: string;
+          event_id?: string | null;
+          id?: string;
+          odds1?: number | null;
+          odds2?: number | null;
+        };
+        Update: {
+          created_at?: string;
+          event_id?: string | null;
+          id?: string;
+          odds1?: number | null;
+          odds2?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'odds_data_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'event_moneyline_odds';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       upcoming_atp_odds: {
         Row: {
           created_at: string;
           game_date: string | null;
+          game_datetime: string | null;
           game_id: string;
           game_name: string | null;
           odds1: number | null;
@@ -170,6 +269,7 @@ export type Database = {
         Insert: {
           created_at?: string;
           game_date?: string | null;
+          game_datetime?: string | null;
           game_id: string;
           game_name?: string | null;
           odds1?: number | null;
@@ -186,6 +286,7 @@ export type Database = {
         Update: {
           created_at?: string;
           game_date?: string | null;
+          game_datetime?: string | null;
           game_id?: string;
           game_name?: string | null;
           odds1?: number | null;
@@ -362,6 +463,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      append_number_to_array: {
+        Args: { element_to_append: number; row_id: string };
+        Returns: undefined;
+      };
       delete_user: {
         Args: Record<PropertyKey, never>;
         Returns: undefined;
@@ -376,27 +481,29 @@ export type Database = {
   };
 };
 
-type PublicSchema = Database[Extract<keyof Database, 'public'>];
+type DefaultSchema = Database[Extract<keyof Database, 'public'>];
 
 export type Tables<
-  PublicTableNameOrOptions extends
-    | keyof (PublicSchema['Tables'] & PublicSchema['Views'])
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions['schema']]['Tables'] &
-        Database[PublicTableNameOrOptions['schema']]['Views'])
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database;
+  }
+    ? keyof (Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+        Database[DefaultSchemaTableNameOrOptions['schema']]['Views'])
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions['schema']]['Tables'] &
-      Database[PublicTableNameOrOptions['schema']]['Views'])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+      Database[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
       Row: infer R;
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] &
-        PublicSchema['Views'])
-    ? (PublicSchema['Tables'] &
-        PublicSchema['Views'])[PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] &
+        DefaultSchema['Views'])
+    ? (DefaultSchema['Tables'] &
+        DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R;
       }
       ? R
@@ -404,20 +511,22 @@ export type Tables<
     : never;
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema['Tables']
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema['Tables']
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database;
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Insert: infer I;
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I;
       }
       ? I
@@ -425,20 +534,22 @@ export type TablesInsert<
     : never;
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema['Tables']
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema['Tables']
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database;
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Update: infer U;
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U;
       }
       ? U
@@ -446,21 +557,23 @@ export type TablesUpdate<
     : never;
 
 export type Enums<
-  PublicEnumNameOrOptions extends
-    | keyof PublicSchema['Enums']
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema['Enums']
     | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions['schema']]['Enums']
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof Database;
+  }
+    ? keyof Database[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
     : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
-    ? PublicSchema['Enums'][PublicEnumNameOrOptions]
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
+    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
     : never;
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof PublicSchema['CompositeTypes']
+    | keyof DefaultSchema['CompositeTypes']
     | { schema: keyof Database },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof Database;
@@ -469,6 +582,15 @@ export type CompositeTypes<
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
   ? Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema['CompositeTypes']
-    ? PublicSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
+    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
     : never;
+
+export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {},
+  },
+} as const;

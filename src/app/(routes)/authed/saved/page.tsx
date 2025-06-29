@@ -134,18 +134,17 @@ export default function SavedPage() {
                 const fight = like.upcoming_fight_odds;
                 if (!fight) return null;
 
-                const isCompleted = !isEventUpcoming(fight.fight_date);
+                const isCompleted = !isEventUpcoming(fight.event_date);
 
                 return (
                   <div
-                    key={fight.fight_id}
+                    key={fight.id}
                     className={cn(isCompleted && 'opacity-75')}
                   >
                     <PickCard
                       event={fight}
-                      type='UFC'
                       isLiked={true}
-                      onUnlike={() => unlikeFight(fight.fight_id)}
+                      onUnlike={() => unlikeFight(fight.id)}
                       league='UFC'
                     />
                   </div>
@@ -168,18 +167,17 @@ export default function SavedPage() {
                 const game = like.upcoming_nfl_odds;
                 if (!game) return null;
 
-                const isCompleted = !isEventUpcoming(game.game_date);
+                const isCompleted = !isEventUpcoming(game.event_date);
 
                 return (
                   <div
-                    key={game.game_id}
+                    key={game.id}
                     className={cn(isCompleted && 'opacity-75')}
                   >
                     <PickCard
                       event={game}
-                      type='NFL'
                       isLiked={true}
-                      onUnlike={() => unlikeGame(game.game_id)}
+                      onUnlike={() => unlikeGame(game.id)}
                       league='NFL'
                     />
                   </div>
@@ -202,18 +200,17 @@ export default function SavedPage() {
                 const game = like.upcoming_nba_odds;
                 if (!game) return null;
 
-                const isCompleted = !isEventUpcoming(game.game_date);
+                const isCompleted = !isEventUpcoming(game.event_date);
 
                 return (
                   <div
-                    key={game.game_id}
+                    key={game.id}
                     className={cn(isCompleted && 'opacity-75')}
                   >
                     <PickCard
                       event={game}
-                      type='NBA'
                       isLiked={true}
-                      onUnlike={() => unlikeNBAGame(game.game_id)}
+                      onUnlike={() => unlikeNBAGame(game.id)}
                       league='NBA'
                     />
                   </div>
@@ -236,18 +233,17 @@ export default function SavedPage() {
                 const game = like.upcoming_atp_odds;
                 if (!game) return null;
 
-                const isCompleted = !isEventUpcoming(game.game_date);
+                const isCompleted = !isEventUpcoming(game.event_date);
 
                 return (
                   <div
-                    key={game.game_id}
+                    key={game.id}
                     className={cn(isCompleted && 'opacity-75')}
                   >
                     <PickCard
                       event={game}
-                      type='ATP'
                       isLiked={true}
-                      onUnlike={() => unlikeATPMatch(game.game_id)}
+                      onUnlike={() => unlikeATPMatch(game.id)}
                       league='ATP'
                     />
                   </div>

@@ -114,8 +114,8 @@ export default function ForgotPassword() {
                 </div>
                 <h3 className='text-xl font-semibold'>Check Your Email</h3>
                 <p className='text-muted-foreground max-w-sm'>
-                  We&apos;ve sent a password reset link to your email address. Please
-                  check your inbox and follow the instructions.
+                  We&apos;ve sent a password reset link to your email address.
+                  Please check your inbox and follow the instructions.
                 </p>
                 <p className='text-muted-foreground'>
                   (You can close this page)
