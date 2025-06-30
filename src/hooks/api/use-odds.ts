@@ -25,8 +25,6 @@ export function useUpcomingEventOdds(
         .from('event_moneyline_odds')
         .select('*')
         .eq('event_type', eventType)
-        .not('book_odds1', 'eq', 0)
-        .not('book_odds2', 'eq', 0)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
