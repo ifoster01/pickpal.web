@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Download, Link2 } from 'lucide-react';
 import Link from 'next/link';
-import PickpocktIcon from '~/assets/logos/pickpockt-icon.png';
+import PickpocktIcon from '~/assets/logos/icon.png';
 export function MobileApp() {
   return (
     <section
