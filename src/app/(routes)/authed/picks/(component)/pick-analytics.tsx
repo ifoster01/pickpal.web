@@ -59,7 +59,7 @@ export function PickAnalytics({
     >
       <div className='grid grid-cols-1 gap-6'>
         <Card className='p-4'>
-          <h4 className='text-sm font-semibold mb-4'>Odds Movement</h4>
+          <h4 className='text-sm font-semibold mb-4'>Book Odds Movement</h4>
           <div className='h-[200px]'>
             <ResponsiveContainer width='100%' height='100%'>
               <LineChart data={historicalData}>
