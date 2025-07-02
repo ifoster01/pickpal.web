@@ -12,6 +12,25 @@ export function isEventUpcoming(eventDate: string | null): boolean {
   );
 }
 
+export function useEventOdds(eventId: string) {
+  const supabase = createClient();
+
+  return useQuery({
+    queryKey: ['event_odds', eventId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('moneyline_book_odds_data')
+        .select('*')
+        .eq('event_id', eventId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      return data;
+    },
+  });
+}
+
 export function useUpcomingEventOdds(
   filter: Filter = 'upcoming',
   eventType: League

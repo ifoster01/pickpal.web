@@ -254,6 +254,7 @@ export function PickCard({
             >
               <div className='px-6 pb-6'>
                 <PickAnalytics
+                  eventId={event.id}
                   team1={team1}
                   team2={team2}
                   discrepancy={discrepancyLevel}

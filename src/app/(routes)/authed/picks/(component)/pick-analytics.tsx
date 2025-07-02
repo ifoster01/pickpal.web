@@ -2,15 +2,17 @@
 
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
-// import {
-//   LineChart,
-//   Line,
-//   XAxis,
-//   YAxis,
-//   CartesianGrid,
-//   Tooltip,
-//   ResponsiveContainer,
-// } from 'recharts';
+import { useEventOdds } from '@/hooks/api/use-odds';
+import { useMemo } from 'react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
 type Team = {
   name: string | null;
@@ -22,35 +24,26 @@ type Team = {
 };
 
 interface PickAnalyticsProps {
+  eventId: string;
   team1: Team;
   team2: Team;
   discrepancy: 'low' | 'medium' | 'high';
 }
 
 export function PickAnalytics({
+  eventId,
   team1,
   team2,
   discrepancy,
 }: PickAnalyticsProps) {
-  // Sample historical data - in a real app, this would come from your API
-  // const historicalData = [
-  //   { date: 'Jan', odds1: fighter1.odds || 0, odds2: fighter2.odds || 0 },
-  //   {
-  //     date: 'Feb',
-  //     odds1: fighter1.odds ? fighter1.odds - 5 : 0,
-  //     odds2: fighter2.odds ? fighter2.odds + 5 : 0,
-  //   },
-  //   {
-  //     date: 'Mar',
-  //     odds1: fighter1.odds ? fighter1.odds - 10 : 0,
-  //     odds2: fighter2.odds ? fighter2.odds + 10 : 0,
-  //   },
-  //   {
-  //     date: 'Apr',
-  //     odds1: fighter1.bookOdds || 0,
-  //     odds2: fighter2.bookOdds || 0,
-  //   },
-  // ];
+  const { data: odds } = useEventOdds(eventId);
+  const historicalData = useMemo(() => {
+    return odds?.map((odd) => ({
+      date: new Date(odd.created_at).toLocaleDateString(),
+      odds1: odd.odds1,
+      odds2: odd.odds2,
+    }));
+  }, [odds]);
 
   const modelConfidence = Math.max(team1.probability, team2.probability) * 100;
   const edgeVsMarket = Math.abs(
@@ -65,31 +58,31 @@ export function PickAnalytics({
       className='space-y-6'
     >
       <div className='grid grid-cols-1 gap-6'>
-        {/* <Card className="p-4">
-          <h4 className="text-sm font-semibold mb-4">Odds Movement</h4>
-          <div className="h-[200px]">
-            <ResponsiveContainer width="100%" height="100%">
+        <Card className='p-4'>
+          <h4 className='text-sm font-semibold mb-4'>Odds Movement</h4>
+          <div className='h-[200px]'>
+            <ResponsiveContainer width='100%' height='100%'>
               <LineChart data={historicalData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
+                <CartesianGrid strokeDasharray='3 3' />
+                <XAxis dataKey='date' />
                 <YAxis />
                 <Tooltip />
                 <Line
-                  type="monotone"
-                  dataKey="odds1"
-                  stroke="hsl(var(--primary))"
-                  name={fighter1.name || type === 'UFC' ? 'Fighter 1' : 'Team'}
+                  type='monotone'
+                  dataKey='odds1'
+                  stroke='hsl(var(--primary))'
+                  name={team1.name || 'Team'}
                 />
                 <Line
-                  type="monotone"
-                  dataKey="odds2"
-                  stroke="hsl(var(--muted-foreground))"
-                  name={fighter2.name || type === 'UFC' ? 'Fighter 2' : 'Opponent'}
+                  type='monotone'
+                  dataKey='odds2'
+                  stroke='hsl(var(--primary))'
+                  name={team2.name || 'Opponent'}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </Card> */}
+        </Card>
 
         <Card className='p-4'>
           <h4 className='text-sm font-semibold mb-4'>Key Statistics</h4>
