@@ -13,6 +13,9 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/utils/cn';
 
 type Team = {
   name: string | null;
@@ -45,6 +48,14 @@ export function PickAnalytics({
     }));
   }, [odds]);
 
+  const modelFavoriteBookOddsMovement = useMemo(() => {
+    if (!odds?.length || odds.length < 2) return 0;
+    const lastOdd = odds[odds.length - 1];
+    const secondLastOdd = odds[odds.length - 2];
+    if (!lastOdd.odds1 || !secondLastOdd.odds1) return 0;
+    return lastOdd.odds1 - secondLastOdd.odds1;
+  }, [odds]);
+
   const modelConfidence = Math.max(team1.probability, team2.probability) * 100;
   const edgeVsMarket = Math.abs(
     (team1.probability - team1.bookProbability) * 100
@@ -58,31 +69,33 @@ export function PickAnalytics({
       className='space-y-6'
     >
       <div className='grid grid-cols-1 gap-6'>
-        <Card className='p-4'>
-          <h4 className='text-sm font-semibold mb-4'>Book Odds Movement</h4>
-          <div className='h-[200px]'>
-            <ResponsiveContainer width='100%' height='100%'>
-              <LineChart data={historicalData}>
-                <CartesianGrid strokeDasharray='3 3' />
-                <XAxis dataKey='date' />
-                <YAxis />
-                <Tooltip />
-                <Line
-                  type='monotone'
-                  dataKey='odds1'
-                  stroke='hsl(var(--primary))'
-                  name={team1.name || 'Team'}
-                />
-                <Line
-                  type='monotone'
-                  dataKey='odds2'
-                  stroke='hsl(var(--primary))'
-                  name={team2.name || 'Opponent'}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
+        {odds?.length && odds.length > 0 && (
+          <Card className='p-4'>
+            <h4 className='text-sm font-semibold mb-4'>Book Odds Movement</h4>
+            <div className='h-[200px]'>
+              <ResponsiveContainer width='100%' height='100%'>
+                <LineChart data={historicalData}>
+                  <CartesianGrid strokeDasharray='3 3' />
+                  <XAxis dataKey='date' />
+                  <YAxis />
+                  <Tooltip />
+                  <Line
+                    type='monotone'
+                    dataKey='odds1'
+                    stroke='hsl(var(--primary))'
+                    name={team1.name || 'Team'}
+                  />
+                  <Line
+                    type='monotone'
+                    dataKey='odds2'
+                    stroke='hsl(var(--primary))'
+                    name={team2.name || 'Opponent'}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        )}
 
         <Card className='p-4'>
           <h4 className='text-sm font-semibold mb-4'>Key Statistics</h4>
@@ -103,6 +116,30 @@ export function PickAnalytics({
               <p className='text-sm text-muted-foreground'>Model Advantage</p>
               <p className='text-lg font-semibold capitalize'>{discrepancy}</p>
             </div>
+            {odds?.length && odds.length > 1 && (
+              <div>
+                <p className='text-sm text-muted-foreground'>
+                  Model Favorite Book Odds Movement
+                </p>
+                <p className='text-lg font-semibold capitalize'>
+                  <Badge
+                    className={cn(
+                      'flex items-center gap-2 w-fit',
+                      modelFavoriteBookOddsMovement > 0
+                        ? 'bg-green-100 text-green-500'
+                        : 'bg-red-100 text-red-500'
+                    )}
+                  >
+                    {modelFavoriteBookOddsMovement > 0 ? (
+                      <ArrowUpIcon className='w-4 h-4' />
+                    ) : (
+                      <ArrowDownIcon className='w-4 h-4' />
+                    )}
+                    {modelFavoriteBookOddsMovement}
+                  </Badge>
+                </p>
+              </div>
+            )}
           </div>
         </Card>
       </div>
