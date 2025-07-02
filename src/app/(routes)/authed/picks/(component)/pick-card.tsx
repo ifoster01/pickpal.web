@@ -63,6 +63,8 @@ export function PickCard({
     picUrl: event.team2_pic_url || '',
   };
 
+  const modelFavorite = team1.odds < team2.odds ? 'team1' : 'team2';
+
   const discrepancy = Math.abs(team1.probability - team1.bookProbability);
   const discrepancyLevel =
     discrepancy < 0.1 ? 'low' : discrepancy < 0.2 ? 'medium' : 'high';
@@ -258,6 +260,7 @@ export function PickCard({
                   team1={team1}
                   team2={team2}
                   discrepancy={discrepancyLevel}
+                  modelFavorite={modelFavorite}
                 />
               </div>
             </motion.div>
