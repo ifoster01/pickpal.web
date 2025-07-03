@@ -2,8 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
-import { useEventOdds } from '@/hooks/api/use-odds';
-import { useMemo } from 'react';
 import {
   LineChart,
   Line,
@@ -13,13 +11,14 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  MinusIcon,
-} from 'lucide-react';
+import { ArrowDownIcon, ArrowUpIcon, MinusIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/utils/cn';
+import { Database } from '@/types/supabase';
+import { useMemo } from 'react';
+
+type EventOdds =
+  Database['public']['Tables']['moneyline_book_odds_data']['Row'];
 
 type Team = {
   name: string | null;
@@ -31,21 +30,20 @@ type Team = {
 };
 
 interface PickAnalyticsProps {
-  eventId: string;
+  odds: EventOdds[];
   team1: Team;
   team2: Team;
   discrepancy: 'low' | 'medium' | 'high';
-  modelFavorite: 'team1' | 'team2';
+  modelFavoriteBookOddsMovement: number;
 }
 
 export function PickAnalytics({
-  eventId,
+  odds,
   team1,
   team2,
   discrepancy,
-  modelFavorite,
+  modelFavoriteBookOddsMovement,
 }: PickAnalyticsProps) {
-  const { data: odds } = useEventOdds(eventId);
   const historicalData = useMemo(() => {
     return odds?.map((odd) => ({
       date: new Date(odd.created_at).toLocaleDateString(),
@@ -53,32 +51,6 @@ export function PickAnalytics({
       odds2: odd.odds2,
     }));
   }, [odds]);
-
-  const modelFavoriteBookOddsMovement = useMemo(() => {
-    if (!odds?.length || odds.length < 2) return 0;
-    const lastOdd = odds[odds.length - 1];
-    const secondLastOdd = odds[odds.length - 2];
-
-    // get the model favorite
-    const modelFavoriteOdds =
-      modelFavorite === 'team1' ? lastOdd.odds1 : lastOdd.odds2;
-    const secondLastModelFavoriteOdds =
-      modelFavorite === 'team1' ? secondLastOdd.odds1 : secondLastOdd.odds2;
-
-    if (!modelFavoriteOdds || !secondLastModelFavoriteOdds) return 0;
-
-    if (modelFavoriteOdds > 0 && secondLastModelFavoriteOdds < 0) {
-      const moveAbove100 = modelFavoriteOdds - 100;
-      const moveBelow100 = Math.abs(secondLastModelFavoriteOdds) - 100;
-      return moveAbove100 + moveBelow100;
-    } else if (modelFavoriteOdds < 0 && secondLastModelFavoriteOdds > 0) {
-      const moveBelow100 = Math.abs(modelFavoriteOdds) - 100;
-      const moveAbove100 = secondLastModelFavoriteOdds - 100;
-      return moveBelow100 + moveAbove100;
-    } else {
-      return modelFavoriteOdds - secondLastModelFavoriteOdds;
-    }
-  }, [odds, modelFavorite]);
 
   const modelConfidence = Math.max(team1.probability, team2.probability) * 100;
   const edgeVsMarket = Math.abs(

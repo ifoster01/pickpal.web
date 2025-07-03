@@ -1,12 +1,19 @@
 'use client';
 
 import { Database } from '@/types/supabase';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, Heart, User } from 'lucide-react';
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  ChevronDown,
+  Heart,
+  MinusIcon,
+  User,
+} from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { PickAnalytics } from './pick-analytics';
 import { calculateProbabilityFromOdds } from '@/utils/odds';
@@ -14,6 +21,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/providers/AuthProvider';
 import { useLikesCount } from '@/hooks/api/use-likes-count';
 import { League } from '@/providers/LeagueProvider';
+import { useEventOdds } from '@/hooks/api/use-odds';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 
 type EventOdds = Database['public']['Tables']['event_moneyline_odds']['Row'];
 
@@ -78,6 +88,68 @@ export function PickCard({
     }
   };
 
+  const { data: odds } = useEventOdds(event.id);
+
+  const modelFavoriteBookOddsMovement = useMemo(() => {
+    if (!odds?.length || odds.length < 2) return 0;
+    const lastOdd = odds[odds.length - 1];
+    const secondLastOdd = odds[odds.length - 2];
+
+    // get the model favorite
+    const modelFavoriteOdds =
+      modelFavorite === 'team1' ? lastOdd.odds1 : lastOdd.odds2;
+    const secondLastModelFavoriteOdds =
+      modelFavorite === 'team1' ? secondLastOdd.odds1 : secondLastOdd.odds2;
+
+    if (!modelFavoriteOdds || !secondLastModelFavoriteOdds) return 0;
+
+    if (modelFavoriteOdds > 0 && secondLastModelFavoriteOdds < 0) {
+      const moveAbove100 = modelFavoriteOdds - 100;
+      const moveBelow100 = Math.abs(secondLastModelFavoriteOdds) - 100;
+      return moveAbove100 + moveBelow100;
+    } else if (modelFavoriteOdds < 0 && secondLastModelFavoriteOdds > 0) {
+      const moveBelow100 = Math.abs(modelFavoriteOdds) - 100;
+      const moveAbove100 = secondLastModelFavoriteOdds - 100;
+      return moveBelow100 + moveAbove100;
+    } else {
+      return modelFavoriteOdds - secondLastModelFavoriteOdds;
+    }
+  }, [odds, modelFavorite]);
+
+  const renderOddsChange = useCallback(() => {
+    if (modelFavoriteBookOddsMovement === 0) return null;
+    return (
+      <div
+        className={cn(
+          'w-full flex items-center gap-2',
+          modelFavorite === 'team2' ? 'justify-end' : 'justify-start'
+        )}
+      >
+        <Badge
+          className={cn(
+            'flex items-center gap-2 w-fit',
+            modelFavoriteBookOddsMovement > 0
+              ? 'bg-green-100 text-green-500'
+              : modelFavoriteBookOddsMovement < 0
+                ? 'bg-red-100 text-red-500'
+                : 'bg-gray-100 text-gray-500'
+          )}
+        >
+          {modelFavoriteBookOddsMovement > 0 && (
+            <ArrowUpIcon className='w-4 h-4' />
+          )}
+          {modelFavoriteBookOddsMovement < 0 && (
+            <ArrowDownIcon className='w-4 h-4' />
+          )}
+          {modelFavoriteBookOddsMovement === 0 && (
+            <MinusIcon className='w-4 h-4' />
+          )}
+          {modelFavoriteBookOddsMovement}
+        </Badge>
+      </div>
+    );
+  }, [modelFavoriteBookOddsMovement, modelFavorite]);
+
   return (
     <motion.div
       layout
@@ -134,7 +206,7 @@ export function PickCard({
                   <User className='h-1/2 w-1/2 text-muted-foreground' />
                 </AvatarFallback>
               </Avatar>
-              <div>
+              <div className='flex flex-col items-start'>
                 <h3
                   className={cn(
                     'font-semibold',
@@ -153,6 +225,7 @@ export function PickCard({
                     {team1.bookOdds ? team1.bookOdds : 'N/A'} book)
                   </span>
                 </div>
+                {modelFavorite === 'team1' && renderOddsChange()}
               </div>
             </div>
 
@@ -187,7 +260,7 @@ export function PickCard({
 
             {/* Team 2 */}
             <div className='flex items-center justify-end space-x-4'>
-              <div className='text-right'>
+              <div className='text-right flex flex-col items-end'>
                 <h3
                   className={cn(
                     'font-semibold',
@@ -206,6 +279,7 @@ export function PickCard({
                   {team2.odds && team2.odds > 0 ? '+' : ''}
                   {team2.odds}
                 </div>
+                {modelFavorite === 'team2' && renderOddsChange()}
               </div>
               <Avatar
                 className={cn(
@@ -255,13 +329,19 @@ export function PickCard({
               className='overflow-hidden'
             >
               <div className='px-6 pb-6'>
-                <PickAnalytics
-                  eventId={event.id}
-                  team1={team1}
-                  team2={team2}
-                  discrepancy={discrepancyLevel}
-                  modelFavorite={modelFavorite}
-                />
+                {odds ? (
+                  <PickAnalytics
+                    odds={odds}
+                    team1={team1}
+                    team2={team2}
+                    discrepancy={discrepancyLevel}
+                    modelFavoriteBookOddsMovement={
+                      modelFavoriteBookOddsMovement
+                    }
+                  />
+                ) : (
+                  <Skeleton className='w-full h-[20px] rounded-md' />
+                )}
               </div>
             </motion.div>
           )}
