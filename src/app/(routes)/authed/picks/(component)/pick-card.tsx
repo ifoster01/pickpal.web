@@ -125,16 +125,8 @@ export function PickCard({
           modelFavorite === 'team2' ? 'justify-end' : 'justify-start'
         )}
       >
-        <Badge
-          className={cn(
-            'flex items-center gap-2 w-fit',
-            modelFavoriteBookOddsMovement > 0
-              ? 'bg-green-100 text-green-500'
-              : modelFavoriteBookOddsMovement < 0
-                ? 'bg-red-100 text-red-500'
-                : 'bg-gray-100 text-gray-500'
-          )}
-        >
+        <Badge className='flex items-center gap-2 w-fit bg-purple-100 text-purple-500'>
+          <span className='text-sm'>Book</span>
           {modelFavoriteBookOddsMovement > 0 && (
             <ArrowUpIcon className='w-4 h-4' />
           )}
