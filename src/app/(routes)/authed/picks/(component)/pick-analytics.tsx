@@ -13,7 +13,6 @@ import {
 } from 'recharts';
 import { ArrowDownIcon, ArrowUpIcon, MinusIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/utils/cn';
 import { Database } from '@/types/supabase';
 import { useMemo } from 'react';
 
