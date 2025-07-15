@@ -44,7 +44,7 @@ export function useUpcomingEventOdds(
         .from('event_moneyline_odds')
         .select('*')
         .eq('event_type', eventType)
-        .order('created_at', { ascending: false });
+        .order('event_datetime', { ascending: true });
 
       if (error) throw error;
 
