@@ -88,7 +88,7 @@ export default function SavedPage() {
           <EventFilter className='block sm:block' />
         </div>
         <Tabs defaultValue='ufc' className='w-full' value={league}>
-          <TabsList className='mb-8'>
+          <TabsList className='mb-8 w-full lg:w-fit justify-start overflow-x-auto'>
             <TabsTrigger onClick={() => setLeague('ufc')} value='ufc'>
               UFC Fights
             </TabsTrigger>
@@ -131,7 +131,7 @@ export default function SavedPage() {
         value={league}
         onValueChange={(val) => setLeague(val as League)}
       >
-        <TabsList className='mb-8'>
+        <TabsList className='mb-8 w-full lg:w-fit justify-start overflow-x-auto'>
           <TabsTrigger value='ufc'>UFC Fights</TabsTrigger>
           <TabsTrigger value='nfl'>NFL Games</TabsTrigger>
           <TabsTrigger value='nba'>NBA Games</TabsTrigger>
