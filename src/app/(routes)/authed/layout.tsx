@@ -11,14 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  User,
-  LogOut,
-  Trophy,
-  Rocket,
-  Heart,
-  UserCircle,
-} from 'lucide-react';
+import { User, LogOut, Trophy, Rocket, Heart, UserCircle } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { cn } from '@/utils/cn';

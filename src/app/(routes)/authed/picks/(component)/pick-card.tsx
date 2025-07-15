@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import {
   ArrowDownIcon,
   ArrowUpIcon,
+  CalendarIcon,
   ChevronDown,
   Heart,
   MinusIcon,
@@ -223,9 +224,24 @@ export function PickCard({
 
             {/* VS and Predictions */}
             <div className='flex flex-col items-center justify-center'>
-              <span className='text-lg font-semibold text-muted-foreground mb-4'>
+              <span className='text-lg font-semibold text-muted-foreground mb-2'>
                 vs
               </span>
+              {event.event_date && (
+                <Badge
+                  variant='outline'
+                  className='flex items-center gap-2 text-sm text-muted-foreground mb-4 py-1 px-2'
+                >
+                  <CalendarIcon className='w-4 h-4' />
+                  <span>
+                    {new Date(event.event_date).toLocaleDateString('en-US', {
+                      weekday: 'short',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </span>
+                </Badge>
+              )}
               <div className='w-full space-y-4'>
                 <div>
                   <div className='flex justify-between text-sm mb-1'>
