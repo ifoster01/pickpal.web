@@ -53,6 +53,14 @@ export function Footer() {
                   Features
                 </button>
               </li>
+              <li>
+                <button
+                  onClick={() => handleNavigation('historical')}
+                  className='text-muted-foreground hover:text-foreground transition-colors'
+                >
+                  Historical
+                </button>
+              </li>
             </ul>
           </div>
 

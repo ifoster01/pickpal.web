@@ -82,16 +82,14 @@ export function Historical() {
   }, [ufcEvents, atpEvents, nflEvents, nbaEvents]);
 
   const ResultBadge = ({ prediction }: { prediction: Prediction }) => {
-    return prediction.result !== null &&
-      ((!prediction.result && prediction.odds2 < 0) ||
-        (prediction.result && prediction.odds1 < 0)) ? (
+    return prediction.result === 'Win' ? (
       <Badge
         variant='outline'
         className='text-sm text-muted-foreground bg-green-500/10 border-green-500'
       >
         Correct Prediction
       </Badge>
-    ) : prediction.result !== null ? (
+    ) : prediction.result === 'Loss' ? (
       <Badge
         variant='outline'
         className='text-sm text-muted-foreground text-red-500 bg-red-500/10 border-red-500'
@@ -153,8 +151,8 @@ export function Historical() {
             Our Historical Performance
           </motion.h2>
           <motion.p variants={fadeIn} className='text-muted-foreground mb-8'>
-            We believe in transparency. Here&apos;s a look at our past 10 predictions
-            and their outcomes across various sports.
+            We believe in transparency. Here&apos;s a look at our past 10
+            predictions and their outcomes across various sports.
           </motion.p>
         </motion.div>
         <Tabs defaultValue='ufc' className='w-full'>
@@ -173,7 +171,7 @@ export function Historical() {
                 animate='visible'
                 variants={staggerContainer}
               >
-                <table className='w-full text-left mt-8'>
+                <table className='w-full text-left'>
                   <thead className='bg-muted/50'>
                     <tr className='border-b'>
                       <th className='p-4 font-semibold'>Event</th>

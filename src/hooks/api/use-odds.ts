@@ -8,7 +8,7 @@ export function isEventUpcoming(eventDate: string | null): boolean {
   if (!eventDate) return true; // Consider events without dates as upcoming
   // new date - 30 hours
   return (
-    new Date(eventDate) > new Date(new Date().getTime() - 30 * 60 * 60 * 1000)
+    new Date(eventDate) > new Date(new Date().getTime() - 12 * 60 * 60 * 1000)
   );
 }
 
@@ -46,12 +46,17 @@ export function useUpcomingEventOdds(
         .from('event_moneyline_odds')
         .select('*')
         .eq('event_type', eventType)
-        .order('event_datetime', { ascending: dateOrder === 'asc' })
         .limit(count);
+
+      if (dateOrder === 'asc' && filter === 'upcoming') {
+        query = query.order('event_datetime', { ascending: true });
+      } else {
+        query = query.order('event_datetime', { ascending: false });
+      }
 
       if (filter !== 'all') {
         const cutoffDate = new Date(
-          new Date().getTime() - 30 * 60 * 60 * 1000
+          new Date().getTime() - 12 * 60 * 60 * 1000
         ).toISOString();
 
         if (filter === 'upcoming') {

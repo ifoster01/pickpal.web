@@ -76,6 +76,14 @@ export function PickCard({
 
   const modelFavorite = team1.odds < team2.odds ? 'team1' : 'team2';
 
+  const isEventInPast =
+    event.event_datetime && new Date(event.event_datetime) < new Date();
+
+  const isModelPredictionCorrect =
+    event.result !== null &&
+    ((modelFavorite === 'team1' && event.result) ||
+      (modelFavorite === 'team2' && !event.result));
+
   const discrepancy = Math.abs(team1.probability - team1.bookProbability);
   const discrepancyLevel =
     discrepancy < 0.1 ? 'low' : discrepancy < 0.2 ? 'medium' : 'high';
@@ -155,29 +163,33 @@ export function PickCard({
       <Card className='overflow-hidden group relative'>
         <div className='absolute top-4 right-4 z-10 flex items-center gap-2'>
           {/* Result indicator */}
-          {event.result !== null &&
-          ((!event.result && event.odds2 < 0) ||
-            (event.result && event.odds1 < 0)) ? (
-            <Badge
-              variant='outline'
-              className='text-sm text-muted-foreground bg-green-500/10 border-green-500'
-            >
-              Correct Prediction
-            </Badge>
-          ) : event.result !== null ? (
-            <Badge
-              variant='outline'
-              className='text-sm text-muted-foreground text-red-500 bg-red-500/10 border-red-500'
-            >
-              Wrong Prediction
-            </Badge>
-          ) : (
-            <Badge
-              variant='outline'
-              className='text-sm text-muted-foreground text-yellow-500 bg-yellow-500/10 border-yellow-500'
-            >
-              Missing Result (Potentially Cancelled)
-            </Badge>
+          {isEventInPast && (
+            <>
+              {event.result !== null ? (
+                isModelPredictionCorrect ? (
+                  <Badge
+                    variant='outline'
+                    className='text-sm text-muted-foreground bg-green-500/10 border-green-500'
+                  >
+                    Correct Prediction
+                  </Badge>
+                ) : (
+                  <Badge
+                    variant='outline'
+                    className='text-sm text-muted-foreground text-red-500 bg-red-500/10 border-red-500'
+                  >
+                    Wrong Prediction
+                  </Badge>
+                )
+              ) : (
+                <Badge
+                  variant='outline'
+                  className='text-sm text-muted-foreground text-yellow-500 bg-yellow-500/10 border-yellow-500'
+                >
+                  Missing Result (Potentially Cancelled)
+                </Badge>
+              )}
+            </>
           )}
 
           {/* Save Button - Floating in top right */}
