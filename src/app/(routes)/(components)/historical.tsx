@@ -55,7 +55,9 @@ export function Historical() {
           gameResult !== null &&
           ((!gameResult && event.odds2 < 0) || (gameResult && event.odds1 < 0))
             ? 'Win'
-            : 'Loss';
+            : gameResult !== null
+              ? 'Loss'
+              : 'Pending';
         preds.push({
           event:
             `${event.team1_name} vs ${event.team2_name}` || 'Unknown Event',
