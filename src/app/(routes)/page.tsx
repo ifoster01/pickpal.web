@@ -8,6 +8,7 @@ import { About } from './(components)/about';
 import { MobileApp } from './(components)/mobile-app';
 import { FAQ } from './(components)/faq';
 import { Contact } from './(components)/contact';
+import { Historical } from './(components)/historical';
 
 export default function LandingPage() {
   useEffect(() => {
@@ -31,6 +32,7 @@ export default function LandingPage() {
       <Navbar />
       <Hero />
       <Features />
+      <Historical />
       <About />
       <MobileApp />
       <FAQ />

@@ -143,6 +143,8 @@ export function PickCard({
     );
   }, [modelFavoriteBookOddsMovement, modelFavorite]);
 
+  if (event.odds1 === null || event.odds2 === null) return null;
+
   return (
     <motion.div
       layout
@@ -152,10 +154,36 @@ export function PickCard({
     >
       <Card className='overflow-hidden group relative'>
         <div className='absolute top-4 right-4 z-10 flex items-center gap-2'>
+          {/* Result indicator */}
+          {event.result !== null &&
+          ((!event.result && event.odds2 < 0) ||
+            (event.result && event.odds1 < 0)) ? (
+            <Badge
+              variant='outline'
+              className='text-sm text-muted-foreground bg-green-500/10 border-green-500'
+            >
+              Correct Prediction
+            </Badge>
+          ) : event.result !== null ? (
+            <Badge
+              variant='outline'
+              className='text-sm text-muted-foreground text-red-500 bg-red-500/10 border-red-500'
+            >
+              Wrong Prediction
+            </Badge>
+          ) : (
+            <Badge
+              variant='outline'
+              className='text-sm text-muted-foreground text-yellow-500 bg-yellow-500/10 border-yellow-500'
+            >
+              Missing Result (Potentially Cancelled)
+            </Badge>
+          )}
+
+          {/* Save Button - Floating in top right */}
           {likesCount !== undefined && likesCount > 0 && (
             <span className='text-sm text-muted-foreground'>{likesCount}</span>
           )}
-          {/* Save Button - Floating in top right */}
           <motion.button
             className={cn(
               'w-8 h-8 rounded-full flex items-center justify-center',

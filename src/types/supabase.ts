@@ -7,30 +7,10 @@ export type Json =
   | Json[];
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never;
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      graphql: {
-        Args: {
-          operationName?: string;
-          query?: string;
-          variables?: Json;
-          extensions?: Json;
-        };
-        Returns: Json;
-      };
-    };
-    Enums: {
-      [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
-    };
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: '12.2.3 (519615d)';
   };
   public: {
     Tables: {
@@ -70,6 +50,7 @@ export type Database = {
           id: string;
           odds1: number | null;
           odds2: number | null;
+          result: boolean | null;
           team1: string | null;
           team1_name: string | null;
           team1_pic_png: string | null;
@@ -91,6 +72,7 @@ export type Database = {
           id?: string;
           odds1?: number | null;
           odds2?: number | null;
+          result?: boolean | null;
           team1?: string | null;
           team1_name?: string | null;
           team1_pic_png?: string | null;
@@ -112,6 +94,7 @@ export type Database = {
           id?: string;
           odds1?: number | null;
           odds2?: number | null;
+          result?: boolean | null;
           team1?: string | null;
           team1_name?: string | null;
           team1_pic_png?: string | null;
@@ -123,35 +106,6 @@ export type Database = {
           updated_at?: string | null;
         };
         Relationships: [];
-      };
-      liked_atp_games: {
-        Row: {
-          game_id: string | null;
-          id: number;
-          saved_at: string;
-          saving_user_id: string | null;
-        };
-        Insert: {
-          game_id?: string | null;
-          id?: number;
-          saved_at?: string;
-          saving_user_id?: string | null;
-        };
-        Update: {
-          game_id?: string | null;
-          id?: number;
-          saved_at?: string;
-          saving_user_id?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'liked_atp_games_game_id_fkey';
-            columns: ['game_id'];
-            isOneToOne: false;
-            referencedRelation: 'upcoming_atp_odds';
-            referencedColumns: ['game_id'];
-          },
-        ];
       };
       liked_events: {
         Row: {
@@ -173,69 +127,6 @@ export type Database = {
           event_id?: string | null;
           event_type?: string | null;
           id?: number;
-          saving_user_id?: string | null;
-        };
-        Relationships: [];
-      };
-      liked_fights: {
-        Row: {
-          fight_id: string | null;
-          id: number;
-          saved_at: string;
-          saving_user_id: string | null;
-        };
-        Insert: {
-          fight_id?: string | null;
-          id?: number;
-          saved_at?: string;
-          saving_user_id?: string | null;
-        };
-        Update: {
-          fight_id?: string | null;
-          id?: number;
-          saved_at?: string;
-          saving_user_id?: string | null;
-        };
-        Relationships: [];
-      };
-      liked_nba_games: {
-        Row: {
-          game_id: string | null;
-          id: number;
-          saved_at: string;
-          saving_user_id: string | null;
-        };
-        Insert: {
-          game_id?: string | null;
-          id?: number;
-          saved_at?: string;
-          saving_user_id?: string | null;
-        };
-        Update: {
-          game_id?: string | null;
-          id?: number;
-          saved_at?: string;
-          saving_user_id?: string | null;
-        };
-        Relationships: [];
-      };
-      liked_nfl_games: {
-        Row: {
-          game_id: string | null;
-          id: number;
-          saved_at: string;
-          saving_user_id: string | null;
-        };
-        Insert: {
-          game_id?: string | null;
-          id?: number;
-          saved_at?: string;
-          saving_user_id?: string | null;
-        };
-        Update: {
-          game_id?: string | null;
-          id?: number;
-          saved_at?: string;
           saving_user_id?: string | null;
         };
         Relationships: [];
@@ -272,216 +163,6 @@ export type Database = {
           },
         ];
       };
-      upcoming_atp_odds: {
-        Row: {
-          created_at: string;
-          game_date: string | null;
-          game_datetime: string | null;
-          game_id: string;
-          game_name: string | null;
-          odds1: number | null;
-          odds2: number | null;
-          opp: string | null;
-          opp_book_odds: number | null;
-          opp_name: string | null;
-          opp_pic_url: string | null;
-          team: string | null;
-          team_book_odds: number | null;
-          team_name: string | null;
-          team_pic_url: string | null;
-        };
-        Insert: {
-          created_at?: string;
-          game_date?: string | null;
-          game_datetime?: string | null;
-          game_id: string;
-          game_name?: string | null;
-          odds1?: number | null;
-          odds2?: number | null;
-          opp?: string | null;
-          opp_book_odds?: number | null;
-          opp_name?: string | null;
-          opp_pic_url?: string | null;
-          team?: string | null;
-          team_book_odds?: number | null;
-          team_name?: string | null;
-          team_pic_url?: string | null;
-        };
-        Update: {
-          created_at?: string;
-          game_date?: string | null;
-          game_datetime?: string | null;
-          game_id?: string;
-          game_name?: string | null;
-          odds1?: number | null;
-          odds2?: number | null;
-          opp?: string | null;
-          opp_book_odds?: number | null;
-          opp_name?: string | null;
-          opp_pic_url?: string | null;
-          team?: string | null;
-          team_book_odds?: number | null;
-          team_name?: string | null;
-          team_pic_url?: string | null;
-        };
-        Relationships: [];
-      };
-      upcoming_fight_odds: {
-        Row: {
-          created_at: string;
-          f1_book_odds: number | null;
-          f1_pic_url: string | null;
-          f2_book_odds: number | null;
-          f2_pic_url: string | null;
-          fight_date: string | null;
-          fight_id: string;
-          fight_name: string | null;
-          fighter1: string | null;
-          fighter2: string | null;
-          id: number;
-          odds1: number | null;
-          odds2: number | null;
-        };
-        Insert: {
-          created_at?: string;
-          f1_book_odds?: number | null;
-          f1_pic_url?: string | null;
-          f2_book_odds?: number | null;
-          f2_pic_url?: string | null;
-          fight_date?: string | null;
-          fight_id: string;
-          fight_name?: string | null;
-          fighter1?: string | null;
-          fighter2?: string | null;
-          id?: number;
-          odds1?: number | null;
-          odds2?: number | null;
-        };
-        Update: {
-          created_at?: string;
-          f1_book_odds?: number | null;
-          f1_pic_url?: string | null;
-          f2_book_odds?: number | null;
-          f2_pic_url?: string | null;
-          fight_date?: string | null;
-          fight_id?: string;
-          fight_name?: string | null;
-          fighter1?: string | null;
-          fighter2?: string | null;
-          id?: number;
-          odds1?: number | null;
-          odds2?: number | null;
-        };
-        Relationships: [];
-      };
-      upcoming_nba_odds: {
-        Row: {
-          created_at: string;
-          game_date: string | null;
-          game_id: string;
-          game_name: string | null;
-          odds1: number | null;
-          odds2: number | null;
-          opp: string | null;
-          opp_book_odds: number | null;
-          opp_name: string | null;
-          opp_pic_png: string | null;
-          opp_pic_url: string | null;
-          team: string | null;
-          team_book_odds: number | null;
-          team_name: string | null;
-          team_pic_png: string | null;
-          team_pic_url: string | null;
-        };
-        Insert: {
-          created_at?: string;
-          game_date?: string | null;
-          game_id: string;
-          game_name?: string | null;
-          odds1?: number | null;
-          odds2?: number | null;
-          opp?: string | null;
-          opp_book_odds?: number | null;
-          opp_name?: string | null;
-          opp_pic_png?: string | null;
-          opp_pic_url?: string | null;
-          team?: string | null;
-          team_book_odds?: number | null;
-          team_name?: string | null;
-          team_pic_png?: string | null;
-          team_pic_url?: string | null;
-        };
-        Update: {
-          created_at?: string;
-          game_date?: string | null;
-          game_id?: string;
-          game_name?: string | null;
-          odds1?: number | null;
-          odds2?: number | null;
-          opp?: string | null;
-          opp_book_odds?: number | null;
-          opp_name?: string | null;
-          opp_pic_png?: string | null;
-          opp_pic_url?: string | null;
-          team?: string | null;
-          team_book_odds?: number | null;
-          team_name?: string | null;
-          team_pic_png?: string | null;
-          team_pic_url?: string | null;
-        };
-        Relationships: [];
-      };
-      upcoming_nfl_odds: {
-        Row: {
-          created_at: string;
-          game_date: string | null;
-          game_id: string;
-          game_name: string | null;
-          odds1: number | null;
-          odds2: number | null;
-          opp: string | null;
-          opp_book_odds: number | null;
-          opp_name: string | null;
-          opp_pic_url: string | null;
-          team: string | null;
-          team_book_odds: number | null;
-          team_name: string | null;
-          team_pic_url: string | null;
-        };
-        Insert: {
-          created_at?: string;
-          game_date?: string | null;
-          game_id: string;
-          game_name?: string | null;
-          odds1?: number | null;
-          odds2?: number | null;
-          opp?: string | null;
-          opp_book_odds?: number | null;
-          opp_name?: string | null;
-          opp_pic_url?: string | null;
-          team?: string | null;
-          team_book_odds?: number | null;
-          team_name?: string | null;
-          team_pic_url?: string | null;
-        };
-        Update: {
-          created_at?: string;
-          game_date?: string | null;
-          game_id?: string;
-          game_name?: string | null;
-          odds1?: number | null;
-          odds2?: number | null;
-          opp?: string | null;
-          opp_book_odds?: number | null;
-          opp_name?: string | null;
-          opp_pic_url?: string | null;
-          team?: string | null;
-          team_book_odds?: number | null;
-          team_name?: string | null;
-          team_pic_url?: string | null;
-        };
-        Relationships: [];
-      };
     };
     Views: {
       [_ in never]: never;
@@ -505,21 +186,28 @@ export type Database = {
   };
 };
 
-type DefaultSchema = Database[Extract<keyof Database, 'public'>];
+type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>;
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<
+  keyof Database,
+  'public'
+>];
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database;
+    schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-        Database[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-      Database[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
       Row: infer R;
     }
     ? R
@@ -537,14 +225,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema['Tables']
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database;
+    schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Insert: infer I;
     }
     ? I
@@ -560,14 +250,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema['Tables']
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database;
+    schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Update: infer U;
     }
     ? U
@@ -583,14 +275,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema['Enums']
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database;
+    schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
     ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
     : never;
@@ -598,22 +292,21 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema['CompositeTypes']
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database;
+    schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
     ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
     : never;
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },

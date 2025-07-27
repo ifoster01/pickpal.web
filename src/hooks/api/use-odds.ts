@@ -33,27 +33,37 @@ export function useEventOdds(eventId: string) {
 
 export function useUpcomingEventOdds(
   filter: Filter = 'upcoming',
-  eventType: League
+  eventType: League,
+  count: number = 1000,
+  dateOrder: 'asc' | 'desc' = 'asc'
 ) {
   const supabase = createClient();
 
   return useQuery({
-    queryKey: ['upcoming_event_odds', filter, eventType],
+    queryKey: ['upcoming_event_odds', filter, eventType, count, dateOrder],
     queryFn: async () => {
-      const { data: games, error } = await supabase
+      let query = supabase
         .from('event_moneyline_odds')
         .select('*')
         .eq('event_type', eventType)
-        .order('event_datetime', { ascending: true });
+        .order('event_datetime', { ascending: dateOrder === 'asc' })
+        .limit(count);
+
+      if (filter !== 'all') {
+        const cutoffDate = new Date(
+          new Date().getTime() - 30 * 60 * 60 * 1000
+        ).toISOString();
+
+        if (filter === 'upcoming') {
+          query = query.filter('event_datetime', 'gte', cutoffDate);
+        } else if (filter === 'past') {
+          query = query.filter('event_datetime', 'lt', cutoffDate);
+        }
+      }
+
+      const { data: games, error } = await query;
 
       if (error) throw error;
-
-      // Filter based on status
-      if (filter === 'upcoming') {
-        return games.filter((game) => isEventUpcoming(game.event_date));
-      } else if (filter === 'past') {
-        return games.filter((game) => !isEventUpcoming(game.event_date));
-      }
 
       return games;
     },

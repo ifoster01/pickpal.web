@@ -1,6 +1,8 @@
 {
   "private": true,
   "scripts": {
+    "generate-types": "export SUPABASE_PROJECT_REF=$(grep '^SUPABASE_PROJECT_REF' .env.local | cut -d '=' -f2) && npx supabase gen types --lang=typescript --project-id $SUPABASE_PROJECT_REF > src/types/supabase.ts",
+    "predev": "npm run generate-types",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

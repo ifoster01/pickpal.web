@@ -84,6 +84,12 @@ export function Navbar() {
               Features
             </button>
             <button
+              onClick={() => handleNavigation('historical')}
+              className='text-foreground/80 hover:text-foreground transition-colors'
+            >
+              Historical
+            </button>
+            <button
               onClick={() => handleNavigation('about')}
               className='text-foreground/80 hover:text-foreground transition-colors'
             >
