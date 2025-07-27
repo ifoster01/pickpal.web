@@ -77,7 +77,8 @@ export function PickCard({
   const modelFavorite = team1.odds < team2.odds ? 'team1' : 'team2';
 
   const isEventInPast =
-    event.event_datetime && new Date(event.event_datetime) < new Date();
+    event.event_datetime &&
+    new Date(event.event_datetime) < new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
 
   const isModelPredictionCorrect =
     event.result !== null &&

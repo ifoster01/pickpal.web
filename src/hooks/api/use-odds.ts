@@ -6,9 +6,9 @@ export type Filter = 'upcoming' | 'past' | 'all';
 
 export function isEventUpcoming(eventDate: string | null): boolean {
   if (!eventDate) return true; // Consider events without dates as upcoming
-  // new date - 30 hours
+  // new date - 24 hours
   return (
-    new Date(eventDate) > new Date(new Date().getTime() - 12 * 60 * 60 * 1000)
+    new Date(eventDate) > new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
   );
 }
 
@@ -56,7 +56,7 @@ export function useUpcomingEventOdds(
 
       if (filter !== 'all') {
         const cutoffDate = new Date(
-          new Date().getTime() - 12 * 60 * 60 * 1000
+          new Date().getTime() - 24 * 60 * 60 * 1000
         ).toISOString();
 
         if (filter === 'upcoming') {
