@@ -55,8 +55,16 @@ export function useUpcomingEventOdds(
       }
 
       if (filter !== 'all') {
+        const now = new Date();
         const cutoffDate = new Date(
-          new Date().getTime() - 24 * 60 * 60 * 1000
+          Date.UTC(
+            now.getUTCFullYear(),
+            now.getUTCMonth(),
+            now.getUTCDate(),
+            now.getUTCHours(),
+            now.getUTCMinutes(),
+            now.getUTCSeconds()
+          )
         ).toISOString();
 
         if (filter === 'upcoming') {
