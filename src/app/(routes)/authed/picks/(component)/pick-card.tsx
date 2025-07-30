@@ -22,7 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/providers/AuthProvider';
 import { useLikesCount } from '@/hooks/api/use-likes-count';
 import { League } from '@/providers/LeagueProvider';
-import { useEventOdds } from '@/hooks/api/use-odds';
+import { isEventUpcoming, useEventOdds } from '@/hooks/api/use-odds';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 
@@ -76,9 +76,7 @@ export function PickCard({
 
   const modelFavorite = team1.odds < team2.odds ? 'team1' : 'team2';
 
-  const isEventInPast =
-    event.event_datetime &&
-    new Date(event.event_datetime) < new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
+  const isEventInPast = !isEventUpcoming(event.event_datetime);
 
   const isModelPredictionCorrect =
     event.result !== null &&
@@ -268,18 +266,23 @@ export function PickCard({
               <span className='text-lg font-semibold text-muted-foreground mb-2'>
                 vs
               </span>
-              {event.event_date && (
+              {event.event_datetime && (
                 <Badge
                   variant='outline'
                   className='flex items-center gap-2 text-sm text-muted-foreground mb-4 py-1 px-2'
                 >
                   <CalendarIcon className='w-4 h-4' />
                   <span>
-                    {new Date(event.event_date).toLocaleDateString('en-US', {
-                      weekday: 'short',
-                      month: 'short',
-                      day: 'numeric',
-                    })}
+                    {new Date(event.event_datetime).toLocaleDateString(
+                      'en-US',
+                      {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                      }
+                    )}
                   </span>
                 </Badge>
               )}

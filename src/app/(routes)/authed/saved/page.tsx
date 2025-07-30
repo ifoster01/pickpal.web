@@ -58,7 +58,7 @@ export default function SavedPage() {
           const event = like.upcoming_event_odds;
           if (!event) return null;
 
-          const isCompleted = !isEventUpcoming(event.event_date);
+          const isCompleted = !isEventUpcoming(event.event_datetime);
 
           return (
             <div key={event.id} className={cn(isCompleted && 'opacity-75')}>

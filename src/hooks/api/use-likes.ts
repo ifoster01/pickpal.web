@@ -21,7 +21,7 @@ function filterEvents<T extends EnrichedLikedEvent>(
   filter: Filter
 ): T[] {
   return events.filter((event) => {
-    const date = event?.upcoming_event_odds?.event_date;
+    const date = event?.upcoming_event_odds?.event_datetime;
 
     if (!date) return true;
     const isUpcoming = isEventUpcoming(date);

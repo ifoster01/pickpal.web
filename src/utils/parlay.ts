@@ -63,7 +63,7 @@ export function getBetterSide(event: EventOdds, type: League): ParlayLeg {
     return {
       eventId: event.id,
       eventName: event.event_name,
-      eventDate: event.event_date,
+      eventDate: event.event_datetime,
       selection: event.team1_name,
       modelOdds: event.odds1 || 0,
       bookOdds: event.book_odds1 || 0,
@@ -77,7 +77,7 @@ export function getBetterSide(event: EventOdds, type: League): ParlayLeg {
     return {
       eventId: event.id,
       eventName: event.event_name,
-      eventDate: event.event_date,
+      eventDate: event.event_datetime,
       selection: event.team2_name,
       modelOdds: event.odds2 || 0,
       bookOdds: event.book_odds2 || 0,

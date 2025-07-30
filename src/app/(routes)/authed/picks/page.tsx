@@ -29,7 +29,7 @@ export default function PicksPage() {
       {events && events.length > 0 ? (
         events.map((event) => {
           const isLiked = likedEventIds.includes(event.id);
-          const isCompleted = !isEventUpcoming(event.event_date);
+          const isCompleted = !isEventUpcoming(event.event_datetime);
 
           return (
             <div key={event.id} className={cn(isCompleted && 'opacity-75')}>

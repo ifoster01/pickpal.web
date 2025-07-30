@@ -5,10 +5,9 @@ import { League } from '@/providers/LeagueProvider';
 export type Filter = 'upcoming' | 'past' | 'all';
 
 export function isEventUpcoming(eventDate: string | null): boolean {
-  if (!eventDate) return true; // Consider events without dates as upcoming
-  // new date - 24 hours
+  if (!eventDate) return true;
   return (
-    new Date(eventDate) > new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+    new Date(eventDate) > new Date(new Date().getTime() - 2 * 60 * 60 * 1000)
   );
 }
 
@@ -78,7 +77,16 @@ export function useUpcomingEventOdds(
 
       if (error) throw error;
 
-      return games;
+      // map through the games and convert the event_datetime to a date object in the local timezone from UTC
+      const gamesWithLocalDatetime = games.map((game) => {
+        const date = new Date(game.event_datetime + 'Z');
+        return {
+          ...game,
+          event_datetime: date.toLocaleString(),
+        };
+      });
+
+      return gamesWithLocalDatetime;
     },
     refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
   });
