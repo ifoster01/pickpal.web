@@ -33,7 +33,6 @@ interface PickAnalyticsProps {
   team1: Team;
   team2: Team;
   discrepancy: 'low' | 'medium' | 'high';
-  modelFavoriteBookOddsMovement: number;
 }
 
 export function PickAnalytics({
@@ -41,7 +40,6 @@ export function PickAnalytics({
   team1,
   team2,
   discrepancy,
-  modelFavoriteBookOddsMovement,
 }: PickAnalyticsProps) {
   const historicalData = useMemo(() => {
     return odds?.map((odd) => ({
@@ -111,27 +109,7 @@ export function PickAnalytics({
               <p className='text-sm text-muted-foreground'>Model Advantage</p>
               <p className='text-lg font-semibold capitalize'>{discrepancy}</p>
             </div>
-            {odds?.length && odds.length > 1 && (
-              <div>
-                <p className='text-sm text-muted-foreground'>
-                  Model&apos;s Favorite Book Odds Movement
-                </p>
-                <div className='text-lg font-semibold capitalize'>
-                  <Badge className='flex items-center gap-2 w-fit bg-purple-100 text-purple-500'>
-                    {modelFavoriteBookOddsMovement > 0 && (
-                      <ArrowUpIcon className='w-4 h-4' />
-                    )}
-                    {modelFavoriteBookOddsMovement < 0 && (
-                      <ArrowDownIcon className='w-4 h-4' />
-                    )}
-                    {modelFavoriteBookOddsMovement === 0 && (
-                      <MinusIcon className='w-4 h-4' />
-                    )}
-                    {modelFavoriteBookOddsMovement}
-                  </Badge>
-                </div>
-              </div>
-            )}
+
           </div>
         </Card>
       </div>

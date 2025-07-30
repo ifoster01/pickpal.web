@@ -7,7 +7,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EventFilter } from '@/components/general/event-filter';
 import { League, useLeague } from '@/providers/LeagueProvider';
-import { PickCard } from '../picks/(component)/pick-card';
+import { PickCard } from '../(components)/pick-card/pick-card';
 import { cn } from '@/utils/cn';
 import { isEventUpcoming } from '@/hooks/api/use-odds';
 import { useFilter } from '@/providers/FilterProvider';

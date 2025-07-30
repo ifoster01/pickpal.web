@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { isEventUpcoming, useUpcomingEventOdds } from '@/hooks/api/use-odds';
 import { useLikedEvents } from '@/hooks/api/use-likes';
 import { cn } from '@/utils/cn';
-import { PickCard } from '@/app/(routes)/authed/picks/(component)/pick-card';
+import { PickCard } from '../(components)/pick-card/pick-card';
 import { League, useLeague } from '@/providers/LeagueProvider';
 import { useFilter } from '@/providers/FilterProvider';
 import { EventFilter } from '@/components/general/event-filter';
