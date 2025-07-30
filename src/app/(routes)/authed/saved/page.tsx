@@ -4,9 +4,9 @@ import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { useWeekLikedEvents } from '@/hooks/api/use-likes';
 import { useAuth } from '@/providers/AuthProvider';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EventFilter } from '@/components/general/event-filter';
-import { League, useLeague } from '@/providers/LeagueProvider';
+import { SportsSelector } from '@/components/general/sports-selector';
+import { useLeague } from '@/providers/LeagueProvider';
 import { PickCard } from '../(components)/pick-card/pick-card';
 import { cn } from '@/utils/cn';
 import { isEventUpcoming } from '@/hooks/api/use-odds';
@@ -16,7 +16,7 @@ import { TimeFilter } from '../(components)/time-filter';
 
 export default function SavedPage() {
   const { user } = useAuth();
-  const { league, setLeague } = useLeague();
+  const { league } = useLeague();
   const { selectedWeek, filter } = useFilter();
 
   const {
@@ -88,27 +88,12 @@ export default function SavedPage() {
           <h1 className='text-3xl font-bold'>Saved Picks</h1>
           <EventFilter className='block sm:block' />
         </div>
-        <Tabs defaultValue='ufc' className='w-full' value={league}>
-          <TabsList className='mb-8 w-full lg:w-fit justify-start overflow-x-auto'>
-            <TabsTrigger onClick={() => setLeague('ufc')} value='ufc'>
-              UFC Fights
-            </TabsTrigger>
-            <TabsTrigger onClick={() => setLeague('atp')} value='atp'>
-              ATP Matches
-            </TabsTrigger>
-            <TabsTrigger onClick={() => setLeague('nfl')} value='nfl'>
-              NFL Games
-            </TabsTrigger>
-            <TabsTrigger onClick={() => setLeague('nba')} value='nba'>
-              NBA Games
-            </TabsTrigger>
-          </TabsList>
-
+        <div className='space-y-6'>
+          <SportsSelector />
+          
           {/* Week selector */}
-          <div className='mb-6'>
-            <TimeFilter />
-          </div>
-        </Tabs>
+          <TimeFilter />
+        </div>
         <div className='grid gap-6'>
           {[1, 2, 3].map((i) => (
             <Skeleton key={i} className='h-64 w-full' />
@@ -131,29 +116,14 @@ export default function SavedPage() {
         <EventFilter className='block sm:block' />
       </div>
 
-      <Tabs
-        defaultValue='ufc'
-        className='w-full'
-        value={league}
-        onValueChange={(val) => setLeague(val as League)}
-      >
-        <TabsList className='mb-8 w-full lg:w-fit justify-start overflow-x-auto'>
-          <TabsTrigger value='ufc'>UFC Fights</TabsTrigger>
-          <TabsTrigger value='atp'>ATP Matches</TabsTrigger>
-          <TabsTrigger value='nfl'>NFL Games</TabsTrigger>
-          <TabsTrigger value='nba'>NBA Games</TabsTrigger>
-        </TabsList>
-
+      <div className='space-y-6'>
+        <SportsSelector />
+        
         {/* Week selector */}
-        <div className='mb-6'>
-          <TimeFilter />
-        </div>
+        <TimeFilter />
 
-        <TabsContent value='ufc'>{renderSavedEvents()}</TabsContent>
-        <TabsContent value='nfl'>{renderSavedEvents()}</TabsContent>
-        <TabsContent value='nba'>{renderSavedEvents()}</TabsContent>
-        <TabsContent value='atp'>{renderSavedEvents()}</TabsContent>
-      </Tabs>
+        {renderSavedEvents()}
+      </div>
     </motion.div>
   );
 }

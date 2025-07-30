@@ -129,8 +129,6 @@ export function useWeekEventOdds(
 
       query = query.order('event_datetime', { ascending: dateOrder === 'asc' });
 
-      console.log('dateFilter', dateFilter);
-
       // add the date filter
       if (dateFilter === 'upcoming') {
         query = query.filter('event_datetime', 'gte', new Date().toISOString());

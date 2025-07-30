@@ -2,14 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { League, useLeague } from '@/providers/LeagueProvider';
+import { useLeague } from '@/providers/LeagueProvider';
+import { SportsSelector } from '@/components/general/sports-selector';
 import { useLikedEvents } from '@/hooks/api/use-likes';
 import { ParlayCard } from './(components)/parlay-card';
 import { ParlayFilters } from './(components)/parlay-filters';
@@ -21,7 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 type SortOption = 'payout' | 'value' | 'probability';
 
 export default function ParlayPage() {
-  const { league, setLeague } = useLeague();
+  const { league } = useLeague();
   const [minLegs, setMinLegs] = useState(2);
   const [maxLegs, setMaxLegs] = useState(4);
   const [minOdds, setMinOdds] = useState(-1000);
@@ -83,7 +77,10 @@ export default function ParlayPage() {
         <div className='flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between'>
           <Skeleton className='h-9 w-48' />
           <div className='flex justify-between sm:justify-start items-center gap-4'>
-            <Skeleton className='h-10 w-full sm:w-[120px]' />
+            <SportsSelector 
+              mode='select' 
+              placeholder='Select League'
+            />
             <Skeleton className='h-10 w-10' />
           </div>
         </div>
@@ -103,23 +100,9 @@ export default function ParlayPage() {
 
   return (
     <div className='space-y-8'>
-      <div className='flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between'>
+      <div className='flex space-y-0 flex-row items-center justify-between'>
         <h1 className='text-3xl font-bold'>Parlay Builder</h1>
-        <div className='flex justify-between sm:justify-start items-center gap-4'>
-          <Select
-            value={league}
-            onValueChange={(value: League) => setLeague(value)}
-          >
-            <SelectTrigger className='w-full sm:w-[120px]'>
-              <SelectValue placeholder='Select League' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='ufc'>UFC</SelectItem>
-              <SelectItem value='atp'>ATP</SelectItem>
-              <SelectItem value='nfl'>NFL</SelectItem>
-              <SelectItem value='nba'>NBA</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className='flex justify-start items-center gap-4'>
           <ParlayFilters
             minLegs={minLegs}
             maxLegs={maxLegs}
@@ -137,31 +120,34 @@ export default function ParlayPage() {
         </div>
       </div>
 
-      <div className='flex gap-2 overflow-x-auto pb-2'>
-        <Button
-          variant='outline'
-          size='sm'
-          className={cn(sortBy === 'value' && 'bg-primary/10')}
-          onClick={() => setSortBy('value')}
-        >
-          Best Value
-        </Button>
-        <Button
-          variant='outline'
-          size='sm'
-          className={cn(sortBy === 'payout' && 'bg-primary/10')}
-          onClick={() => setSortBy('payout')}
-        >
-          Highest Payout
-        </Button>
-        <Button
-          variant='outline'
-          size='sm'
-          className={cn(sortBy === 'probability' && 'bg-primary/10')}
-          onClick={() => setSortBy('probability')}
-        >
-          Most Probable
-        </Button>
+      <div className='flex flex-col space-y-2'>
+        <SportsSelector />
+        <div className='flex gap-2 overflow-x-auto pb-2'>
+          <Button
+            variant='outline'
+            size='sm'
+            className={cn(sortBy === 'value' && 'bg-primary/10')}
+            onClick={() => setSortBy('value')}
+          >
+            Best Value
+          </Button>
+          <Button
+            variant='outline'
+            size='sm'
+            className={cn(sortBy === 'payout' && 'bg-primary/10')}
+            onClick={() => setSortBy('payout')}
+          >
+            Highest Payout
+          </Button>
+          <Button
+            variant='outline'
+            size='sm'
+            className={cn(sortBy === 'probability' && 'bg-primary/10')}
+            onClick={() => setSortBy('probability')}
+          >
+            Most Probable
+          </Button>
+        </div>
       </div>
 
       <div className='grid gap-4'>
