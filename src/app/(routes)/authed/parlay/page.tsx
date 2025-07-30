@@ -115,9 +115,9 @@ export default function ParlayPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value='ufc'>UFC</SelectItem>
+              <SelectItem value='atp'>ATP</SelectItem>
               <SelectItem value='nfl'>NFL</SelectItem>
               <SelectItem value='nba'>NBA</SelectItem>
-              <SelectItem value='atp'>ATP</SelectItem>
             </SelectContent>
           </Select>
           <ParlayFilters

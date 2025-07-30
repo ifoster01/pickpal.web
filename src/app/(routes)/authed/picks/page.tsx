@@ -65,14 +65,14 @@ export default function PicksPage() {
             <TabsTrigger onClick={() => setLeague('ufc')} value='ufc'>
               UFC Fights
             </TabsTrigger>
+            <TabsTrigger onClick={() => setLeague('atp')} value='atp'>
+              ATP Matches
+            </TabsTrigger>
             <TabsTrigger onClick={() => setLeague('nfl')} value='nfl'>
               NFL Games
             </TabsTrigger>
             <TabsTrigger onClick={() => setLeague('nba')} value='nba'>
               NBA Games
-            </TabsTrigger>
-            <TabsTrigger onClick={() => setLeague('atp')} value='atp'>
-              ATP Matches
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -102,9 +102,9 @@ export default function PicksPage() {
       >
         <TabsList className='mb-8 w-full lg:w-fit justify-start overflow-x-auto'>
           <TabsTrigger value='ufc'>UFC Fights</TabsTrigger>
+          <TabsTrigger value='atp'>ATP Matches</TabsTrigger>
           <TabsTrigger value='nfl'>NFL Games</TabsTrigger>
           <TabsTrigger value='nba'>NBA Games</TabsTrigger>
-          <TabsTrigger value='atp'>ATP Matches</TabsTrigger>
         </TabsList>
 
         <TabsContent value='ufc'>{renderEvents()}</TabsContent>
