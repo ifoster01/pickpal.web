@@ -10,10 +10,12 @@ import {
   ArrowDownIcon,
   ArrowUpIcon,
   CalendarIcon,
+  CircleCheck,
   ChevronDown,
   Heart,
   MinusIcon,
   User,
+  CircleX,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { PickAnalytics } from './pick-analytics';
@@ -224,20 +226,50 @@ export function PickCard({
           <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
             {/* Team 1 */}
             <div className='flex items-center space-x-4'>
-              <Avatar
-                className={cn(
-                  league === 'ufc' ? 'w-[100px] h-[100px]' : 'w-[50px] h-[50px]'
-                )}
-              >
-                <AvatarImage
-                  src={team1.picUrl}
-                  alt={team1.name || 'Team 1'}
-                  className='object-cover object-top'
-                />
-                <AvatarFallback>
-                  <User className='h-1/2 w-1/2 text-muted-foreground' />
-                </AvatarFallback>
-              </Avatar>
+              <div className='relative'>
+                <Avatar
+                  className={cn(
+                    'relative',
+                    event.result !== null &&
+                      isModelPredictionCorrect &&
+                      team1.odds < 0
+                      ? 'border-2 border-green-500'
+                      : event.result !== null &&
+                          !isModelPredictionCorrect &&
+                          team1.odds < 0
+                        ? 'border-2 border-red-500'
+                        : '',
+                    league === 'ufc'
+                      ? 'w-[100px] h-[100px]'
+                      : 'w-[50px] h-[50px]'
+                  )}
+                >
+                  <AvatarImage
+                    src={team1.picUrl}
+                    alt={team1.name || 'Team 1'}
+                    className='object-cover object-top'
+                  />
+                  <AvatarFallback>
+                    <User className='h-1/2 w-1/2 text-muted-foreground' />
+                  </AvatarFallback>
+                </Avatar>
+                {event.result !== null &&
+                  isModelPredictionCorrect &&
+                  team1.odds < 0 && (
+                    <>
+                      <div className='absolute top-0 right-0 w-full h-full bg-green-500/10 rounded-full' />
+                      <CircleCheck className='absolute -bottom-4 right-[50%] translate-x-[50%] w-8 h-8 text-white fill-green-500' />
+                    </>
+                  )}
+                {event.result !== null &&
+                  !isModelPredictionCorrect &&
+                  team1.odds < 0 && (
+                    <>
+                      <div className='absolute top-0 right-0 w-full h-full bg-red-500/10 rounded-full' />
+                      <CircleX className='absolute -bottom-4 right-[50%] translate-x-[50%] w-8 h-8 text-white fill-red-500' />
+                    </>
+                  )}
+              </div>
               <div className='flex flex-col items-start'>
                 <h3
                   className={cn(
@@ -333,20 +365,50 @@ export function PickCard({
                 </div>
                 {modelFavorite === 'team2' && renderOddsChange()}
               </div>
-              <Avatar
-                className={cn(
-                  league === 'ufc' ? 'w-[100px] h-[100px]' : 'w-[50px] h-[50px]'
-                )}
-              >
-                <AvatarImage
-                  src={team2.picUrl}
-                  alt={team2.name || 'Team 2'}
-                  className='object-cover object-top'
-                />
-                <AvatarFallback>
-                  <User className='h-1/2 w-1/2 text-muted-foreground' />
-                </AvatarFallback>
-              </Avatar>
+              <div className='relative'>
+                <Avatar
+                  className={cn(
+                    'relative',
+                    event.result !== null &&
+                      isModelPredictionCorrect &&
+                      team2.odds < 0
+                      ? 'border-2 border-green-500'
+                      : event.result !== null &&
+                          !isModelPredictionCorrect &&
+                          team2.odds < 0
+                        ? 'border-2 border-red-500'
+                        : '',
+                    league === 'ufc'
+                      ? 'w-[100px] h-[100px]'
+                      : 'w-[50px] h-[50px]'
+                  )}
+                >
+                  <AvatarImage
+                    src={team2.picUrl}
+                    alt={team2.name || 'Team 2'}
+                    className='object-cover object-top'
+                  />
+                  <AvatarFallback>
+                    <User className='h-1/2 w-1/2 text-muted-foreground' />
+                  </AvatarFallback>
+                </Avatar>
+                {event.result !== null &&
+                  isModelPredictionCorrect &&
+                  team2.odds < 0 && (
+                    <>
+                      <div className='absolute top-0 right-0 w-full h-full bg-green-500/10 rounded-full' />
+                      <CircleCheck className='absolute -bottom-4 right-[50%] translate-x-[50%] w-8 h-8 text-white fill-green-500' />
+                    </>
+                  )}
+                {event.result !== null &&
+                  !isModelPredictionCorrect &&
+                  team2.odds < 0 && (
+                    <>
+                      <div className='absolute top-0 right-0 w-full h-full bg-red-500/10 rounded-full' />
+                      <CircleX className='absolute -bottom-4 right-[50%] translate-x-[50%] w-8 h-8 text-white fill-red-500' />
+                    </>
+                  )}
+              </div>
             </div>
           </div>
 
