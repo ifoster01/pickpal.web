@@ -77,10 +77,7 @@ export default function ParlayPage() {
         <div className='flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between'>
           <Skeleton className='h-9 w-48' />
           <div className='flex justify-between sm:justify-start items-center gap-4'>
-            <SportsSelector 
-              mode='select' 
-              placeholder='Select League'
-            />
+            <SportsSelector mode='select' placeholder='Select League' />
             <Skeleton className='h-10 w-10' />
           </div>
         </div>

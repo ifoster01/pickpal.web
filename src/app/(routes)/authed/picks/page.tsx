@@ -67,7 +67,7 @@ export default function PicksPage() {
         </div>
         <div className='space-y-6'>
           <SportsSelector />
-          
+
           {/* Week selector */}
           <TimeFilter />
         </div>
@@ -91,7 +91,7 @@ export default function PicksPage() {
 
       <div className='space-y-6'>
         <SportsSelector />
-        
+
         {/* Week selector */}
         <TimeFilter />
 

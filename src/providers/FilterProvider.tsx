@@ -1,6 +1,12 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import {
   WeekRange,
   getCurrentWeekRange,
@@ -33,18 +39,21 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
   const [selectedWeek, setSelectedWeek] = useState<WeekRange | null>(null);
 
   // Helper function to update filter based on week timing
-  const updateFilterBasedOnWeek = useCallback((week: WeekRange, currentFilter: LegacyFilter) => {
-    const now = new Date();
-    
-    // If the selected week is completely in the past, set filter to 'past'
-    if (week.start < now && week.end < now && currentFilter === 'upcoming') {
-      setFilter('past');
-    } 
-    // If the selected week end is in the future, set filter to 'upcoming'
-    else if (week.end > now && currentFilter === 'past') {
-      setFilter('upcoming');
-    }
-  }, []);
+  const updateFilterBasedOnWeek = useCallback(
+    (week: WeekRange, currentFilter: LegacyFilter) => {
+      const now = new Date();
+
+      // If the selected week is completely in the past, set filter to 'past'
+      if (week.end < now && currentFilter === 'upcoming') {
+        setFilter('past');
+      }
+      // If the selected week end is in the future, set filter to 'upcoming'
+      else if (week.end > now && currentFilter === 'past') {
+        setFilter('upcoming');
+      }
+    },
+    []
+  );
 
   // This effect runs only on the client after the component has mounted.
   useEffect(() => {
@@ -58,21 +67,20 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
     setSelectedWeek(savedWeek || getCurrentWeekRange());
   }, []);
 
-  // Update filter when sport/league changes
+  // Update filter when sport/league or week changes (but not when user manually changes filter)
   useEffect(() => {
     if (selectedWeek) {
       updateFilterBasedOnWeek(selectedWeek, filter);
     }
-  }, [league, selectedWeek, filter, updateFilterBasedOnWeek]); // This triggers when the sport changes
+  }, [league, selectedWeek, updateFilterBasedOnWeek]);
 
   // Persist week selection to localStorage
   useEffect(() => {
     // Ensure selectedWeek is not null before setting
     if (selectedWeek) {
       localStorage.setItem('selectedWeekKey', selectedWeek.key);
-      updateFilterBasedOnWeek(selectedWeek, filter);
     }
-  }, [selectedWeek, filter, updateFilterBasedOnWeek]);
+  }, [selectedWeek]);
 
   // Legacy filter persistence for backward compatibility
   useEffect(() => {

@@ -13,7 +13,7 @@ export function TimeFilter() {
   const { selectedWeek, setSelectedWeek, availableWeeks } = useFilter();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to selected week when component mounts or selection changes
+  // Position selected week in center on initial load (without animation)
   useEffect(() => {
     if (scrollContainerRef.current && selectedWeek) {
       const selectedButton = scrollContainerRef.current.querySelector(
@@ -21,13 +21,13 @@ export function TimeFilter() {
       );
       if (selectedButton) {
         selectedButton.scrollIntoView({
-          behavior: 'smooth',
+          behavior: 'instant',
           block: 'nearest',
           inline: 'center',
         });
       }
     }
-  }, [selectedWeek, selectedWeek?.key]);
+  }, [selectedWeek]); // Only run on mount
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -85,7 +85,23 @@ export function TimeFilter() {
                 isCurrentWeek && !isSelected && 'ring-1 ring-primary/30',
                 'hover:scale-105'
               )}
-              onClick={() => setSelectedWeek(week)}
+              onClick={() => {
+                setSelectedWeek(week);
+                // Animate scroll to the newly selected week
+                setTimeout(() => {
+                  const selectedButton =
+                    scrollContainerRef.current?.querySelector(
+                      `[data-week-key="${week.key}"]`
+                    );
+                  if (selectedButton) {
+                    selectedButton.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'nearest',
+                      inline: 'center',
+                    });
+                  }
+                }, 0);
+              }}
             >
               {week.label}
             </Button>
