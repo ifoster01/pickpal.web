@@ -11,8 +11,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { ArrowDownIcon, ArrowUpIcon, MinusIcon } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Database } from '@/types/supabase';
 import { useMemo } from 'react';
 
@@ -109,7 +107,6 @@ export function PickAnalytics({
               <p className='text-sm text-muted-foreground'>Model Advantage</p>
               <p className='text-lg font-semibold capitalize'>{discrepancy}</p>
             </div>
-
           </div>
         </Card>
       </div>

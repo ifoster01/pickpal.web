@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
-import { useLikedEvents } from '@/hooks/api/use-likes';
+import { useWeekLikedEvents } from '@/hooks/api/use-likes';
 import { useAuth } from '@/providers/AuthProvider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EventFilter } from '@/components/general/event-filter';
@@ -12,17 +12,18 @@ import { cn } from '@/utils/cn';
 import { isEventUpcoming } from '@/hooks/api/use-odds';
 import { useFilter } from '@/providers/FilterProvider';
 import { Skeleton } from '@/components/ui/skeleton';
+import { TimeFilter } from '../(components)/time-filter';
 
 export default function SavedPage() {
   const { user } = useAuth();
   const { league, setLeague } = useLeague();
-  const { filter } = useFilter();
+  const { selectedWeek } = useFilter();
 
   const {
     data: likedEvents,
     unlikeEvent,
     isLoading,
-  } = useLikedEvents(filter, league);
+  } = useWeekLikedEvents(selectedWeek, league);
 
   if (!user) {
     return (
@@ -102,6 +103,11 @@ export default function SavedPage() {
               NBA Games
             </TabsTrigger>
           </TabsList>
+
+          {/* Week selector */}
+          <div className='mb-6'>
+            <TimeFilter />
+          </div>
         </Tabs>
         <div className='grid gap-6'>
           {[1, 2, 3].map((i) => (
@@ -118,7 +124,7 @@ export default function SavedPage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
       className='w-full'
-      key={`${league}-${filter}`}
+      key={`${league}-${selectedWeek.key}`}
     >
       <div className='flex items-center justify-between'>
         <h1 className='text-3xl font-bold mb-8'>Saved Picks</h1>
@@ -137,6 +143,11 @@ export default function SavedPage() {
           <TabsTrigger value='nfl'>NFL Games</TabsTrigger>
           <TabsTrigger value='nba'>NBA Games</TabsTrigger>
         </TabsList>
+
+        {/* Week selector */}
+        <div className='mb-6'>
+          <TimeFilter />
+        </div>
 
         <TabsContent value='ufc'>{renderSavedEvents()}</TabsContent>
         <TabsContent value='nfl'>{renderSavedEvents()}</TabsContent>

@@ -1,14 +1,11 @@
 'use client';
 
 import { Database } from '@/types/supabase';
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import {
-  ChevronDown,
-} from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { PickAnalytics } from './pick-analytics';
 import { TeamImages } from './team-images';
@@ -82,11 +79,7 @@ export function PickCard({
   const discrepancyLevel =
     discrepancy < 0.1 ? 'low' : discrepancy < 0.2 ? 'medium' : 'high';
 
-
-
   const { data: odds } = useEventOdds(event.id);
-
-
 
   if (event.odds1 === null || event.odds2 === null) return null;
 
@@ -145,11 +138,7 @@ export function PickCard({
             </div>
 
             {/* VS and Predictions */}
-            <PredictionsSection
-              event={event}
-              team1={team1}
-              team2={team2}
-            />
+            <PredictionsSection event={event} team1={team1} team2={team2} />
 
             {/* Team 2 */}
             <div className='flex items-center justify-end space-x-4'>

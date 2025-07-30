@@ -13,7 +13,8 @@ import {
 } from '@/components/ui/tooltip';
 import { Database } from '@/types/supabase';
 
-type EventOdds = Database['public']['Tables']['moneyline_book_odds_data']['Row'];
+type EventOdds =
+  Database['public']['Tables']['moneyline_book_odds_data']['Row'];
 
 interface OddsComparisonProps {
   modelOdds: number;
@@ -24,17 +25,17 @@ interface OddsComparisonProps {
   showMovement?: boolean;
 }
 
-export function OddsComparison({ 
-  modelOdds, 
-  bookOdds, 
-  odds, 
-  modelFavorite, 
+export function OddsComparison({
+  modelOdds,
+  bookOdds,
+  odds,
+  modelFavorite,
   teamType,
-  showMovement = false 
+  showMovement = false,
 }: OddsComparisonProps) {
   const formatOdds = (odds: number) =>
     odds > 0 ? `+${odds}` : odds.toString();
-  
+
   const getOddsColor = (modelOdds: number, bookOdds: number) => {
     const diff = Math.abs(modelOdds - bookOdds);
     return diff > 50 ? 'text-green-500' : 'text-foreground';
@@ -67,7 +68,12 @@ export function OddsComparison({
   }, [odds, modelFavorite]);
 
   const renderOddsMovement = () => {
-    if (!showMovement || modelFavoriteBookOddsMovement === 0 || modelFavorite !== teamType) return null;
+    if (
+      !showMovement ||
+      modelFavoriteBookOddsMovement === 0 ||
+      modelFavorite !== teamType
+    )
+      return null;
     return (
       <div
         className={cn(

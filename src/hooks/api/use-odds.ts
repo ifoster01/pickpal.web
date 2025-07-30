@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/utils/supabase/client';
 import { League } from '@/providers/LeagueProvider';
+import { WeekRange } from '@/utils/utils';
 
 export type Filter = 'upcoming' | 'past' | 'all';
 
@@ -78,6 +79,53 @@ export function useUpcomingEventOdds(
       if (error) throw error;
 
       // map through the games and convert the event_datetime to a date object in the local timezone from UTC
+      const gamesWithLocalDatetime = games.map((game) => {
+        const date = new Date(game.event_datetime + 'Z');
+        return {
+          ...game,
+          event_datetime: date.toLocaleString(),
+        };
+      });
+
+      return gamesWithLocalDatetime;
+    },
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+  });
+}
+
+/**
+ * New hook for week-based event filtering
+ */
+export function useWeekEventOdds(
+  weekRange: WeekRange,
+  eventType: League,
+  count: number = 1000,
+  dateOrder: 'asc' | 'desc' = 'asc'
+) {
+  const supabase = createClient();
+
+  return useQuery({
+    queryKey: ['week_event_odds', weekRange.key, eventType, count, dateOrder],
+    queryFn: async () => {
+      // Convert week range to UTC for server query
+      const startUTC = new Date(weekRange.start).toISOString();
+      const endUTC = new Date(weekRange.end).toISOString();
+
+      let query = supabase
+        .from('event_moneyline_odds')
+        .select('*')
+        .eq('event_type', eventType)
+        .gte('event_datetime', startUTC)
+        .lte('event_datetime', endUTC)
+        .limit(count);
+
+      query = query.order('event_datetime', { ascending: dateOrder === 'asc' });
+
+      const { data: games, error } = await query;
+
+      if (error) throw error;
+
+      // Convert the event_datetime to local timezone
       const gamesWithLocalDatetime = games.map((game) => {
         const date = new Date(game.event_datetime + 'Z');
         return {

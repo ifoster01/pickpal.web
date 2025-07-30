@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import { cn } from '@/utils/cn';
+import { User } from '@supabase/supabase-js';
 
 export function SaveButton({
   isLiked,
@@ -12,7 +13,7 @@ export function SaveButton({
   isLiked?: boolean;
   onLike?: () => void;
   onUnlike?: () => void;
-  user: any;
+  user: User | null;
   likesCount?: number;
 }) {
   const handleSaveClick = () => {
@@ -45,9 +46,7 @@ export function SaveButton({
         <Heart
           className={cn(
             'w-4 h-4 transition-all duration-200',
-            isLiked
-              ? 'fill-primary stroke-primary'
-              : 'stroke-muted-foreground',
+            isLiked ? 'fill-primary stroke-primary' : 'stroke-muted-foreground',
             'group-hover:stroke-primary'
           )}
         />

@@ -2,25 +2,26 @@
 
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { isEventUpcoming, useUpcomingEventOdds } from '@/hooks/api/use-odds';
-import { useLikedEvents } from '@/hooks/api/use-likes';
+import { isEventUpcoming, useWeekEventOdds } from '@/hooks/api/use-odds';
+import { useWeekLikedEvents } from '@/hooks/api/use-likes';
 import { cn } from '@/utils/cn';
 import { PickCard } from '../(components)/pick-card/pick-card';
 import { League, useLeague } from '@/providers/LeagueProvider';
 import { useFilter } from '@/providers/FilterProvider';
 import { EventFilter } from '@/components/general/event-filter';
+import { TimeFilter } from '../(components)/time-filter';
 
 export default function PicksPage() {
   const { league, setLeague } = useLeague();
-  const { filter } = useFilter();
+  const { selectedWeek } = useFilter();
 
-  const { data: events, isLoading } = useUpcomingEventOdds(filter, league);
+  const { data: events, isLoading } = useWeekEventOdds(selectedWeek, league);
 
   const {
     data: likedEvents,
     likeEvent,
     unlikeEvent,
-  } = useLikedEvents(filter, league);
+  } = useWeekLikedEvents(selectedWeek, league);
 
   const likedEventIds = likedEvents?.map((like) => like.event_id) || [];
 
@@ -75,6 +76,11 @@ export default function PicksPage() {
               NBA Games
             </TabsTrigger>
           </TabsList>
+
+          {/* Week selector */}
+          <div className='mb-6'>
+            <TimeFilter />
+          </div>
         </Tabs>
         <div className='grid gap-6'>
           {[1, 2, 3].map((i) => (
@@ -106,6 +112,11 @@ export default function PicksPage() {
           <TabsTrigger value='nfl'>NFL Games</TabsTrigger>
           <TabsTrigger value='nba'>NBA Games</TabsTrigger>
         </TabsList>
+
+        {/* Week selector */}
+        <div className='mb-6'>
+          <TimeFilter />
+        </div>
 
         <TabsContent value='ufc'>{renderEvents()}</TabsContent>
         <TabsContent value='nfl'>{renderEvents()}</TabsContent>

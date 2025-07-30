@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useAuth } from '@/providers/AuthProvider';
 import { isEventUpcoming } from './use-odds';
 import { League } from '@/providers/LeagueProvider';
+import { WeekRange } from '@/utils/utils';
 
 type LikedEvent = Database['public']['Tables']['liked_events']['Row'];
 type EventOdds = Database['public']['Tables']['event_moneyline_odds']['Row'];
@@ -241,6 +242,236 @@ export function useLikedEvents(filter: Filter = 'upcoming', league: League) {
       if (user) {
         queryClient.invalidateQueries({
           queryKey: ['liked_events', user.id, filter, league],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['likes-count', eventId],
+        });
+      }
+    },
+  });
+
+  return {
+    ...query,
+    likeEvent: likeMutation.mutate,
+    unlikeEvent: unlikeMutation.mutate,
+    isLiking: likeMutation.isPending,
+    isUnliking: unlikeMutation.isPending,
+  };
+}
+
+/**
+ * New hook for week-based liked events filtering
+ */
+export function useWeekLikedEvents(weekRange: WeekRange, league: League) {
+  const { user } = useAuth();
+  const supabase = createClient();
+  const queryClient = useQueryClient();
+
+  // Set up real-time subscription
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('liked_events_changes_week')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'liked_events',
+          filter: `saving_user_id=eq.${user.id}`,
+        },
+        () => {
+          // Refetch the liked events when changes occur
+          queryClient.invalidateQueries({
+            queryKey: ['week_liked_events', user.id, weekRange.key, league],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ['likes-count', league],
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase, user, queryClient, weekRange.key, league]);
+
+  // Query for liked events within the week range
+  const query = useQuery<EnrichedLikedEvent[]>({
+    queryKey: ['week_liked_events', user?.id, weekRange.key, league],
+    queryFn: async () => {
+      if (!user) return [];
+
+      // Convert week range to UTC for server query
+      const startUTC = new Date(weekRange.start).toISOString();
+      const endUTC = new Date(weekRange.end).toISOString();
+
+      // First, get the event odds within the week range
+      const { data: eventOdds, error: oddsError } = await supabase
+        .from('event_moneyline_odds')
+        .select('*')
+        .eq('event_type', league.toLowerCase())
+        .gte('event_datetime', startUTC)
+        .lte('event_datetime', endUTC);
+
+      if (oddsError) throw oddsError;
+
+      // Get the event IDs from the week's events
+      const weekEventIds = eventOdds.map((event) => event.id);
+
+      if (weekEventIds.length === 0) {
+        return []; // No events in this week
+      }
+
+      // Then, get the liked events that match those event IDs
+      const { data: likedEvents, error: likedError } = await supabase
+        .from('liked_events')
+        .select('*')
+        .eq('saving_user_id', user.id)
+        .eq('event_type', league)
+        .in('event_id', weekEventIds)
+        .order('created_at', { ascending: false });
+
+      if (likedError) throw likedError;
+
+      // Manually join the data
+      const enrichedLikes: EnrichedLikedEvent[] = likedEvents.map((like) => ({
+        ...like,
+        upcoming_event_odds:
+          eventOdds.find((odds) => odds.id === like.event_id) || null,
+      }));
+
+      return enrichedLikes;
+    },
+    enabled: !!user,
+  });
+
+  // Mutation to like an event
+  const likeMutation = useMutation({
+    mutationFn: async (eventId: string) => {
+      if (!user) throw new Error('User not authenticated');
+
+      const newLike = {
+        event_id: eventId,
+        saving_user_id: user.id,
+        created_at: new Date().toISOString(),
+        event_type: league,
+      };
+
+      const { error } = await supabase.from('liked_events').insert(newLike);
+
+      if (error) throw error;
+      return newLike;
+    },
+    onMutate: async (eventId) => {
+      if (!user) return;
+
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({
+        queryKey: ['week_liked_events', user.id, weekRange.key, league],
+      });
+
+      // Snapshot the previous value
+      const previousLikes = queryClient.getQueryData<EnrichedLikedEvent[]>([
+        'week_liked_events',
+        user.id,
+        weekRange.key,
+        league,
+      ]);
+
+      // Optimistically update to the new value
+      const newLike: EnrichedLikedEvent = {
+        event_id: eventId,
+        saving_user_id: user.id,
+        created_at: new Date().toISOString(),
+        id: Math.random(), // temporary ID
+        upcoming_event_odds:
+          queryClient
+            .getQueryData<EventOdds[]>(['event_moneyline_odds'])
+            ?.find((event) => event.id === eventId) || null,
+        event_type: league,
+      };
+
+      queryClient.setQueryData<EnrichedLikedEvent[]>(
+        ['week_liked_events', user.id, weekRange.key, league],
+        (old = []) => [newLike, ...old]
+      );
+
+      // Return a context object with the snapshotted value
+      return { previousLikes };
+    },
+    onError: (err, newEvent, context) => {
+      if (context?.previousLikes && user) {
+        queryClient.setQueryData<EnrichedLikedEvent[]>(
+          ['week_liked_events', user.id, weekRange.key, league],
+          context.previousLikes
+        );
+      }
+    },
+    onSettled: (_data, _error, eventId) => {
+      if (user) {
+        queryClient.invalidateQueries({
+          queryKey: ['week_liked_events', user.id, weekRange.key, league],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['likes-count', eventId],
+        });
+      }
+    },
+  });
+
+  // Mutation to unlike an event
+  const unlikeMutation = useMutation({
+    mutationFn: async (eventId: string) => {
+      if (!user) throw new Error('User not authenticated');
+
+      const { error } = await supabase
+        .from('liked_events')
+        .delete()
+        .eq('event_id', eventId)
+        .eq('saving_user_id', user.id);
+
+      if (error) throw error;
+    },
+    onMutate: async (eventId) => {
+      if (!user) return;
+
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({
+        queryKey: ['week_liked_events', user.id, weekRange.key, league],
+      });
+
+      // Snapshot the previous value
+      const previousLikes = queryClient.getQueryData<EnrichedLikedEvent[]>([
+        'week_liked_events',
+        user.id,
+        weekRange.key,
+        league,
+      ]);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData<EnrichedLikedEvent[]>(
+        ['week_liked_events', user.id, weekRange.key, league],
+        (old = []) => old.filter((like) => like.event_id !== eventId)
+      );
+
+      // Return a context object with the snapshotted value
+      return { previousLikes };
+    },
+    onError: (err, eventId, context) => {
+      if (context?.previousLikes && user) {
+        queryClient.setQueryData<EnrichedLikedEvent[]>(
+          ['week_liked_events', user.id, weekRange.key, league],
+          context.previousLikes
+        );
+      }
+    },
+    onSettled: (_data, _error, eventId) => {
+      if (user) {
+        queryClient.invalidateQueries({
+          queryKey: ['week_liked_events', user.id, weekRange.key, league],
         });
         queryClient.invalidateQueries({
           queryKey: ['likes-count', eventId],
