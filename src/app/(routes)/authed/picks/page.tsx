@@ -13,15 +13,19 @@ import { TimeFilter } from '../(components)/time-filter';
 
 export default function PicksPage() {
   const { league, setLeague } = useLeague();
-  const { selectedWeek } = useFilter();
+  const { selectedWeek, filter } = useFilter();
 
-  const { data: events, isLoading } = useWeekEventOdds(selectedWeek, league);
+  const { data: events, isLoading } = useWeekEventOdds(
+    selectedWeek,
+    league,
+    filter
+  );
 
   const {
     data: likedEvents,
     likeEvent,
     unlikeEvent,
-  } = useWeekLikedEvents(selectedWeek, league);
+  } = useWeekLikedEvents(selectedWeek, league, filter);
 
   const likedEventIds = likedEvents?.map((like) => like.event_id) || [];
 

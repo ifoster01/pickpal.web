@@ -17,13 +17,13 @@ import { TimeFilter } from '../(components)/time-filter';
 export default function SavedPage() {
   const { user } = useAuth();
   const { league, setLeague } = useLeague();
-  const { selectedWeek } = useFilter();
+  const { selectedWeek, filter } = useFilter();
 
   const {
     data: likedEvents,
     unlikeEvent,
     isLoading,
-  } = useWeekLikedEvents(selectedWeek, league);
+  } = useWeekLikedEvents(selectedWeek, league, filter);
 
   if (!user) {
     return (

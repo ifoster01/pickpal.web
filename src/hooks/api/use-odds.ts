@@ -99,13 +99,21 @@ export function useUpcomingEventOdds(
 export function useWeekEventOdds(
   weekRange: WeekRange,
   eventType: League,
+  dateFilter: 'upcoming' | 'past' | 'all' = 'upcoming',
   count: number = 1000,
   dateOrder: 'asc' | 'desc' = 'asc'
 ) {
   const supabase = createClient();
 
   return useQuery({
-    queryKey: ['week_event_odds', weekRange.key, eventType, count, dateOrder],
+    queryKey: [
+      'week_event_odds',
+      weekRange.key,
+      eventType,
+      count,
+      dateOrder,
+      dateFilter,
+    ],
     queryFn: async () => {
       // Convert week range to UTC for server query
       const startUTC = new Date(weekRange.start).toISOString();
@@ -120,6 +128,15 @@ export function useWeekEventOdds(
         .limit(count);
 
       query = query.order('event_datetime', { ascending: dateOrder === 'asc' });
+
+      console.log('dateFilter', dateFilter);
+
+      // add the date filter
+      if (dateFilter === 'upcoming') {
+        query = query.filter('event_datetime', 'gte', new Date().toISOString());
+      } else if (dateFilter === 'past') {
+        query = query.filter('event_datetime', 'lt', new Date().toISOString());
+      }
 
       const { data: games, error } = await query;
 
