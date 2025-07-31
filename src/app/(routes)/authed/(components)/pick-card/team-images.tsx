@@ -2,7 +2,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { League } from '@/providers/LeagueProvider';
 import { cn } from '@/utils/cn';
 import { Database } from '@/types/supabase';
-import { CircleCheck, CircleX, User } from 'lucide-react';
+import { CircleCheck, CircleX, Star, User } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 type EventOdds = Database['public']['Tables']['event_moneyline_odds']['Row'];
 
@@ -20,11 +25,13 @@ export function TeamImages({
   isModelPredictionCorrect,
   team,
   league,
+  pick,
 }: {
   event: EventOdds;
   isModelPredictionCorrect: boolean;
   team: Team;
   league: League;
+  pick: boolean;
 }) {
   return (
     <div className='relative'>
@@ -61,6 +68,16 @@ export function TeamImages({
           <div className='absolute top-0 right-0 w-full h-full bg-red-500/10 rounded-full' />
           <CircleX className='absolute -bottom-4 right-[50%] translate-x-[50%] w-8 h-8 text-white fill-red-500' />
         </>
+      )}
+      {pick && (
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            <Star className='absolute -top-1 -right-1 w-10 h-10 text-white fill-purple-500' />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Super Pick</p>
+          </TooltipContent>
+        </Tooltip>
       )}
     </div>
   );

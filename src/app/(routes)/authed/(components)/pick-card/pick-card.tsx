@@ -19,6 +19,7 @@ import { useLikesCount } from '@/hooks/api/use-likes-count';
 import { League } from '@/providers/LeagueProvider';
 import { useEventOdds } from '@/hooks/api/use-odds';
 import { Skeleton } from '@/components/ui/skeleton';
+import { usePick } from '@/hooks/api/use-pick';
 
 type EventOdds = Database['public']['Tables']['event_moneyline_odds']['Row'];
 
@@ -49,6 +50,7 @@ export function PickCard({
   const [isExpanded, setIsExpanded] = useState(false);
   const { user } = useAuth();
   const { data: likesCount } = useLikesCount(event.id, league);
+  const { data: pick } = usePick(event, league);
 
   const team1: Team = {
     name: event.team1 || '',
@@ -114,6 +116,7 @@ export function PickCard({
                 isModelPredictionCorrect={isModelPredictionCorrect}
                 team={team1}
                 league={league}
+                pick={pick === 'team1'}
               />
               <div className='flex flex-col items-start'>
                 <h3
@@ -169,6 +172,7 @@ export function PickCard({
                 isModelPredictionCorrect={isModelPredictionCorrect}
                 team={team2}
                 league={league}
+                pick={pick === 'team2'}
               />
             </div>
           </div>
