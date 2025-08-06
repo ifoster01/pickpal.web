@@ -115,7 +115,6 @@ export function PickCard({
                 event={event}
                 isModelPredictionCorrect={isModelPredictionCorrect}
                 team={team1}
-                league={league}
                 pick={pick === 'team1'}
               />
               <div className='flex flex-col items-start'>
@@ -171,7 +170,6 @@ export function PickCard({
                 event={event}
                 isModelPredictionCorrect={isModelPredictionCorrect}
                 team={team2}
-                league={league}
                 pick={pick === 'team2'}
               />
             </div>

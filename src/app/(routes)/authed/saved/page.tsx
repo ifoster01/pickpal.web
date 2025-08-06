@@ -109,7 +109,7 @@ export default function SavedPage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
       className='w-full'
-      key={`${league}-${selectedWeek.key}`}
+      key={`${league}-${selectedWeek?.key || ''}`}
     >
       <div className='flex items-center justify-between'>
         <h1 className='text-3xl font-bold mb-8'>Saved Picks</h1>

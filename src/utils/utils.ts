@@ -17,6 +17,8 @@ export function encodedRedirect(
 
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { createClient } from './supabase/client';
+import { League } from '@/providers/LeagueProvider';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -155,6 +157,45 @@ export function generateWeekRanges(
   // Sort weeks chronologically
   weeks.sort((a, b) => a.start.getTime() - b.start.getTime());
 
+  return weeks;
+}
+
+export async function generateEventRanges(
+  eventType: League
+): Promise<WeekRange[]> {
+  const weeks: WeekRange[] = [];
+  const supabase = createClient();
+
+  // get all the unique events from supabase
+  const { data: tournaments, error: tournamentsError } = await supabase.rpc(
+    'get_tournaments_with_dates',
+    {
+      p_event_type: eventType,
+    }
+  );
+
+  if (tournamentsError) {
+    console.error(tournamentsError);
+  }
+
+  // adding the tournaments to the weeks array
+  for (const tournament of tournaments || []) {
+    // move the start date back 1 day
+    const startDate = new Date(tournament.tournament_start_date);
+    startDate.setDate(startDate.getDate() - 1);
+    // move the end date forward 1 day
+    const endDate = new Date(tournament.tournament_end_date);
+    endDate.setDate(endDate.getDate() + 1);
+    weeks.push({
+      start: startDate,
+      end: endDate,
+      label: tournament.tournament_name,
+      key: `tournament-${tournament.tournament_name}-${new Date(tournament.tournament_start_date).getFullYear()}`,
+    });
+  }
+
+  // sort the weeks by start date
+  weeks.sort((a, b) => a.start.getTime() - b.start.getTime());
   return weeks;
 }
 

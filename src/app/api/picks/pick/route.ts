@@ -35,6 +35,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ pick: 'none' }, { status: 200 });
   }
   if (league === 'atp') {
+    // the favorite's odds are less than -100
+    // the book odds agree on the favorite
+    // the book odds are less than -122
+    const odds_threshold = -110;
+    const book_odds_threshold = -122;
+    if (
+      model_favorite_odds < odds_threshold &&
+      model_favorite_book > book_odds_threshold &&
+      model_favorite_book < 0
+    ) {
+      return NextResponse.json(
+        { pick: model_favorite_odds === event.odds1 ? 'team1' : 'team2' },
+        { status: 200 }
+      );
+    }
     return NextResponse.json({ pick: 'none' }, { status: 200 });
   }
   if (league === 'nba') {

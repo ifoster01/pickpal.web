@@ -35,6 +35,11 @@ export function PredictionsSection({
 
   return (
     <div className='flex flex-col items-center justify-center'>
+      <div className='flex flex-col items-center justify-center'>
+        {event.tournament && (
+          <span className='text-lg font-semibold'>{event.tournament}</span>
+        )}
+      </div>
       <span className='text-lg font-semibold text-muted-foreground mb-2'>
         vs
       </span>

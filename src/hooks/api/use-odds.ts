@@ -96,28 +96,47 @@ export function useUpcomingEventOdds(
 /**
  * New hook for week-based event filtering
  */
-export function useWeekEventOdds(
-  weekRange: WeekRange,
-  eventType: League,
-  dateFilter: 'upcoming' | 'past' | 'all' = 'upcoming',
-  count: number = 1000,
-  dateOrder: 'asc' | 'desc' = 'asc'
-) {
+export function useWeekEventOdds({
+  weekRange,
+  eventType,
+  dateFilter,
+  count,
+  dateOrder,
+  tournament,
+  eventYear,
+}: {
+  weekRange: WeekRange | null;
+  eventType: League;
+  dateFilter: 'upcoming' | 'past' | 'all';
+  count: number;
+  dateOrder: 'asc' | 'desc';
+  tournament: string | null;
+  eventYear: string | null;
+}) {
   const supabase = createClient();
 
   return useQuery({
     queryKey: [
       'week_event_odds',
-      weekRange.key,
+      weekRange?.key,
       eventType,
       count,
       dateOrder,
       dateFilter,
     ],
     queryFn: async () => {
+      if (!weekRange) {
+        return [];
+      }
+
       // Convert week range to UTC for server query
       const startUTC = new Date(weekRange.start).toISOString();
       const endUTC = new Date(weekRange.end).toISOString();
+
+      // Convert eventYear to a date range
+      const startDate = new Date(eventYear || '');
+      const endDate = new Date(eventYear || '');
+      endDate.setFullYear(endDate.getFullYear() + 1);
 
       let query = supabase
         .from('event_moneyline_odds')
@@ -125,6 +144,9 @@ export function useWeekEventOdds(
         .eq('event_type', eventType)
         .gte('event_datetime', startUTC)
         .lte('event_datetime', endUTC)
+        .eq('tournament', tournament || '')
+        .gte('event_datetime', startDate.toISOString())
+        .lte('event_datetime', endDate.toISOString())
         .limit(count);
 
       query = query.order('event_datetime', { ascending: dateOrder === 'asc' });

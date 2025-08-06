@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { League } from '@/providers/LeagueProvider';
 import { cn } from '@/utils/cn';
 import { Database } from '@/types/supabase';
 import { CircleCheck, CircleX, Star, User } from 'lucide-react';
@@ -24,13 +23,11 @@ export function TeamImages({
   event,
   isModelPredictionCorrect,
   team,
-  league,
   pick,
 }: {
   event: EventOdds;
   isModelPredictionCorrect: boolean;
   team: Team;
-  league: League;
   pick: boolean;
 }) {
   return (
@@ -45,7 +42,7 @@ export function TeamImages({
                 team.odds < 0
               ? 'border-2 border-red-500'
               : '',
-          league === 'ufc' ? 'w-[100px] h-[100px]' : 'w-[50px] h-[50px]'
+          'w-[100px] h-[100px]'
         )}
       >
         <AvatarImage

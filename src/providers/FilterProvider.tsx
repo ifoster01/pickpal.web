@@ -11,17 +11,19 @@ import {
   WeekRange,
   getCurrentWeekRange,
   generateWeekRanges,
+  generateEventRanges,
 } from '@/utils/utils';
-import { useLeague } from '@/providers/LeagueProvider';
+import { useLeague, League } from '@/providers/LeagueProvider';
 
 // Legacy filter type for backward compatibility
 export type LegacyFilter = 'upcoming' | 'past' | 'all';
 
 interface FilterContextType {
   // Week-based filtering (new)
-  selectedWeek: WeekRange;
+  selectedWeek: WeekRange | null;
   setSelectedWeek: (week: WeekRange) => void;
   availableWeeks: WeekRange[];
+  isLoading: boolean;
 
   // Legacy filter support
   filter: LegacyFilter;
@@ -33,6 +35,7 @@ const FilterContext = createContext<FilterContextType | undefined>(undefined);
 export function FilterProvider({ children }: { children: React.ReactNode }) {
   const { league } = useLeague();
   const [filter, setFilter] = useState<LegacyFilter>('upcoming');
+  const [isLoading, setIsLoading] = useState(true);
 
   // State dependent on client-side Date object must be initialized in useEffect
   const [availableWeeks, setAvailableWeeks] = useState<WeekRange[]>([]);
@@ -57,15 +60,58 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
 
   // This effect runs only on the client after the component has mounted.
   useEffect(() => {
-    const clientWeeks = generateWeekRanges();
-    setAvailableWeeks(clientWeeks);
+    let isCancelled = false;
 
-    const savedWeekKey = localStorage.getItem('selectedWeekKey');
-    const savedWeek = clientWeeks.find((week) => week.key === savedWeekKey);
+    const initializeWeeks = async (currentLeague: League) => {
+      setIsLoading(true);
+      let clientWeeks: WeekRange[] = [];
 
-    // Set the initial week from localStorage or default to the current week
-    setSelectedWeek(savedWeek || getCurrentWeekRange());
-  }, []);
+      try {
+        if (currentLeague === 'atp' || currentLeague === 'ufc') {
+          clientWeeks = await generateEventRanges(currentLeague);
+        } else {
+          clientWeeks = generateWeekRanges();
+        }
+
+        // Check if this effect is still valid (league hasn't changed)
+        if (isCancelled || currentLeague !== league) {
+          return;
+        }
+
+        setAvailableWeeks(clientWeeks);
+
+        const savedWeekKey = localStorage.getItem('selectedWeekKey');
+        const savedWeek = clientWeeks.find((week) => week.key === savedWeekKey);
+
+        if (currentLeague === 'atp' || currentLeague === 'ufc') {
+          // Set the initial week from localStorage or default to the current week
+          setSelectedWeek(savedWeek || clientWeeks[clientWeeks.length - 1]);
+        } else {
+          // Set the initial week from localStorage or default to the current week
+          setSelectedWeek(savedWeek || getCurrentWeekRange());
+        }
+      } catch (error) {
+        console.error('Failed to initialize weeks:', error);
+        // Fallback to current week in case of error
+        if (!isCancelled && currentLeague === league) {
+          const fallbackWeek = getCurrentWeekRange();
+          setSelectedWeek(fallbackWeek);
+          setAvailableWeeks([fallbackWeek]);
+        }
+      } finally {
+        if (!isCancelled && currentLeague === league) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    initializeWeeks(league);
+
+    // Cleanup function to cancel stale requests
+    return () => {
+      isCancelled = true;
+    };
+  }, [league]);
 
   // Update filter when sport/league or week changes (but not when user manually changes filter)
   useEffect(() => {
@@ -98,18 +144,13 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('selectedFilter', filter);
   }, [filter]);
 
-  // Do not render children until the client-side state has been initialized
-  // to prevent passing down null values and causing crashes.
-  if (!selectedWeek) {
-    return null; // Or a loading spinner
-  }
-
   return (
     <FilterContext.Provider
       value={{
         selectedWeek,
         setSelectedWeek,
         availableWeeks,
+        isLoading,
         filter,
         setFilter,
       }}

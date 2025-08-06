@@ -59,6 +59,7 @@ export type Database = {
           team2_name: string | null;
           team2_pic_png: string | null;
           team2_pic_url: string | null;
+          tournament: string | null;
           updated_at: string | null;
         };
         Insert: {
@@ -81,6 +82,7 @@ export type Database = {
           team2_name?: string | null;
           team2_pic_png?: string | null;
           team2_pic_url?: string | null;
+          tournament?: string | null;
           updated_at?: string | null;
         };
         Update: {
@@ -103,6 +105,7 @@ export type Database = {
           team2_name?: string | null;
           team2_pic_png?: string | null;
           team2_pic_url?: string | null;
+          tournament?: string | null;
           updated_at?: string | null;
         };
         Relationships: [];
@@ -175,6 +178,34 @@ export type Database = {
       delete_user: {
         Args: Record<PropertyKey, never>;
         Returns: undefined;
+      };
+      get_atp_tournaments: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          tournament_name: string;
+        }[];
+      };
+      get_tournament_event_date_ranges: {
+        Args: { p_tournament_name: string };
+        Returns: {
+          event_year: number;
+          earliest_event_datetime: string;
+          latest_event_datetime: string;
+        }[];
+      };
+      get_tournaments_with_dates: {
+        Args: { p_event_type: string };
+        Returns: {
+          tournament_name: string;
+          tournament_start_date: string;
+          tournament_end_date: string;
+        }[];
+      };
+      get_ufc_tournaments: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          tournament_name: string;
+        }[];
       };
     };
     Enums: {

@@ -263,7 +263,7 @@ export function useLikedEvents(filter: Filter = 'upcoming', league: League) {
  * New hook for week-based liked events filtering
  */
 export function useWeekLikedEvents(
-  weekRange: WeekRange,
+  weekRange: WeekRange | null,
   league: League,
   dateFilter: 'upcoming' | 'past' | 'all' = 'all'
 ) {
@@ -291,7 +291,7 @@ export function useWeekLikedEvents(
             queryKey: [
               'week_liked_events',
               user.id,
-              weekRange.key,
+              weekRange?.key,
               league,
               dateFilter,
             ],
@@ -306,19 +306,19 @@ export function useWeekLikedEvents(
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, user, queryClient, weekRange.key, league, dateFilter]);
+  }, [supabase, user, queryClient, weekRange?.key, league, dateFilter]);
 
   // Query for liked events within the week range
   const query = useQuery<EnrichedLikedEvent[]>({
     queryKey: [
       'week_liked_events',
       user?.id,
-      weekRange.key,
+      weekRange?.key,
       league,
       dateFilter,
     ],
     queryFn: async () => {
-      if (!user) return [];
+      if (!user || !weekRange) return [];
 
       // Convert week range to UTC for server query
       const startUTC = new Date(weekRange.start).toISOString();
@@ -406,7 +406,7 @@ export function useWeekLikedEvents(
         queryKey: [
           'week_liked_events',
           user.id,
-          weekRange.key,
+          weekRange?.key,
           league,
           dateFilter,
         ],
@@ -416,7 +416,7 @@ export function useWeekLikedEvents(
       const previousLikes = queryClient.getQueryData<EnrichedLikedEvent[]>([
         'week_liked_events',
         user.id,
-        weekRange.key,
+        weekRange?.key,
         league,
         dateFilter,
       ]);
@@ -435,7 +435,7 @@ export function useWeekLikedEvents(
       };
 
       queryClient.setQueryData<EnrichedLikedEvent[]>(
-        ['week_liked_events', user.id, weekRange.key, league, dateFilter],
+        ['week_liked_events', user.id, weekRange?.key, league, dateFilter],
         (old = []) => [newLike, ...old]
       );
 
@@ -445,7 +445,7 @@ export function useWeekLikedEvents(
     onError: (err, newEvent, context) => {
       if (context?.previousLikes && user) {
         queryClient.setQueryData<EnrichedLikedEvent[]>(
-          ['week_liked_events', user.id, weekRange.key, league, dateFilter],
+          ['week_liked_events', user.id, weekRange?.key, league, dateFilter],
           context.previousLikes
         );
       }
@@ -456,7 +456,7 @@ export function useWeekLikedEvents(
           queryKey: [
             'week_liked_events',
             user.id,
-            weekRange.key,
+            weekRange?.key,
             league,
             dateFilter,
           ],
@@ -489,7 +489,7 @@ export function useWeekLikedEvents(
         queryKey: [
           'week_liked_events',
           user.id,
-          weekRange.key,
+          weekRange?.key,
           league,
           dateFilter,
         ],
@@ -499,14 +499,14 @@ export function useWeekLikedEvents(
       const previousLikes = queryClient.getQueryData<EnrichedLikedEvent[]>([
         'week_liked_events',
         user.id,
-        weekRange.key,
+        weekRange?.key,
         league,
         dateFilter,
       ]);
 
       // Optimistically update to the new value
       queryClient.setQueryData<EnrichedLikedEvent[]>(
-        ['week_liked_events', user.id, weekRange.key, league, dateFilter],
+        ['week_liked_events', user.id, weekRange?.key, league, dateFilter],
         (old = []) => old.filter((like) => like.event_id !== eventId)
       );
 
@@ -516,7 +516,7 @@ export function useWeekLikedEvents(
     onError: (err, eventId, context) => {
       if (context?.previousLikes && user) {
         queryClient.setQueryData<EnrichedLikedEvent[]>(
-          ['week_liked_events', user.id, weekRange.key, league, dateFilter],
+          ['week_liked_events', user.id, weekRange?.key, league, dateFilter],
           context.previousLikes
         );
       }
@@ -527,7 +527,7 @@ export function useWeekLikedEvents(
           queryKey: [
             'week_liked_events',
             user.id,
-            weekRange.key,
+            weekRange?.key,
             league,
             dateFilter,
           ],

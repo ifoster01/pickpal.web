@@ -10,7 +10,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
  * TimeFilter component that displays a horizontal scrolling tab selector for week ranges
  */
 export function TimeFilter() {
-  const { selectedWeek, setSelectedWeek, availableWeeks } = useFilter();
+  const { selectedWeek, setSelectedWeek, availableWeeks, isLoading } =
+    useFilter();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Position selected week in center on initial load (without animation)
@@ -21,7 +22,7 @@ export function TimeFilter() {
       );
       if (selectedButton) {
         selectedButton.scrollIntoView({
-          behavior: 'instant',
+          behavior: 'smooth',
           block: 'nearest',
           inline: 'center',
         });
@@ -46,6 +47,22 @@ export function TimeFilter() {
       });
     }
   };
+
+  // Show loading state
+  if (isLoading || !selectedWeek) {
+    return (
+      <div className='relative w-full'>
+        <div className='flex gap-2 px-8 py-2'>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className='h-8 w-20 animate-pulse rounded bg-muted flex-shrink-0'
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='relative w-full'>

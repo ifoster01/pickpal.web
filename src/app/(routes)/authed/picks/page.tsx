@@ -13,13 +13,17 @@ import { TimeFilter } from '../(components)/time-filter';
 
 export default function PicksPage() {
   const { league } = useLeague();
-  const { selectedWeek, filter } = useFilter();
+  const { selectedWeek, filter, isLoading: isFilterLoading } = useFilter();
 
-  const { data: events, isLoading } = useWeekEventOdds(
-    selectedWeek,
-    league,
-    filter
-  );
+  const { data: events, isLoading } = useWeekEventOdds({
+    weekRange: selectedWeek,
+    eventType: league,
+    dateFilter: filter,
+    count: 1000,
+    dateOrder: 'asc',
+    tournament: selectedWeek?.label || null,
+    eventYear: selectedWeek?.key.split('-').pop() || null,
+  });
 
   const {
     data: likedEvents,
@@ -58,7 +62,7 @@ export default function PicksPage() {
     </div>
   );
 
-  if (isLoading) {
+  if (isLoading || isFilterLoading || !selectedWeek) {
     return (
       <div className='space-y-8'>
         <div className='flex items-center justify-between'>
