@@ -13,17 +13,33 @@ import { isEventUpcoming } from '@/hooks/api/use-odds';
 import { useFilter } from '@/providers/FilterProvider';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TimeFilter } from '../(components)/time-filter';
+import { eventHasPick } from '@/hooks/api/use-pick';
+import { useMemo } from 'react';
 
 export default function SavedPage() {
   const { user } = useAuth();
   const { league } = useLeague();
-  const { selectedWeek, filter } = useFilter();
+  const { selectedWeek, filter, showPicksOnly } = useFilter();
 
   const {
     data: likedEvents,
     unlikeEvent,
     isLoading,
   } = useWeekLikedEvents(selectedWeek, league, filter);
+
+  // Filter liked events based on showPicksOnly flag
+  const filteredLikedEvents = useMemo(() => {
+    if (!likedEvents) return [];
+
+    if (showPicksOnly) {
+      return likedEvents.filter((like) => {
+        const event = like.upcoming_event_odds;
+        return event && eventHasPick(event, league);
+      });
+    }
+
+    return likedEvents;
+  }, [likedEvents, showPicksOnly, league]);
 
   if (!user) {
     return (
@@ -44,18 +60,20 @@ export default function SavedPage() {
   }
 
   const renderSavedEvents = () => {
-    if (likedEvents?.length === 0) {
+    if (filteredLikedEvents?.length === 0) {
       return (
         <Card className='w-full p-6'>
           <p className='text-muted-foreground'>
-            You haven&apos;t saved any {league} events yet.
+            {showPicksOnly
+              ? `You haven't saved any ${league} events with picks yet.`
+              : `You haven't saved any ${league} events yet.`}
           </p>
         </Card>
       );
     }
     return (
       <div className='grid gap-6'>
-        {likedEvents?.map((like) => {
+        {filteredLikedEvents?.map((like) => {
           const event = like.upcoming_event_odds;
           if (!event) return null;
 

@@ -3,6 +3,7 @@
 import { Card } from '@/components/ui/card';
 import { isEventUpcoming, useWeekEventOdds } from '@/hooks/api/use-odds';
 import { useWeekLikedEvents } from '@/hooks/api/use-likes';
+import { eventHasPick } from '@/hooks/api/use-pick';
 import { cn } from '@/utils/cn';
 import { PickCard } from '../(components)/pick-card/pick-card';
 import { useLeague } from '@/providers/LeagueProvider';
@@ -10,10 +11,16 @@ import { useFilter } from '@/providers/FilterProvider';
 import { EventFilter } from '@/components/general/event-filter';
 import { SportsSelector } from '@/components/general/sports-selector';
 import { TimeFilter } from '../(components)/time-filter';
+import { useMemo } from 'react';
 
 export default function PicksPage() {
   const { league } = useLeague();
-  const { selectedWeek, filter, isLoading: isFilterLoading } = useFilter();
+  const {
+    selectedWeek,
+    filter,
+    showPicksOnly,
+    isLoading: isFilterLoading,
+  } = useFilter();
 
   const { data: events, isLoading } = useWeekEventOdds({
     weekRange: selectedWeek,
@@ -33,10 +40,21 @@ export default function PicksPage() {
 
   const likedEventIds = likedEvents?.map((like) => like.event_id) || [];
 
+  // Filter events based on showPicksOnly flag
+  const filteredEvents = useMemo(() => {
+    if (!events) return [];
+
+    if (showPicksOnly) {
+      return events.filter((event) => eventHasPick(event, league));
+    }
+
+    return events;
+  }, [events, showPicksOnly, league]);
+
   const renderEvents = () => (
     <div className='grid gap-6'>
-      {events && events.length > 0 ? (
-        events.map((event) => {
+      {filteredEvents && filteredEvents.length > 0 ? (
+        filteredEvents.map((event) => {
           const isLiked = likedEventIds.includes(event.id);
           const isCompleted = !isEventUpcoming(event.event_datetime);
 
@@ -55,7 +73,9 @@ export default function PicksPage() {
       ) : (
         <Card className='p-6'>
           <p className='text-center text-muted-foreground'>
-            No {league} events available
+            {showPicksOnly
+              ? `No ${league} events with picks available`
+              : `No ${league} events available`}
           </p>
         </Card>
       )}

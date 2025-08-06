@@ -28,6 +28,10 @@ interface FilterContextType {
   // Legacy filter support
   filter: LegacyFilter;
   setFilter: (filter: LegacyFilter) => void;
+
+  // Picks filter
+  showPicksOnly: boolean;
+  setShowPicksOnly: (showPicksOnly: boolean) => void;
 }
 
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
@@ -36,6 +40,7 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
   const { league } = useLeague();
   const [filter, setFilter] = useState<LegacyFilter>('upcoming');
   const [isLoading, setIsLoading] = useState(true);
+  const [showPicksOnly, setShowPicksOnly] = useState(false);
 
   // State dependent on client-side Date object must be initialized in useEffect
   const [availableWeeks, setAvailableWeeks] = useState<WeekRange[]>([]);
@@ -144,6 +149,18 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('selectedFilter', filter);
   }, [filter]);
 
+  // Picks filter persistence
+  useEffect(() => {
+    const savedShowPicksOnly = localStorage.getItem('showPicksOnly');
+    if (savedShowPicksOnly !== null) {
+      setShowPicksOnly(savedShowPicksOnly === 'true');
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('showPicksOnly', showPicksOnly.toString());
+  }, [showPicksOnly]);
+
   return (
     <FilterContext.Provider
       value={{
@@ -153,6 +170,8 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         filter,
         setFilter,
+        showPicksOnly,
+        setShowPicksOnly,
       }}
     >
       {children}
