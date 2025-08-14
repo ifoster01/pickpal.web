@@ -38,8 +38,8 @@ export async function POST(request: NextRequest) {
     // the favorite's odds are less than -100
     // the book odds agree on the favorite
     // the book odds are less than -122
-    const odds_threshold = -110;
-    const book_odds_threshold = -122;
+    const odds_threshold = -130;
+    const book_odds_threshold = -150;
     if (
       model_favorite_odds < odds_threshold &&
       model_favorite_book > book_odds_threshold &&
