@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Database } from '@/types/supabase';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Check, Search, User, AlertTriangle } from 'lucide-react';
+import { Check, Search, User, AlertTriangle, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { cn } from '@/utils/cn';
@@ -23,6 +23,11 @@ interface EventSelectorProps {
   league: League;
 }
 
+interface PickResult {
+  eventId: string;
+  pick: 'team1' | 'team2' | 'none';
+}
+
 export function EventSelector({
   events,
   selectedEventIds,
@@ -31,9 +36,46 @@ export function EventSelector({
   league,
 }: EventSelectorProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterBy, setFilterBy] = useState<'all' | 'favorites' | 'underdogs'>(
-    'all'
-  );
+  const [showModelFavBookDog, setShowModelFavBookDog] = useState(false);
+  const [showPicksOnly, setShowPicksOnly] = useState(false);
+  const [picks, setPicks] = useState<PickResult[]>([]);
+  const [isLoadingPicks, setIsLoadingPicks] = useState(false);
+
+  // Fetch picks when events or league changes
+  useEffect(() => {
+    const fetchPicks = async () => {
+      if (events.length === 0) return;
+
+      setIsLoadingPicks(true);
+      try {
+        const response = await fetch('/api/picks', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            events,
+            league,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setPicks(data.picks || []);
+        } else {
+          console.error('Failed to fetch picks');
+          setPicks([]);
+        }
+      } catch (error) {
+        console.error('Error fetching picks:', error);
+        setPicks([]);
+      } finally {
+        setIsLoadingPicks(false);
+      }
+    };
+
+    fetchPicks();
+  }, [events, league]);
 
   // Helper function to check if an event has valid book odds
   const hasValidBookOdds = (event: EventOdds) => {
@@ -46,6 +88,12 @@ export function EventSelector({
   };
 
   const filteredEvents = useMemo(() => {
+    // Helper function to check if an event has a pick
+    const hasPick = (eventId: string) => {
+      const pick = picks.find((p) => p.eventId === eventId);
+      return pick && pick.pick !== 'none';
+    };
+
     let filtered = events;
 
     // Search filter
@@ -60,17 +108,32 @@ export function EventSelector({
       );
     }
 
-    // Favorite/Underdog filter
-    if (filterBy !== 'all') {
+    // Picks filter
+    if (showPicksOnly) {
+      filtered = filtered.filter((event) => hasPick(event.id));
+    }
+
+    // Model Favorite + Book Underdog filter
+    if (showModelFavBookDog) {
       filtered = filtered.filter((event) => {
         if (!event.odds1 || !event.odds2) return false;
-        const team1IsFavorite = event.odds1 < event.odds2;
-        return filterBy === 'favorites' ? team1IsFavorite : !team1IsFavorite;
+
+        // Check if we have valid book odds
+        const hasBookOdds = hasValidBookOdds(event);
+        if (!hasBookOdds) return false;
+
+        // Check if team1 is model favorite (< 0) and book underdog (> 0)
+        const team1IsModelFavBookDog = event.odds1 < 0 && event.book_odds1! > 0;
+
+        // Check if team2 is model favorite (< 0) and book underdog (> 0)
+        const team2IsModelFavBookDog = event.odds2 < 0 && event.book_odds2! > 0;
+
+        return team1IsModelFavBookDog || team2IsModelFavBookDog;
       });
     }
 
     return filtered;
-  }, [events, searchTerm, filterBy]);
+  }, [events, searchTerm, showModelFavBookDog, showPicksOnly, picks]);
 
   const renderEventCard = (event: EventOdds) => {
     const isSelected = selectedEventIds.includes(event.id);
@@ -80,6 +143,10 @@ export function EventSelector({
     const team1BookProb = calculateProbabilityFromOdds(event.book_odds1 || 0);
     const team2BookProb = calculateProbabilityFromOdds(event.book_odds2 || 0);
     const favorite = team1Prob > team2Prob ? 'team1' : 'team2';
+
+    // Get pick for this event
+    const pick = picks.find((p) => p.eventId === event.id);
+    const hasPick = pick && pick.pick !== 'none';
 
     return (
       <motion.div
@@ -117,6 +184,12 @@ export function EventSelector({
         {!hasValidOdds && (
           <div className='z-10 absolute top-2 right-2 w-6 h-6 bg-destructive rounded-full flex items-center justify-center'>
             <AlertTriangle className='h-4 w-4 text-destructive-foreground' />
+          </div>
+        )}
+
+        {hasPick && (
+          <div className='z-10 absolute top-2 left-2'>
+            <Star className='w-8 h-8 text-white fill-purple-500' />
           </div>
         )}
 
@@ -291,27 +364,21 @@ export function EventSelector({
             className='pl-10'
           />
         </div>
-        <div className='flex gap-2'>
+        <div className='flex flex-wrap gap-2'>
           <Button
-            variant={filterBy === 'all' ? 'default' : 'outline'}
+            variant={showModelFavBookDog ? 'default' : 'outline'}
             size='sm'
-            onClick={() => setFilterBy('all')}
+            onClick={() => setShowModelFavBookDog(!showModelFavBookDog)}
           >
-            All
+            Model Preferred Underdog
           </Button>
           <Button
-            variant={filterBy === 'favorites' ? 'default' : 'outline'}
+            variant={showPicksOnly ? 'default' : 'outline'}
             size='sm'
-            onClick={() => setFilterBy('favorites')}
+            onClick={() => setShowPicksOnly(!showPicksOnly)}
+            disabled={isLoadingPicks}
           >
-            Favorites
-          </Button>
-          <Button
-            variant={filterBy === 'underdogs' ? 'default' : 'outline'}
-            size='sm'
-            onClick={() => setFilterBy('underdogs')}
-          >
-            Underdogs
+            {isLoadingPicks ? 'Loading...' : 'Show Picks Only'}
           </Button>
         </div>
       </div>
@@ -323,7 +390,7 @@ export function EventSelector({
         ) : (
           <Card className='p-8 text-center'>
             <p className='text-muted-foreground'>
-              {searchTerm || filterBy !== 'all'
+              {searchTerm || showModelFavBookDog || showPicksOnly
                 ? 'No events match your search criteria'
                 : `No upcoming ${league} events available`}
             </p>
