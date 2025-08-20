@@ -11,16 +11,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Trophy, Rocket, Heart, UserCircle } from 'lucide-react';
+import {
+  User,
+  LogOut,
+  Trophy,
+  Heart,
+  UserCircle,
+  ListChecks,
+} from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { cn } from '@/utils/cn';
-import { SubNavbar } from './(components)/sub-navbar';
+import { SubNavbar } from '@/components/general/sub-navbar';
 
 const navItems = [
   { href: '/authed/picks', label: 'Picks', icon: Trophy },
   { href: '/authed/saved', label: 'Saved', icon: Heart },
-  { href: '/authed/parlay', label: 'Parlay', icon: Rocket },
+  // { href: '/authed/parlay', label: 'Auto Parlay', icon: Rocket },
+  { href: '/authed/my-parlays', label: 'My Parlays', icon: ListChecks },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -53,14 +61,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 className={cn(
                   'relative py-4 transition-colors hover:text-foreground/80 flex items-center space-x-1',
-                  pathname === item.href
+                  pathname === item.href ||
+                    (item.href === '/authed/my-parlays' &&
+                      pathname.startsWith('/authed/my-parlays'))
                     ? 'text-foreground'
                     : 'text-foreground/60'
                 )}
               >
                 <item.icon className='h-4 w-4' />
                 <span>{item.label}</span>
-                {pathname === item.href && (
+                {(pathname === item.href ||
+                  (item.href === '/authed/my-parlays' &&
+                    pathname.startsWith('/authed/my-parlays'))) && (
                   <motion.div
                     className='absolute bottom-0 left-0 right-0 h-0.5 bg-foreground'
                     layoutId='navbar-indicator'

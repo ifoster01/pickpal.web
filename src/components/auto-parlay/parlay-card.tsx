@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, User } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import Image from 'next/image';
 import { type Parlay } from '@/utils/parlay';
@@ -36,19 +36,30 @@ export function ParlayCard({ parlay }: ParlayCardProps) {
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-3'>
               <div className='flex -space-x-3'>
-                {parlay.legs.slice(0, 2).map((leg) => (
-                  <div
-                    key={leg.eventId}
-                    className='relative w-8 h-8 rounded-full overflow-hidden border-2 border-background bg-white'
-                  >
-                    <Image
-                      src={leg.picUrl || '/placeholder-fighter.png'}
-                      alt={leg.selection || 'Selection'}
-                      fill
-                      className='object-cover object-top'
+                {parlay.legs.slice(0, 2).map((leg) => {
+                  if (leg.picUrl) {
+                    return (
+                      <div
+                        key={leg.eventId}
+                        className='relative w-8 h-8 rounded-full overflow-hidden border-2 border-background bg-white'
+                      >
+                        <Image
+                          src={leg.picUrl}
+                          alt={leg.selection || 'Selection'}
+                          fill
+                          className='object-cover object-top'
+                        />
+                      </div>
+                    );
+                  }
+                  return (
+                    <User
+                      className='h-8 w-8 text-muted-foreground flex-shrink-0'
+                      key={leg.eventId}
                     />
-                  </div>
-                ))}
+                  );
+                })}
+
                 {parlay.legs.length > 2 && (
                   <div className='relative w-8 h-8 rounded-full bg-muted flex items-center justify-center border-2 border-background'>
                     <span className='text-xs'>+{parlay.legs.length - 2}</span>
@@ -98,19 +109,30 @@ export function ParlayCard({ parlay }: ParlayCardProps) {
         <div className='hidden md:flex items-center justify-between'>
           <div className='flex items-center gap-4'>
             <div className='flex -space-x-4'>
-              {parlay.legs.slice(0, 3).map((leg) => (
-                <div
-                  key={leg.eventId}
-                  className='relative w-10 h-10 rounded-full overflow-hidden border-2 border-background bg-white'
-                >
-                  <Image
-                    src={leg.picUrl || '/placeholder-fighter.png'}
-                    alt={leg.selection || 'Selection'}
-                    fill
-                    className='object-cover object-top'
+              {parlay.legs.slice(0, 3).map((leg) => {
+                if (leg.picUrl) {
+                  return (
+                    <div
+                      key={leg.eventId}
+                      className='relative w-10 h-10 rounded-full overflow-hidden border-2 border-background bg-white'
+                    >
+                      <Image
+                        src={leg.picUrl}
+                        alt={leg.selection || 'Selection'}
+                        fill
+                        className='object-cover object-top'
+                      />
+                    </div>
+                  );
+                }
+                return (
+                  <User
+                    className='h-10 w-10 text-muted-foreground flex-shrink-0'
+                    key={leg.eventId}
                   />
-                </div>
-              ))}
+                );
+              })}
+
               {parlay.legs.length > 3 && (
                 <div className='relative w-10 h-10 rounded-full bg-muted flex items-center justify-center border-2 border-background'>
                   <span className='text-sm'>+{parlay.legs.length - 3}</span>
@@ -171,14 +193,18 @@ export function ParlayCard({ parlay }: ParlayCardProps) {
                     className='flex flex-col md:flex-row md:items-center justify-between p-3 rounded-lg bg-accent/50 gap-3'
                   >
                     <div className='flex items-center gap-3'>
-                      <div className='relative w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden'>
-                        <Image
-                          src={leg.picUrl || '/placeholder-fighter.png'}
-                          alt={leg.selection || 'Selection'}
-                          fill
-                          className='object-cover object-top'
-                        />
-                      </div>
+                      {leg.picUrl ? (
+                        <div className='relative w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden'>
+                          <Image
+                            src={leg.picUrl}
+                            alt={leg.selection || 'Selection'}
+                            fill
+                            className='object-cover object-top'
+                          />
+                        </div>
+                      ) : (
+                        <User className='h-8 w-8 text-muted-foreground flex-shrink-0' />
+                      )}
                       <div>
                         <p className='font-medium text-sm md:text-base'>
                           {leg.selection}

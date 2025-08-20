@@ -35,9 +35,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ pick: 'none' }, { status: 200 });
   }
   if (league === 'atp') {
-    // the favorite's odds are less than -100
+    // the favorite's odds are less than -130
     // the book odds agree on the favorite
-    // the book odds are less than -122
+    // the book odds are less than -150
     const odds_threshold = -130;
     const book_odds_threshold = -150;
     if (

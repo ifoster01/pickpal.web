@@ -132,6 +132,19 @@ export function Footer() {
         </div>
 
         <div className='mt-8 pt-8 border-t text-center text-sm text-muted-foreground'>
+          <p>
+            If you or someone you know is struggling with gambling, help is
+            available. Contact the{' '}
+            <span className='font-bold'>
+              National Problem Gambling Helpline at 1-800-522-4700
+            </span>{' '}
+            for confidential support, available 24/7. Talking to a professional
+            can provide guidance, resources, and support tailored to your needs.
+            Remember, help is just a call away.
+          </p>
+        </div>
+
+        <div className='mt-8 pt-8 border-t text-center text-sm text-muted-foreground'>
           <p>© {new Date().getFullYear()} Pickpockt. All rights reserved.</p>
         </div>
       </div>

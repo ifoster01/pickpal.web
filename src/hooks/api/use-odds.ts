@@ -33,7 +33,7 @@ export function useEventOdds(eventId: string) {
 
 export function useUpcomingEventOdds(
   filter: Filter = 'upcoming',
-  eventType: League,
+  eventType: League | null = null,
   count: number = 1000,
   dateOrder: 'asc' | 'desc' = 'asc'
 ) {
@@ -45,8 +45,13 @@ export function useUpcomingEventOdds(
       let query = supabase
         .from('event_moneyline_odds')
         .select('*')
-        .eq('event_type', eventType)
         .limit(count);
+
+      console.log('eventType', eventType);
+
+      if (eventType) {
+        query = query.eq('event_type', eventType);
+      }
 
       if (dateOrder === 'asc' && filter === 'upcoming') {
         query = query.order('event_datetime', { ascending: true });

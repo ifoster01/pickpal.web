@@ -7,7 +7,7 @@ export type Json =
   | Json[];
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: '12.2.3 (519615d)';
@@ -166,6 +166,60 @@ export type Database = {
           },
         ];
       };
+      parlay_leg: {
+        Row: {
+          created_at: string;
+          event_id: string;
+          parlay_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          event_id: string;
+          parlay_id?: string;
+        };
+        Update: {
+          created_at?: string;
+          event_id?: string;
+          parlay_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'parlay_leg_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'event_moneyline_odds';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'parlay_leg_parlay_id_fkey';
+            columns: ['parlay_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_parlays';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      user_parlays: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          name: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          name?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          name?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -188,17 +242,17 @@ export type Database = {
       get_tournament_event_date_ranges: {
         Args: { p_tournament_name: string };
         Returns: {
-          event_year: number;
           earliest_event_datetime: string;
+          event_year: number;
           latest_event_datetime: string;
         }[];
       };
       get_tournaments_with_dates: {
         Args: { p_event_type: string };
         Returns: {
+          tournament_end_date: string;
           tournament_name: string;
           tournament_start_date: string;
-          tournament_end_date: string;
         }[];
       };
       get_ufc_tournaments: {

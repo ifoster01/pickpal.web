@@ -1,6 +1,13 @@
 'use client';
 
-import { Heart, Rocket, Trophy, User, LogOut, ChevronLeft } from 'lucide-react';
+import {
+  Heart,
+  Trophy,
+  User,
+  LogOut,
+  ChevronLeft,
+  ListChecks,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -26,9 +33,9 @@ const authedRoutes = [
     icon: <Heart className='w-5 h-5' />,
   },
   {
-    name: 'Parlay',
-    path: '/authed/parlay',
-    icon: <Rocket className='w-5 h-5' />,
+    name: 'My Parlays',
+    path: '/authed/my-parlays',
+    icon: <ListChecks className='w-5 h-5' />,
   },
 ];
 
