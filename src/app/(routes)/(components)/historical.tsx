@@ -30,6 +30,11 @@ export function Historical() {
   const { data: nflEvents } = useUpcomingEventOdds('past', 'nfl', 10, 'desc');
   const { data: nbaEvents } = useUpcomingEventOdds('past', 'nba', 10, 'desc');
 
+  console.log('ufcEvents', ufcEvents);
+  console.log('atpEvents', atpEvents);
+  console.log('nflEvents', nflEvents);
+  console.log('nbaEvents', nbaEvents);
+
   const sportsData: SportsData = useMemo(() => {
     const processEvents = (
       events: Tables<'event_moneyline_odds'>[] | undefined,

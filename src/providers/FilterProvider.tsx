@@ -72,7 +72,7 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
       let clientWeeks: WeekRange[] = [];
 
       try {
-        if (currentLeague === 'atp' || currentLeague === 'ufc') {
+        if (currentLeague === 'atp' || currentLeague === 'ufc' || currentLeague === 'nfl') {
           clientWeeks = await generateEventRanges(currentLeague);
         } else {
           clientWeeks = generateWeekRanges();

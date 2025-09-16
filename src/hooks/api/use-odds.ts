@@ -47,8 +47,6 @@ export function useUpcomingEventOdds(
         .select('*')
         .limit(count);
 
-      console.log('eventType', eventType);
-
       if (eventType) {
         query = query.eq('event_type', eventType);
       }
@@ -61,6 +59,7 @@ export function useUpcomingEventOdds(
 
       if (filter !== 'all') {
         const now = new Date();
+        now.setDate(now.getDate() - 1);
         const cutoffDate = new Date(
           Date.UTC(
             now.getUTCFullYear(),
