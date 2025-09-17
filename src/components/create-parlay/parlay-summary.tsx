@@ -41,8 +41,6 @@ export function ParlaySummary({
     }
   };
 
-  console.log(parlayCalculations);
-
   const potentialModelPayout = parlayCalculations
     ? calculatePayout(parlayCalculations.totalModelOdds)
     : 0;

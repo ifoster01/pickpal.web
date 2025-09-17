@@ -30,7 +30,6 @@ export function TeamImages({
   team: Team;
   pick: boolean;
 }) {
-  console.log(pick, team.odds, team.bookOdds);
   return (
     <div className='relative'>
       <Avatar
