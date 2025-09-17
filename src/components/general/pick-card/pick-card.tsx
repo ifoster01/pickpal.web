@@ -53,7 +53,7 @@ export function PickCard({
   const { data: pick } = usePick(event, league);
 
   const team1: Team = {
-    name: event.team1 || '',
+    name: event.team1_name || '',
     odds: event.odds1 || 0,
     bookOdds: event.book_odds1 || 0,
     probability: calculateProbabilityFromOdds(event.odds1 || 0),
@@ -62,7 +62,7 @@ export function PickCard({
   };
 
   const team2: Team = {
-    name: event.team2 || '',
+    name: event.team2_name || '',
     odds: event.odds2 || 0,
     bookOdds: event.book_odds2 || 0,
     probability: calculateProbabilityFromOdds(event.odds2 || 0),
