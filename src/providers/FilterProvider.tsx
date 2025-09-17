@@ -88,7 +88,7 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
         const savedWeekKey = localStorage.getItem('selectedWeekKey');
         const savedWeek = clientWeeks.find((week) => week.key === savedWeekKey);
 
-        if (currentLeague === 'atp' || currentLeague === 'ufc') {
+        if (currentLeague === 'atp' || currentLeague === 'ufc' || currentLeague === 'nfl') {
           // Set the initial week from localStorage or default to the current week
           setSelectedWeek(savedWeek || clientWeeks[clientWeeks.length - 1]);
         } else {
