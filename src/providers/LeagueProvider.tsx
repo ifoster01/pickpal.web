@@ -12,7 +12,7 @@ interface LeagueContextType {
 const LeagueContext = createContext<LeagueContextType | undefined>(undefined);
 
 export function LeagueProvider({ children }: { children: React.ReactNode }) {
-  const [league, setLeague] = useState<League>('ufc');
+  const [league, setLeague] = useState<League>('nfl');
 
   // Persist league selection to localStorage
   useEffect(() => {

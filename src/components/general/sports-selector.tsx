@@ -27,9 +27,9 @@ interface SportOption {
 }
 
 const sportOptions: SportOption[] = [
+  { value: 'nfl', label: 'NFL Games', shortLabel: 'NFL' },
   { value: 'ufc', label: 'UFC Fights', shortLabel: 'UFC' },
   { value: 'atp', label: 'ATP Matches', shortLabel: 'ATP' },
-  { value: 'nfl', label: 'NFL Games', shortLabel: 'NFL' },
   { value: 'nba', label: 'NBA Games', shortLabel: 'NBA' },
 ];
 
